@@ -2,7 +2,7 @@
 // All terminal output is buffered and flushed atomically via looping write.
 // STDOUT_FILENO stays blocking; only /dev/tty (input fd) is opened O_NONBLOCK.
 
-import Darwin
+import Foundation
 
 final class ANSITerminal: TUIOutputPort {
 
