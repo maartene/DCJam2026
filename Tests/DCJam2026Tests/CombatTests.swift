@@ -51,8 +51,7 @@ struct CombatTests {
         #expect(bracedDamage < unbracedDamage)
     }
 
-    @Test("Brace keeps Ember in the encounter — it does not end combat",
-          .disabled("not yet implemented"))
+    @Test("Brace keeps Ember in the encounter — it does not end combat")
     func braceKeepsEncounterActive() {
         // Given
         let state = gameStateInRegularEncounter()
