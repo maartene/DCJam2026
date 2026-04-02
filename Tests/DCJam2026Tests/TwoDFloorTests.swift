@@ -137,11 +137,37 @@ struct TwoDFloorTests {
 
     // MARK: - US-TM-03: Game rule preservation after movement
 
-    @Test("Encounter proximity check still fires when Ember steps onto the encounter cell", .disabled("not yet implemented"))
-    func encounterProximityCheckAppliedAfterMove() {}
+    @Test("Encounter proximity check still fires when Ember steps onto the encounter cell")
+    func encounterProximityCheckAppliedAfterMove() {
+        // Ember is one step south of the encounter cell (7,3), facing North.
+        let start = GameState.initial(config: .default)
+            .withPlayerPosition(Position(x: 7, y: 2))
+            .withFacingDirection(.north)
+        let result = RulesEngine.apply(command: .move(.forward), to: start, deltaTime: 0)
+        if case .combat = result.screenMode {
+            // Expected: stepping onto encounter cell (7,3) triggers combat mode.
+        } else {
+            Issue.record("Expected .combat screen mode after stepping onto encounter cell, got \(result.screenMode)")
+        }
+    }
 
-    @Test("Win condition is checked when Ember reaches the exit cell with the egg", .disabled("not yet implemented"))
-    func winConditionCheckedAfterMoveToExit() {}
+    @Test("Win condition is checked when Ember reaches the exit cell with the egg")
+    func winConditionCheckedAfterMoveToExit() {
+        // Ember is one step south of the exit cell (7,6) on the final floor, facing North, carrying the egg.
+        // The final floor (maxFloors=5) has hasExitSquare=true, which activates the win condition check.
+        let finalFloor = GameConfig.default.maxFloors
+        let start = GameState.initial(config: .default)
+            .withCurrentFloor(finalFloor)
+            .withPlayerPosition(Position(x: 7, y: 5))
+            .withFacingDirection(.north)
+            .withHasEgg(true)
+        let result = RulesEngine.apply(command: .move(.forward), to: start, deltaTime: 0)
+        if case .narrativeOverlay(let event) = result.screenMode, event == .exitPatio {
+            // Expected: stepping onto exit cell (7,6) with egg triggers the exit narrative overlay.
+        } else {
+            Issue.record("Expected .narrativeOverlay(.exitPatio) screen mode after stepping onto exit with egg, got \(result.screenMode)")
+        }
+    }
 
     // MARK: - US-TM-03: 2D floor grid structure
 
