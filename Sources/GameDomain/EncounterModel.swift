@@ -1,12 +1,12 @@
 // EncounterModel — state of a single enemy encounter.
 
-struct EncounterModel: Sendable {
-    let isBossEncounter: Bool
-    var enemyHP: Int
+public struct EncounterModel: Sendable {
+    public let isBossEncounter: Bool
+    public var enemyHP: Int
     /// Seconds remaining until the enemy's next attack. Counts down each tick.
-    var enemyAttackTimer: Double
+    public var enemyAttackTimer: Double
 
-    static func `guard`(isBossEncounter: Bool) -> EncounterModel {
+    public static func `guard`(isBossEncounter: Bool) -> EncounterModel {
         EncounterModel(
             isBossEncounter: isBossEncounter,
             enemyHP: isBossEncounter ? 120 : 40,
@@ -14,7 +14,7 @@ struct EncounterModel: Sendable {
         )
     }
 
-    static func boss() -> EncounterModel {
+    public static func boss() -> EncounterModel {
         EncounterModel(isBossEncounter: true, enemyHP: 120, enemyAttackTimer: GameConfig.default.enemyAttackInterval)
     }
 }

@@ -1,9 +1,9 @@
 // RulesEngine — pure function driving port: (GameState, GameCommand, deltaTime) → GameState.
 // All game rules live here. No I/O, no side effects.
 
-enum RulesEngine {
+public enum RulesEngine {
 
-    static func apply(command: GameCommand, to state: GameState, deltaTime: Double) -> GameState {
+    public static func apply(command: GameCommand, to state: GameState, deltaTime: Double) -> GameState {
         // Advance timers first on every tick.
         let next = advanceTimers(state, deltaTime: deltaTime)
 
@@ -90,11 +90,13 @@ enum RulesEngine {
 
     private static func applyMove(_ direction: MoveDirection, to state: GameState) -> GameState {
         // Movement is locked when in combat — only Dash exits an encounter.
-        if case .combat = state.screenMode {
-            return state
-        }
+        if case .combat = state.screenMode { return state }
+        // Movement is locked during narrative overlays — player must confirm first.
+        if case .narrativeOverlay = state.screenMode { return state }
 
         guard direction == .forward else { return state }
+        // Clear the post-dash feedback on the first step after a dash.
+        let state = state.withRecentDash(false)
 
         let newPos = state.playerPosition + 1
         let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
@@ -123,6 +125,12 @@ enum RulesEngine {
                 .withScreenMode(.narrativeOverlay(event: .eggDiscovery))
         }
 
+        // Step into an encounter.
+        if let encounterPos = floor.encounterPosition, newPos == encounterPos {
+            let encounter = EncounterModel.guard(isBossEncounter: floor.hasBossEncounter)
+            return state.withPlayerPosition(newPos).withScreenMode(.combat(encounter: encounter))
+        }
+
         return state.withPlayerPosition(newPos)
     }
 
@@ -140,6 +148,7 @@ enum RulesEngine {
             .withTimerModel(newTimer)
             .withPlayerPosition(state.playerPosition + 3)
             .withScreenMode(.dungeon)
+            .withRecentDash(true)
     }
 
     // MARK: - Brace

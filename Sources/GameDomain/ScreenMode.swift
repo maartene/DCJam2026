@@ -1,6 +1,6 @@
 // ScreenMode — drives renderer strategy selection (see CLAUDE.md).
 
-enum ScreenMode: Sendable {
+public enum ScreenMode: Sendable {
     case dungeon
     case combat(encounter: EncounterModel)
     case narrativeOverlay(event: NarrativeEvent)

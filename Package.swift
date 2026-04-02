@@ -11,15 +11,17 @@ let package = Package(
             name: "GameDomain",
             path: "Sources/GameDomain"
         ),
-        // Entry point executable. Wires all modules and starts the game loop.
+        // Entry point executable. Imports GameDomain; all TUI layers compiled as one module.
         .executableTarget(
             name: "DCJam2026",
-            dependencies: ["GameDomain"]
+            dependencies: ["GameDomain"],
+            path: "Sources/App"
         ),
         // Acceptance tests invoke GameDomain directly. No mocks. No terminal I/O.
         .testTarget(
             name: "DCJam2026Tests",
-            dependencies: ["GameDomain"]
+            dependencies: ["GameDomain"],
+            path: "Tests/DCJam2026Tests"
         ),
     ],
     swiftLanguageModes: [.v6]

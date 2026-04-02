@@ -1,6 +1,6 @@
 // GameCommand — all player inputs the RulesEngine can receive.
 
-enum GameCommand: Sendable {
+public enum GameCommand: Sendable {
     case move(MoveDirection)
     case dash
     case brace
@@ -11,7 +11,7 @@ enum GameCommand: Sendable {
     case none
 }
 
-enum MoveDirection: Sendable {
+public enum MoveDirection: Sendable {
     case forward
     case backward
     case turnLeft

@@ -1,34 +1,34 @@
 // UpgradePool — pool of available upgrades for milestone prompts.
 // Excludes already-selected upgrades from future draws.
 
-struct UpgradePool: Sendable {
+public struct UpgradePool: Sendable {
     private let available: [Upgrade]
 
-    init(alreadySelected: [Upgrade]) {
+    public init(alreadySelected: [Upgrade]) {
         let takenIDs = Set(alreadySelected.map { $0.id })
         available = UpgradePool.allUpgrades.filter { !takenIDs.contains($0.id) }
     }
 
     /// Returns up to `count` unique upgrades drawn from the pool.
-    func drawChoices(count: Int) -> [Upgrade] {
+    public func drawChoices(count: Int) -> [Upgrade] {
         Array(available.prefix(count))
     }
 
     // MARK: - Named upgrade factories (used by tests and RulesEngine)
 
-    static func cooldownReductionUpgrade() -> Upgrade {
+    public static func cooldownReductionUpgrade() -> Upgrade {
         Upgrade(id: "cooldown-reduction", name: "Ember's Fury",
                 effect: .reduceDashCooldown(factor: 0.75))
     }
 
-    static func chargeCapUpgrade() -> Upgrade {
+    public static func chargeCapUpgrade() -> Upgrade {
         Upgrade(id: "charge-cap", name: "Dragon Endurance",
                 effect: .increaseDashChargeCap(by: 1))
     }
 
     // MARK: - Full pool (8 upgrades per CLAUDE.md)
 
-    static let allUpgrades: [Upgrade] = [
+    public static let allUpgrades: [Upgrade] = [
         Upgrade(id: "cooldown-reduction",  name: "Ember's Fury",      effect: .reduceDashCooldown(factor: 0.75)),
         Upgrade(id: "charge-cap",          name: "Dragon Endurance",  effect: .increaseDashChargeCap(by: 1)),
         Upgrade(id: "hp-boost",            name: "Dragonhide",        effect: .increaseMaxHP(by: 25)),

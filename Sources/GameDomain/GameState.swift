@@ -1,27 +1,29 @@
 // GameState — complete snapshot of a run. Pure value type; all mutations produce new copies.
 
-struct GameState: Sendable {
-    var hp: Int
-    var dashCharges: Int
-    var specialCharge: Double
-    var hasEgg: Bool
-    var currentFloor: Int
-    var playerPosition: Int
-    var screenMode: ScreenMode
-    var timerModel: TimerModel
-    var activeUpgrades: [Upgrade]
-    var config: GameConfig
+public struct GameState: Sendable {
+    public var hp: Int
+    public var dashCharges: Int
+    public var specialCharge: Double
+    public var hasEgg: Bool
+    public var currentFloor: Int
+    public var playerPosition: Int
+    public var screenMode: ScreenMode
+    public var timerModel: TimerModel
+    public var activeUpgrades: [Upgrade]
+    public var config: GameConfig
 
     /// Seconds remaining in the active Brace invulnerability window (0 = not active).
-    var braceWindowTimer: Double
+    public var braceWindowTimer: Double
     /// Seconds remaining before Brace can be used again (0 = ready).
-    var braceCooldownTimer: Double
+    public var braceCooldownTimer: Double
+    /// True for the first dungeon tick after a successful Dash — used to show feedback text.
+    public var recentDash: Bool
 
-    var specialIsReady: Bool { specialCharge >= 1.0 }
-    var braceWindowActive: Bool { braceWindowTimer > 0 }
-    var braceOnCooldown: Bool { braceCooldownTimer > 0 }
+    public var specialIsReady: Bool { specialCharge >= 1.0 }
+    public var braceWindowActive: Bool { braceWindowTimer > 0 }
+    public var braceOnCooldown: Bool { braceCooldownTimer > 0 }
 
-    static func initial(config: GameConfig) -> GameState {
+    public static func initial(config: GameConfig) -> GameState {
         GameState(
             hp: config.maxHP,
             dashCharges: config.dashStartingCharges,
@@ -34,57 +36,62 @@ struct GameState: Sendable {
             activeUpgrades: [],
             config: config,
             braceWindowTimer: 0.0,
-            braceCooldownTimer: 0.0
+            braceCooldownTimer: 0.0,
+            recentDash: false
         )
     }
 
     // MARK: - Functional update helpers
 
-    func withHP(_ hp: Int) -> GameState {
+    public func withHP(_ hp: Int) -> GameState {
         var s = self; s.hp = hp; return s
     }
 
-    func withDashCharges(_ charges: Int) -> GameState {
+    public func withDashCharges(_ charges: Int) -> GameState {
         var s = self; s.dashCharges = charges; return s
     }
 
-    func withSpecialCharge(_ charge: Double) -> GameState {
+    public func withSpecialCharge(_ charge: Double) -> GameState {
         var s = self; s.specialCharge = charge; return s
     }
 
-    func withHasEgg(_ hasEgg: Bool) -> GameState {
+    public func withHasEgg(_ hasEgg: Bool) -> GameState {
         var s = self; s.hasEgg = hasEgg; return s
     }
 
-    func withCurrentFloor(_ floor: Int) -> GameState {
+    public func withCurrentFloor(_ floor: Int) -> GameState {
         var s = self; s.currentFloor = floor; return s
     }
 
-    func withPlayerPosition(_ pos: Int) -> GameState {
+    public func withPlayerPosition(_ pos: Int) -> GameState {
         var s = self; s.playerPosition = pos; return s
     }
 
-    func withScreenMode(_ mode: ScreenMode) -> GameState {
+    public func withScreenMode(_ mode: ScreenMode) -> GameState {
         var s = self; s.screenMode = mode; return s
     }
 
-    func withTimerModel(_ model: TimerModel) -> GameState {
+    public func withTimerModel(_ model: TimerModel) -> GameState {
         var s = self; s.timerModel = model; return s
     }
 
-    func withActiveUpgrades(_ upgrades: [Upgrade]) -> GameState {
+    public func withActiveUpgrades(_ upgrades: [Upgrade]) -> GameState {
         var s = self; s.activeUpgrades = upgrades; return s
     }
 
-    func withConfig(_ config: GameConfig) -> GameState {
+    public func withConfig(_ config: GameConfig) -> GameState {
         var s = self; s.config = config; return s
     }
 
-    func withBraceWindowTimer(_ t: Double) -> GameState {
+    public func withBraceWindowTimer(_ t: Double) -> GameState {
         var s = self; s.braceWindowTimer = t; return s
     }
 
-    func withBraceCooldownTimer(_ t: Double) -> GameState {
+    public func withBraceCooldownTimer(_ t: Double) -> GameState {
         var s = self; s.braceCooldownTimer = t; return s
+    }
+
+    public func withRecentDash(_ v: Bool) -> GameState {
+        var s = self; s.recentDash = v; return s
     }
 }
