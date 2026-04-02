@@ -138,12 +138,18 @@ public enum RulesEngine {
         let newPos = Position(x: state.playerPosition.x + d.dx, y: state.playerPosition.y + d.dy)
 
         // Descend staircase — triggers when stepping onto or through the staircase cell.
+        // Checked before the passability guard: the "step through" case lands out-of-bounds.
         let isAtOrPastStaircase = (newPos == floor.staircasePosition2D)
             || (state.playerPosition == floor.staircasePosition2D && direction == .forward)
         if !floor.hasExitSquare && isAtOrPastStaircase {
             let nextFloor = state.currentFloor + 1
             let nextFloorMap = FloorGenerator.generate(floorNumber: nextFloor, config: state.config)
             return state.withCurrentFloor(nextFloor).withPlayerPosition(nextFloorMap.entryPosition)
+        }
+
+        // Wall collision — block movement into non-passable cells (walls or out-of-bounds).
+        guard floor.grid.cell(x: newPos.x, y: newPos.y).isPassable else {
+            return state
         }
 
         // Step onto exit square (requires egg for win).

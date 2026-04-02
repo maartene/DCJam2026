@@ -52,11 +52,12 @@ struct TwoDFloorTests {
 
     @Test("Moving forward while facing East advances Ember by (dx:+1, dy:0)")
     func forwardEastAppliesCorrectDelta() {
+        // Use branch corridor (y=3, x=4..5 are passable) to verify East delta.
         let start = GameState.initial(config: .default)
-            .withPlayerPosition(Position(x: 7, y: 4))
+            .withPlayerPosition(Position(x: 4, y: 3))
             .withFacingDirection(.east)
         let result = RulesEngine.apply(command: .move(.forward), to: start, deltaTime: 0)
-        #expect(result.playerPosition == Position(x: 8, y: 4))
+        #expect(result.playerPosition == Position(x: 5, y: 3))
     }
 
     @Test("Moving forward while facing South retreats Ember by (dx:0, dy:-1)")
@@ -70,44 +71,69 @@ struct TwoDFloorTests {
 
     @Test("Moving forward while facing West retreats Ember by (dx:-1, dy:0)")
     func forwardWestAppliesCorrectDelta() {
+        // Use branch corridor (y=3, x=5..4 are passable) to verify West delta.
         let start = GameState.initial(config: .default)
-            .withPlayerPosition(Position(x: 7, y: 4))
+            .withPlayerPosition(Position(x: 5, y: 3))
             .withFacingDirection(.west)
         let result = RulesEngine.apply(command: .move(.forward), to: start, deltaTime: 0)
-        #expect(result.playerPosition == Position(x: 6, y: 4))
+        #expect(result.playerPosition == Position(x: 4, y: 3))
     }
 
     @Test("Moving backward produces the inverse delta for all four facings")
     func backwardIsInverseOfForward() {
-        let startPos = Position(x: 7, y: 4)
-        let facings: [CardinalDirection] = [.north, .east, .south, .west]
-        let expectedBackward: [Position] = [
-            Position(x: 7, y: 3),   // backward north = dy:-1
-            Position(x: 6, y: 4),   // backward east  = dx:-1
-            Position(x: 7, y: 5),   // backward south = dy:+1
-            Position(x: 8, y: 4),   // backward west  = dx:+1
+        // Each case uses a start position where the backward target is a passable corridor cell.
+        // backward north (dy:-1): (7,4)→(7,3) — main corridor
+        // backward east  (dx:-1): (5,3)→(4,3) — branch corridor
+        // backward south (dy:+1): (7,4)→(7,5) — main corridor
+        // backward west  (dx:+1): (4,3)→(5,3) — branch corridor
+        let cases: [(start: Position, facing: CardinalDirection, expected: Position)] = [
+            (Position(x: 7, y: 4), .north, Position(x: 7, y: 3)),
+            (Position(x: 5, y: 3), .east,  Position(x: 4, y: 3)),
+            (Position(x: 7, y: 4), .south, Position(x: 7, y: 5)),
+            (Position(x: 4, y: 3), .west,  Position(x: 5, y: 3)),
         ]
-        for (facing, expected) in zip(facings, expectedBackward) {
+        for c in cases {
             let start = GameState.initial(config: .default)
-                .withPlayerPosition(startPos)
-                .withFacingDirection(facing)
+                .withPlayerPosition(c.start)
+                .withFacingDirection(c.facing)
             let result = RulesEngine.apply(command: .move(.backward), to: start, deltaTime: 0)
-            #expect(result.playerPosition == expected, "backward from \(facing) should give \(expected)")
+            #expect(result.playerPosition == c.expected, "backward from \(c.facing) should give \(c.expected)")
         }
     }
 
     // MARK: - US-TM-03: Wall collision
 
-    @Test("Ember cannot step into a wall cell — position is unchanged", .disabled("not yet implemented"))
-    func movementIntoWallIsBlocked() {}
+    @Test("Ember cannot step into a wall cell — position is unchanged")
+    func movementIntoWallIsBlocked() {
+        // Player at (7,4) facing East. Cell (8,4) is a wall (off the main corridor).
+        let start = GameState.initial(config: .default)
+            .withPlayerPosition(Position(x: 7, y: 4))
+            .withFacingDirection(.east)
+        let result = RulesEngine.apply(command: .move(.forward), to: start, deltaTime: 0)
+        #expect(result.playerPosition == Position(x: 7, y: 4), "Stepping into a wall should leave position unchanged")
+    }
 
     // MARK: - US-TM-03: Bounds clamping
 
-    @Test("Ember's position is clamped at the south boundary — cannot step below y=0", .disabled("not yet implemented"))
-    func movementClampedAtSouthBoundary() {}
+    @Test("Ember's position is clamped at the south boundary — cannot step below y=0")
+    func movementClampedAtSouthBoundary() {
+        // Player at (7,0) facing South. Candidate (7,-1) is out-of-bounds → treated as wall.
+        let start = GameState.initial(config: .default)
+            .withPlayerPosition(Position(x: 7, y: 0))
+            .withFacingDirection(.south)
+        let result = RulesEngine.apply(command: .move(.forward), to: start, deltaTime: 0)
+        #expect(result.playerPosition == Position(x: 7, y: 0), "Stepping south off the grid should leave position unchanged")
+    }
 
-    @Test("Ember's position is clamped at the west boundary — cannot step past x=0", .disabled("not yet implemented"))
-    func movementClampedAtWestBoundary() {}
+    @Test("Ember's position is clamped at the west boundary — cannot step past x=0")
+    func movementClampedAtWestBoundary() {
+        // Player at (2,3) facing West. Cell (1,3) is a wall (branch corridor starts at x=2).
+        let start = GameState.initial(config: .default)
+            .withPlayerPosition(Position(x: 2, y: 3))
+            .withFacingDirection(.west)
+        let result = RulesEngine.apply(command: .move(.forward), to: start, deltaTime: 0)
+        #expect(result.playerPosition == Position(x: 2, y: 3), "Stepping into a wall at the west end of the branch should leave position unchanged")
+    }
 
     // MARK: - US-TM-03: Game rule preservation after movement
 
