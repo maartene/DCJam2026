@@ -96,32 +96,15 @@ public enum RulesEngine {
 
     // MARK: - Turning
 
-    private static func applyTurn(_ dir: TurnDirection, to state: GameState) -> GameState {
+    private static func applyTurn(_ turn: TurnDirection, to state: GameState) -> GameState {
         if case .combat = state.screenMode { return state }
-        let newFacing: CardinalDirection
-        switch (state.facingDirection, dir) {
-        case (.north, .left):  newFacing = .west
-        case (.north, .right): newFacing = .east
-        case (.east, .left):   newFacing = .north
-        case (.east, .right):  newFacing = .south
-        case (.south, .left):  newFacing = .east
-        case (.south, .right): newFacing = .west
-        case (.west, .left):   newFacing = .south
-        case (.west, .right):  newFacing = .north
-        }
-        return state.withFacingDirection(newFacing)
+        return state.withFacingDirection(state.facingDirection.turned(by: turn))
     }
 
     // MARK: - Movement
 
     private static func delta(facing: CardinalDirection, direction: MoveDirection) -> (dx: Int, dy: Int) {
-        let forward: (dx: Int, dy: Int)
-        switch facing {
-        case .north: forward = (dx:  0, dy: +1)
-        case .east:  forward = (dx: +1, dy:  0)
-        case .south: forward = (dx:  0, dy: -1)
-        case .west:  forward = (dx: -1, dy:  0)
-        }
+        let forward = facing.forwardDelta
         return direction == .forward ? forward : (dx: -forward.dx, dy: -forward.dy)
     }
 

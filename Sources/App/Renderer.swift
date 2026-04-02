@@ -106,7 +106,7 @@ final class Renderer {
         let key = dungeonFrameKey(grid: floor.grid, position: state.playerPosition, facing: state.facingDirection)
         let frameLines = frames[key] ?? fallbackFrame(for: key)
         for (i, line) in frameLines.enumerated() {
-            output.moveCursor(row: i + 2, col: 2)
+            output.moveCursor(row: i + Self.mainViewFirstRow, col: 2)
             output.write(line)
         }
 
@@ -121,12 +121,16 @@ final class Renderer {
 
     private func renderCombat(_ state: GameState, encounter: EncounterModel) {
         let lines = buildCombatFrame(state, encounter: encounter)
-        for (i, line) in lines.enumerated() where i < 15 {
-            output.moveCursor(row: i + 2, col: 2)
+        for (i, line) in lines.enumerated() where i < Self.mainViewLineCount {
+            output.moveCursor(row: i + Self.mainViewFirstRow, col: 2)
             output.write(line)
         }
     }
 
+    private static let mainViewLineCount = 15
+    private static let mainViewFirstRow = 2
+    private static let mainViewLastRow = 16
+    private static let thoughtsLineWidth = 77
     private static let enemyHPBarWidth = 20
     private static let specialMeterWidth = 8
     private static let hpBarWidth = 10
@@ -178,8 +182,8 @@ final class Renderer {
         lines.append(pad78(centered("(1) DASH    (2) BRACE    (3) SPECIAL", width: 78)))
         lines.append(pad78(""))
 
-        while lines.count < 15 { lines.append(pad78("")) }
-        return Array(lines.prefix(15))
+        while lines.count < Self.mainViewLineCount { lines.append(pad78("")) }
+        return Array(lines.prefix(Self.mainViewLineCount))
     }
 
     // MARK: - Narrative overlay (rows 2-16)
@@ -341,10 +345,10 @@ final class Renderer {
     // MARK: - Thoughts (rows 21-24)
 
     private func drawThoughts(_ lines: [String]) {
-        // Word-wrap each entry to 77 chars (1 leading space eats the last column).
+        // Word-wrap each entry to thoughtsLineWidth chars (1 leading space eats the last column).
         var wrapped: [String] = []
         for line in lines {
-            wrapped += wordWrap(line, width: 77)
+            wrapped += wordWrap(line, width: Self.thoughtsLineWidth)
         }
         for row in 21...24 {
             output.moveCursor(row: row, col: 2)
@@ -470,9 +474,9 @@ final class Renderer {
 
     // MARK: - Helpers
 
-    /// Blanks the main view area (rows 2-16, col 2 onwards) before drawing a full-screen overlay.
+    /// Blanks the main view area before drawing a full-screen overlay.
     private func clearMainView() {
-        for row in 2...16 {
+        for row in Self.mainViewFirstRow...Self.mainViewLastRow {
             output.moveCursor(row: row, col: 2)
             output.write(pad78(""))
         }

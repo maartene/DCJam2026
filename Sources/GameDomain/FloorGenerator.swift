@@ -28,14 +28,7 @@ public enum FloorGenerator {
         let hasEggRoom = !isFirstFloor && !isFinalFloor && floorNumber == eggFloor
         let eggPos2D: Position? = hasEggRoom ? egg2D : nil
 
-        let encounterPos2D: Position?
-        if isFinalFloor {
-            encounterPos2D = bossEncounter2D
-        } else if hasEggRoom || (!isFirstFloor && !isFinalFloor) {
-            encounterPos2D = encounter2D
-        } else {
-            encounterPos2D = encounter2D
-        }
+        let encounterPos2D: Position? = isFinalFloor ? bossEncounter2D : encounter2D
 
         let grid = buildGrid(eggPosition: eggPos2D)
 
