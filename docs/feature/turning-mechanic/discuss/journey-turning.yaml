@@ -1,0 +1,252 @@
+journey:
+  name: "Turning Mechanic"
+  feature_id: "turning-mechanic"
+  goal: "Ember can turn to face any cardinal direction and move relative to facing, maintaining spatial awareness via the minimap at all times"
+  persona: "Ember — player navigating Dragon Escape dungeons"
+  jam_constraint: "DCJam 2026 rule: 90-degree turns in four cardinal directions, keyboard-invoked"
+
+  emotional_arc:
+    start: "Curious and slightly disoriented — new floor, unknown layout"
+    middle: "Engaged and in control — turning reveals new corridors, minimap confirms orientation"
+    end: "Confident and oriented — knows exactly which direction leads to egg/exit"
+
+  settled_decisions:
+    - "Minimap is primary UX concern (WD-01)"
+    - "Facing does not affect combat (WD-02)"
+    - "Movement is facing-relative (WD-03)"
+    - "90-degree turns, keyboard-invoked (WD-04)"
+    - "W/S forward/back; A/D turn left/right (WD-06)"
+    - "Arrow Left/Right = turn left/right (WD-07)"
+    - "Turning allowed in combat (WD-08)"
+    - "Minimap in Thoughts panel rows 21-24 (WD-09)"
+    - "Facing indicator: caret appended to player circle (WD-10)"
+
+steps:
+  - id: 1
+    name: "Enter floor — default facing North"
+    trigger: "Player transitions to a new floor (staircase or game start)"
+    action: "GameState initialises facingDirection = .north"
+
+    tui_mockup: |
+      Thoughts row 21:
+        Floor 2:  [E...○^..G..*..S]  Facing: N
+
+    shared_artifacts:
+      - name: "facingDirection"
+        source: "GameState.facingDirection"
+        displayed_as: "caret on minimap player marker (^/>/ v/<) + Facing: label"
+        consumers:
+          - "Renderer.buildMinimap (Thoughts panel)"
+          - "RulesEngine.apply(move:) for grid delta resolution"
+          - "DungeonFrameKey depth computation"
+
+    emotional_state:
+      entry: "Curious — new floor, unknown corridor layout"
+      exit: "Oriented — minimap shows North facing immediately"
+
+    integration_checkpoint: |
+      GameState.facingDirection must be .north on all initial states.
+      Minimap must show ○^ at player position.
+
+    gherkin: |
+      Scenario: Player enters a new floor facing North by default
+        Given Ember starts a new floor
+        Then Ember's facing direction is North
+        And the minimap shows the player marker as "○^"
+        And the Facing label reads "N"
+
+  - id: 2
+    name: "Turn left — facing changes 90 degrees counter-clockwise"
+    trigger: "Player presses A or Arrow Left"
+    action: "GameCommand.turn(.left) → RulesEngine updates facingDirection counter-clockwise"
+
+    facing_rotation:
+      turn_left:
+        north: east    # NOTE: in a top-down grid, turning left from North = West visually,
+        east: north    # BUT the game uses a 1D position model; left/right are ego-centric.
+        south: west    # Ego-centric: facing North, turn left = face West.
+        west: south    # North→West→South→East→North (counter-clockwise on compass)
+      turn_right:
+        north: west    # Facing North, turn right = face East. East→South→West→North
+        east: south
+        south: east
+        west: north
+
+    # Clarification on rotation direction:
+    # Ego-centric (first-person) turn left = rotate body left = compass rotates counter-clockwise.
+    # North (up) → turn left → West (left) → turn left → South (down) → turn left → East (right)
+    # This matches classic dungeon crawler convention.
+
+    tui_mockup: |
+      Before (facing N):  Floor 2:  [E...○^..G..*..S]  Facing: N
+      After  (facing W):  Floor 2:  [E...○<..G..*..S]  Facing: W
+
+    shared_artifacts:
+      - name: "facingDirection"
+        source: "GameState.facingDirection"
+        displayed_as: "○< on minimap"
+        consumers:
+          - "Renderer.buildMinimap"
+          - "RulesEngine.apply(move:)"
+
+    emotional_state:
+      entry: "Deciding — corridor may branch, or player is reorienting"
+      exit: "In control — minimap immediately confirms new facing"
+
+    integration_checkpoint: |
+      Turn must be a pure domain function: (facingDirection, TurnDirection) -> CardinalDirection.
+      Minimap caret must update on same frame as turn.
+      No health cost, no cooldown.
+
+    gherkin: |
+      Scenario: Player turns left from North
+        Given Ember is facing North
+        When Ember presses the turn-left key (A or Arrow Left)
+        Then Ember's facing direction is West
+        And the minimap shows the player marker as "○<"
+        And the Facing label reads "W"
+
+      Scenario: Player turns left 4 times returns to original facing
+        Given Ember is facing North
+        When Ember presses turn-left 4 times
+        Then Ember's facing direction is North again
+
+  - id: 3
+    name: "Turn right — facing changes 90 degrees clockwise"
+    trigger: "Player presses D or Arrow Right"
+    action: "GameCommand.turn(.right) → RulesEngine updates facingDirection clockwise"
+
+    tui_mockup: |
+      Before (facing N):  Floor 2:  [E...○^..G..*..S]  Facing: N
+      After  (facing E):  Floor 2:  [E...○>..G..*..S]  Facing: E
+
+    shared_artifacts:
+      - name: "facingDirection"
+        source: "GameState.facingDirection"
+        displayed_as: "○> on minimap"
+        consumers:
+          - "Renderer.buildMinimap"
+          - "RulesEngine.apply(move:)"
+
+    emotional_state:
+      entry: "Deciding"
+      exit: "Confirmed — new East facing shown instantly"
+
+    integration_checkpoint: |
+      Same as turn-left: pure domain function, no side effects.
+
+    gherkin: |
+      Scenario: Player turns right from North
+        Given Ember is facing North
+        When Ember presses the turn-right key (D or Arrow Right)
+        Then Ember's facing direction is East
+        And the minimap shows the player marker as "○>"
+        And the Facing label reads "E"
+
+  - id: 4
+    name: "Move forward — advance one square in facing direction"
+    trigger: "Player presses W or Arrow Up"
+    action: "GameCommand.move(.forward) → RulesEngine computes grid delta from facingDirection, updates playerPosition"
+
+    grid_delta_resolution:
+      north: "playerPosition += +1 (toward staircase/exit end of floor)"
+      south: "playerPosition += -1 (toward entry)"
+      east:  "playerPosition += +1 (same as north in 1D model — see note)"
+      west:  "playerPosition += -1 (same as south in 1D model — see note)"
+      # NOTE: The current FloorMap model is 1-dimensional (playerPosition: Int along a corridor).
+      # East/West movement along the same axis as North/South.
+      # The floor generator produces a linear corridor; branching is not yet modelled.
+      # For this jam scope, facing East/West = same grid delta as North/South respectively.
+      # This is the simplest correct implementation; 2D map is out of scope.
+
+    shared_artifacts:
+      - name: "playerPosition"
+        source: "GameState.playerPosition"
+        displayed_as: "○ position on minimap"
+        consumers:
+          - "Renderer.buildMinimap"
+          - "RulesEngine encounter checks"
+          - "RulesEngine win condition"
+
+    emotional_state:
+      entry: "Purposeful — moving toward a known destination"
+      exit: "Progressing — minimap marker shifts, depth view updates"
+
+    integration_checkpoint: |
+      Forward movement must respect existing encounter proximity rule (DISC-03).
+      Grid delta must be derived from facingDirection at time of move, not hardcoded.
+
+    gherkin: |
+      Scenario: Player moves forward while facing North
+        Given Ember is facing North at position 3
+        When Ember presses the move-forward key (W or Arrow Up)
+        Then Ember's position advances to 4
+        And the minimap shows the player marker one cell closer to the staircase
+
+      Scenario: Player moves forward while facing South
+        Given Ember is facing South at position 3
+        When Ember presses the move-forward key
+        Then Ember's position retreats to 2
+
+  - id: 5
+    name: "Minimap reflects facing at all times"
+    trigger: "Any turn or move command; also on initial render"
+    action: "Renderer.buildMinimap reads GameState.facingDirection and appends caret to player marker"
+
+    minimap_format: |
+      "Floor {N}:  [{cells with ○{caret} at playerPosition}]  Facing: {N/S/E/W}"
+      Example: "Floor 2:  [E...○^..G..*..S]  Facing: N"
+
+    shared_artifacts:
+      - name: "facingDirection"
+        source: "GameState.facingDirection"
+        displayed_as: "caret character in minimap (^/>/ v/<) + Facing: label"
+        consumers:
+          - "Renderer.buildMinimap (row 21 in Thoughts panel)"
+
+    emotional_state:
+      entry: "Any moment during exploration"
+      exit: "Constantly oriented — minimap is always accurate"
+
+    integration_checkpoint: |
+      Minimap caret and Facing label must match GameState.facingDirection at every render tick.
+      No cached or stale facing data in Renderer.
+
+    gherkin: |
+      Scenario: Minimap shows correct caret after each turn
+        Given Ember is facing South
+        Then the minimap player marker reads "○v"
+        And the Facing label reads "S"
+
+  - id: 6
+    name: "Turn during combat — allowed, facing updates, movement still locked"
+    trigger: "Player presses A/D or Arrow Left/Right while in .combat screen mode"
+    action: "GameCommand.turn processed normally; facingDirection updates; movement lock (DISC-03) unchanged"
+
+    emotional_state:
+      entry: "Tense — in a combat encounter"
+      exit: "Informed — knows which way to run if Dash becomes available"
+
+    integration_checkpoint: |
+      RulesEngine must process turn commands regardless of screenMode.
+      Movement lock (DISC-03) is checked at move time, not turn time.
+      Combat screen rendering does not display minimap — no visual change during combat.
+
+    gherkin: |
+      Scenario: Player turns during combat encounter
+        Given Ember is in a combat encounter facing North
+        When Ember presses the turn-right key
+        Then Ember's facing direction is East
+        And the combat encounter continues unaffected
+        And movement is still locked by the encounter proximity rule
+
+integration_validation:
+  shared_artifact_consistency:
+    - artifact: "facingDirection"
+      source: "GameState.facingDirection"
+      must_match_across: [1, 2, 3, 4, 5, 6]
+      failure_message: "Minimap caret, Facing label, and grid delta must all derive from GameState.facingDirection. Any component reading facing from a different source will desync."
+    - artifact: "playerPosition"
+      source: "GameState.playerPosition"
+      must_match_across: [4, 5]
+      failure_message: "Minimap position marker and RulesEngine grid delta must use the same playerPosition."
