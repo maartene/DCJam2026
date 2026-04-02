@@ -75,8 +75,25 @@ struct TurningEdgeCaseTests {
         }
     }
 
-    @Test("Turn-left command in combat does not change facing regardless of current direction", .disabled("not yet implemented"))
-    func allTurnDirectionsBlockedInCombat() {}
+    @Test("Turn-left command in combat does not change facing regardless of current direction")
+    func allTurnDirectionsBlockedInCombat() {
+        let encounter = EncounterModel.guard(isBossEncounter: false)
+        let facings: [CardinalDirection] = [.north, .east, .south, .west]
+        let directions: [TurnDirection] = [.left, .right]
+
+        for facing in facings {
+            for direction in directions {
+                let state = GameState.initial(config: .default)
+                    .withFacingDirection(facing)
+                    .withScreenMode(.combat(encounter: encounter))
+
+                let result = RulesEngine.apply(command: .turn(direction), to: state, deltaTime: 0)
+
+                #expect(result.facingDirection == facing,
+                    "Expected facing \(facing) to be unchanged after .turn(.\(direction)) in combat")
+            }
+        }
+    }
 
     // MARK: - US-TM-06: Movement lock in combat is unaffected by facing
 
