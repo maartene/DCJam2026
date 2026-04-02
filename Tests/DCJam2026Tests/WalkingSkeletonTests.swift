@@ -37,8 +37,7 @@ struct WalkingSkeletonTests {
         #expect(state.dashCharges == 2)
     }
 
-    @Test("Ember's Special charge is 0 when a new run begins",
-          .disabled("not yet implemented"))
+    @Test("Ember's Special charge is 0 when a new run begins")
     func emberStartsWithEmptySpecialCharge() {
         // Given
         let config = GameConfig.default
