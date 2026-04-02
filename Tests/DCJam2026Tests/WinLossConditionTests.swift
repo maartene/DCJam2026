@@ -17,8 +17,7 @@ struct WinLossConditionTests {
 
     // MARK: - Win condition: BOTH hasEgg AND exitSquare required (INT-01)
 
-    @Test("Stepping onto the exit square with the egg fires the exit patio narrative event",
-          .disabled("not yet implemented"))
+    @Test("Stepping onto the exit square with the egg fires the exit patio narrative event")
     func exitWithEggFiresNarrativeEvent() {
         // Given — Floor 5, Ember carries egg, at exit square
         let state = stateAtExitSquareWithEgg(true)
