@@ -155,3 +155,64 @@ struct MinimapTests {
         #expect(allText.contains("."), "Expected '.' for corridor cells in minimap panel (rows 2-16, cols 61-79)")
     }
 }
+
+// MARK: - ADR-006 Screen Layout — Vertical Split
+
+@Suite("Turning Mechanic — Vertical Split Layout (ADR-006)")
+struct VerticalSplitLayoutTests {
+
+    // Test Budget: 3 distinct behaviors × 2 = 6 max tests
+    //   B1: vertical divider '│' at col 60 for rows 2-16
+    //   B2: top connector '┬' at col 60 in row 1
+    //   B3: bottom T-junction '┴' at col 60 in row 17
+
+    /// Extracts the character at a 1-based column position from a write at a given row.
+    /// Looks for a write that covers col 60 — either written starting at col 1 (full border)
+    /// or written exactly at col 60 (individual divider character).
+    private func characterAtCol60(row: Int, in entries: [TUIOutputSpy.Entry]) -> Character? {
+        for entry in entries where entry.row == row {
+            if entry.col == 60 {
+                // Direct write at col 60
+                return entry.string.first
+            }
+            if entry.col == 1 && entry.string.count >= 60 {
+                // Full-width border string starting at col 1; col 60 is at index 59
+                let idx = entry.string.index(entry.string.startIndex, offsetBy: 59)
+                return entry.string[idx]
+            }
+        }
+        return nil
+    }
+
+    @Test("Top border has split connector '┬' at column 60")
+    func topBorderHasSplitConnectorAtCol60() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy)
+        let state = GameState.initial(config: .default)
+        renderer.render(state)
+        let ch = characterAtCol60(row: 1, in: spy.entries)
+        #expect(ch == "┬", "Expected '┬' at row 1 col 60 for vertical split, got: \(ch.map(String.init) ?? "nil")")
+    }
+
+    @Test("Vertical divider '│' is present at column 60 for all dungeon view rows (2-16)")
+    func verticalDividerPresentInAllDungeonViewRows() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy)
+        let state = GameState.initial(config: .default)
+        renderer.render(state)
+        for row in 2...16 {
+            let ch = characterAtCol60(row: row, in: spy.entries)
+            #expect(ch == "│", "Expected '│' at row \(row) col 60 for vertical split, got: \(ch.map(String.init) ?? "nil")")
+        }
+    }
+
+    @Test("Row 17 separator has bottom T-junction '┴' at column 60")
+    func row17SeparatorHasBottomTJunctionAtCol60() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy)
+        let state = GameState.initial(config: .default)
+        renderer.render(state)
+        let ch = characterAtCol60(row: 17, in: spy.entries)
+        #expect(ch == "┴", "Expected '┴' at row 17 col 60 for vertical split, got: \(ch.map(String.init) ?? "nil")")
+    }
+}

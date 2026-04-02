@@ -1,13 +1,13 @@
 // Renderer — maps GameState to ANSI terminal output via TUIOutputPort.
-// Screen layout (80×25 terminal):
-//   Row 1       ┌──────────────────────────────────────────────────────────────────────────────┐
-//   Rows 2-16   │ dungeon view (78×15) │
-//   Row 17      ├──────────────────────────────────────────────────────────────────────────────┤
-//   Row 18      │ HP/EGG/DASH/BRACE/SPEC status bar │
-//   Row 19      │ controls hint line │
-//   Row 20      ├─Thoughts──────────────────────────────────────────────────────────────────────┤
-//   Rows 21-24  │ Ember's internal thoughts / flavor text │
-//   Row 25      └──────────────────────────────────────────────────────────────────────────────┘
+// Screen layout (80×25 terminal, ADR-006 vertical split):
+//   Row 1       ┌──────────────────────────────────────────────────────┬──────────────────┐
+//   Rows 2-16   │ dungeon view (cols 2-59, 58 cols) │ minimap (61-79) │
+//   Row 17      ├──────────────────────────────────────────────────────┴──────────────────┤
+//   Row 18      │ HP/EGG/DASH/BRACE/SPEC status bar                                      │
+//   Row 19      │ controls hint line                                                      │
+//   Row 20      ├─Thoughts──────────────────────────────────────────────────────────────────┤
+//   Rows 21-24  │ Ember's internal thoughts / flavor text                                │
+//   Row 25      └──────────────────────────────────────────────────────────────────────────┘
 
 import Foundation
 import GameDomain
@@ -55,13 +55,18 @@ final class Renderer {
     // MARK: - Chrome (box borders)
 
     private func drawChrome() {
+        // Row 1: top border with vertical split connector '┬' at col 60
+        // col 1='┌', cols 2-59=58×'─', col 60='┬', cols 61-79=19×'─', col 80='┐'
         output.moveCursor(row: 1, col: 1)
-        output.write("┌" + String(repeating: "─", count: 78) + "┐")
+        output.write("┌" + String(repeating: "─", count: 58) + "┬" + String(repeating: "─", count: 19) + "┐")
 
-        drawSideBars(rows: 2...16)
+        // Rows 2-16: side borders + vertical divider at col 60
+        drawSideBarsWithDivider(rows: 2...16)
 
+        // Row 17: separator with '┴' T-junction closing the vertical divider
+        // col 1='├', cols 2-59=58×'─', col 60='┴', cols 61-79=19×'─', col 80='┤'
         output.moveCursor(row: 17, col: 1)
-        output.write("├" + String(repeating: "─", count: 78) + "┤")
+        output.write("├" + String(repeating: "─", count: 58) + "┴" + String(repeating: "─", count: 19) + "┤")
 
         drawSideBars(rows: 18...19)
 
@@ -77,6 +82,17 @@ final class Renderer {
     private func drawSideBars(rows: ClosedRange<Int>) {
         for row in rows {
             output.moveCursor(row: row, col: 1)
+            output.write("│")
+            output.moveCursor(row: row, col: 80)
+            output.write("│")
+        }
+    }
+
+    private func drawSideBarsWithDivider(rows: ClosedRange<Int>) {
+        for row in rows {
+            output.moveCursor(row: row, col: 1)
+            output.write("│")
+            output.moveCursor(row: row, col: 60)
             output.write("│")
             output.moveCursor(row: row, col: 80)
             output.write("│")
