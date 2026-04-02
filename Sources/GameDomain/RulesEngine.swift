@@ -113,6 +113,17 @@ public enum RulesEngine {
 
     // MARK: - Movement
 
+    private static func delta(facing: CardinalDirection, direction: MoveDirection) -> (dx: Int, dy: Int) {
+        let forward: (dx: Int, dy: Int)
+        switch facing {
+        case .north: forward = (dx:  0, dy: +1)
+        case .east:  forward = (dx: +1, dy:  0)
+        case .south: forward = (dx:  0, dy: -1)
+        case .west:  forward = (dx: -1, dy:  0)
+        }
+        return direction == .forward ? forward : (dx: -forward.dx, dy: -forward.dy)
+    }
+
     private static func applyMove(_ direction: MoveDirection, to state: GameState) -> GameState {
         // Movement is locked when in combat — only Dash exits an encounter.
         if case .combat = state.screenMode { return state }
@@ -123,23 +134,20 @@ public enum RulesEngine {
         let state = state.withRecentDash(false)
         let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
 
-        // Backward movement: retreat toward entry, clamped to floor start.
-        if direction == .backward {
-            let newPos = max(state.playerPosition - 1, floor.entryPosition)
-            return state.withPlayerPosition(newPos)
-        }
+        let d = delta(facing: state.facingDirection, direction: direction)
+        let newPos = Position(x: state.playerPosition.x + d.dx, y: state.playerPosition.y + d.dy)
 
-        let newPos = state.playerPosition + 1
-
-        // Descend staircase.
-        if newPos >= floor.staircasePosition && !floor.hasExitSquare {
+        // Descend staircase — triggers when stepping onto or through the staircase cell.
+        let isAtOrPastStaircase = (newPos == floor.staircasePosition2D)
+            || (state.playerPosition == floor.staircasePosition2D && direction == .forward)
+        if !floor.hasExitSquare && isAtOrPastStaircase {
             let nextFloor = state.currentFloor + 1
             let nextFloorMap = FloorGenerator.generate(floorNumber: nextFloor, config: state.config)
             return state.withCurrentFloor(nextFloor).withPlayerPosition(nextFloorMap.entryPosition)
         }
 
         // Step onto exit square (requires egg for win).
-        if floor.hasExitSquare && newPos >= floor.exitPosition {
+        if floor.hasExitSquare && newPos == floor.exitPosition2D {
             if state.hasEgg {
                 return state
                     .withPlayerPosition(newPos)
@@ -149,14 +157,14 @@ public enum RulesEngine {
         }
 
         // Step into egg room.
-        if floor.hasEggRoom, let eggPos = floor.eggRoomPosition, newPos >= eggPos, !state.hasEgg {
+        if floor.hasEggRoom, let eggPos = floor.eggRoomPosition2D, newPos == eggPos, !state.hasEgg {
             return state
                 .withPlayerPosition(newPos)
                 .withScreenMode(.narrativeOverlay(event: .eggDiscovery))
         }
 
         // Step into an encounter.
-        if let encounterPos = floor.encounterPosition, newPos == encounterPos {
+        if let encounterPos = floor.encounterPosition2D, newPos == encounterPos {
             let encounter = EncounterModel.guard(isBossEncounter: floor.hasBossEncounter)
             return state.withPlayerPosition(newPos).withScreenMode(.combat(encounter: encounter))
         }

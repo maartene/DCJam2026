@@ -41,20 +41,60 @@ struct TwoDFloorTests {
 
     // MARK: - US-TM-03: Facing-relative movement deltas
 
-    @Test("Moving forward while facing North advances Ember by (dx:0, dy:+1)", .disabled("not yet implemented"))
-    func forwardNorthAppliesCorrectDelta() {}
+    @Test("Moving forward while facing North advances Ember by (dx:0, dy:+1)")
+    func forwardNorthAppliesCorrectDelta() {
+        let start = GameState.initial(config: .default)
+            .withPlayerPosition(Position(x: 7, y: 4))
+            .withFacingDirection(.north)
+        let result = RulesEngine.apply(command: .move(.forward), to: start, deltaTime: 0)
+        #expect(result.playerPosition == Position(x: 7, y: 5))
+    }
 
-    @Test("Moving forward while facing East advances Ember by (dx:+1, dy:0)", .disabled("not yet implemented"))
-    func forwardEastAppliesCorrectDelta() {}
+    @Test("Moving forward while facing East advances Ember by (dx:+1, dy:0)")
+    func forwardEastAppliesCorrectDelta() {
+        let start = GameState.initial(config: .default)
+            .withPlayerPosition(Position(x: 7, y: 4))
+            .withFacingDirection(.east)
+        let result = RulesEngine.apply(command: .move(.forward), to: start, deltaTime: 0)
+        #expect(result.playerPosition == Position(x: 8, y: 4))
+    }
 
-    @Test("Moving forward while facing South retreats Ember by (dx:0, dy:-1)", .disabled("not yet implemented"))
-    func forwardSouthAppliesCorrectDelta() {}
+    @Test("Moving forward while facing South retreats Ember by (dx:0, dy:-1)")
+    func forwardSouthAppliesCorrectDelta() {
+        let start = GameState.initial(config: .default)
+            .withPlayerPosition(Position(x: 7, y: 5))
+            .withFacingDirection(.south)
+        let result = RulesEngine.apply(command: .move(.forward), to: start, deltaTime: 0)
+        #expect(result.playerPosition == Position(x: 7, y: 4))
+    }
 
-    @Test("Moving forward while facing West retreats Ember by (dx:-1, dy:0)", .disabled("not yet implemented"))
-    func forwardWestAppliesCorrectDelta() {}
+    @Test("Moving forward while facing West retreats Ember by (dx:-1, dy:0)")
+    func forwardWestAppliesCorrectDelta() {
+        let start = GameState.initial(config: .default)
+            .withPlayerPosition(Position(x: 7, y: 4))
+            .withFacingDirection(.west)
+        let result = RulesEngine.apply(command: .move(.forward), to: start, deltaTime: 0)
+        #expect(result.playerPosition == Position(x: 6, y: 4))
+    }
 
-    @Test("Moving backward produces the inverse delta for all four facings", .disabled("not yet implemented"))
-    func backwardIsInverseOfForward() {}
+    @Test("Moving backward produces the inverse delta for all four facings")
+    func backwardIsInverseOfForward() {
+        let startPos = Position(x: 7, y: 4)
+        let facings: [CardinalDirection] = [.north, .east, .south, .west]
+        let expectedBackward: [Position] = [
+            Position(x: 7, y: 3),   // backward north = dy:-1
+            Position(x: 6, y: 4),   // backward east  = dx:-1
+            Position(x: 7, y: 5),   // backward south = dy:+1
+            Position(x: 8, y: 4),   // backward west  = dx:+1
+        ]
+        for (facing, expected) in zip(facings, expectedBackward) {
+            let start = GameState.initial(config: .default)
+                .withPlayerPosition(startPos)
+                .withFacingDirection(facing)
+            let result = RulesEngine.apply(command: .move(.backward), to: start, deltaTime: 0)
+            #expect(result.playerPosition == expected, "backward from \(facing) should give \(expected)")
+        }
+    }
 
     // MARK: - US-TM-03: Wall collision
 
