@@ -119,8 +119,7 @@ struct CombatTests {
 
     // MARK: - Special: requires full charge
 
-    @Test("Special is not selectable when the charge meter is below full",
-          .disabled("not yet implemented"))
+    @Test("Special is not selectable when the charge meter is below full")
     func specialNotSelectableBelowFull() {
         // Given — Special at 80% (not full)
         var state = gameStateInRegularEncounter()
