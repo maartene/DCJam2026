@@ -83,8 +83,7 @@ struct WinLossConditionTests {
 
     // MARK: - Death condition
 
-    @Test("The death screen appears when Ember's HP drops to exactly 0",
-          .disabled("not yet implemented"))
+    @Test("The death screen appears when Ember's HP drops to exactly 0")
     func deathScreenFiresAtZeroHP() {
         // Given — Ember at 1 HP in encounter
         var state = GameState.initial(config: GameConfig.default)
