@@ -51,15 +51,67 @@ struct TurningMechanicTests {
 
     // MARK: - US-TM-02: Rotation table
 
-    @Test("Complete turn rotation table is correct for all 8 combinations", .disabled("not yet implemented"))
-    func fullRotationTableIsCorrect() {}
+    @Test("Complete turn rotation table is correct for all 8 combinations")
+    func fullRotationTableIsCorrect() {
+        let config = GameConfig.default
+        let base = GameState.initial(config: config)
 
-    @Test("Turning does not change Ember's HP, Dash charges, Special charge, or position", .disabled("not yet implemented"))
-    func turningHasNoSideEffectsOnVitalStats() {}
+        let combinations: [(CardinalDirection, TurnDirection, CardinalDirection)] = [
+            (.north, .left,  .west),
+            (.north, .right, .east),
+            (.east,  .left,  .north),
+            (.east,  .right, .south),
+            (.south, .left,  .east),
+            (.south, .right, .west),
+            (.west,  .left,  .south),
+            (.west,  .right, .north),
+        ]
 
-    @Test("Four consecutive turns left return Ember to her original facing", .disabled("not yet implemented"))
-    func fourConsecutiveLeftTurnsReturnToStart() {}
+        for (facing, dir, expected) in combinations {
+            let state = base.withFacingDirection(facing)
+            let result = RulesEngine.apply(command: .turn(dir), to: state, deltaTime: 0)
+            #expect(result.facingDirection == expected, "facing \(facing) + \(dir) should produce \(expected)")
+        }
+    }
 
-    @Test("Four consecutive turns right return Ember to her original facing", .disabled("not yet implemented"))
-    func fourConsecutiveRightTurnsReturnToStart() {}
+    @Test("Turning does not change Ember's HP, Dash charges, Special charge, or position")
+    func turningHasNoSideEffectsOnVitalStats() {
+        let config = GameConfig.default
+        let state = GameState.initial(config: config)
+            .withHP(7)
+            .withDashCharges(2)
+            .withSpecialCharge(0.5)
+            .withPlayerPosition(3)
+
+        let result = RulesEngine.apply(command: .turn(.left), to: state, deltaTime: 0)
+
+        #expect(result.hp == 7)
+        #expect(result.dashCharges == 2)
+        #expect(result.specialCharge == 0.5)
+        #expect(result.playerPosition == 3)
+    }
+
+    @Test("Four consecutive turns left return Ember to her original facing")
+    func fourConsecutiveLeftTurnsReturnToStart() {
+        let config = GameConfig.default
+        let initial = GameState.initial(config: config)
+
+        let result = (0 ..< 4).reduce(initial) { state, _ in
+            RulesEngine.apply(command: .turn(.left), to: state, deltaTime: 0)
+        }
+
+        #expect(result.facingDirection == initial.facingDirection)
+    }
+
+    @Test("Four consecutive turns right return Ember to her original facing")
+    func fourConsecutiveRightTurnsReturnToStart() {
+        let config = GameConfig.default
+        let initial = GameState.initial(config: config)
+
+        let result = (0 ..< 4).reduce(initial) { state, _ in
+            RulesEngine.apply(command: .turn(.right), to: state, deltaTime: 0)
+        }
+
+        #expect(result.facingDirection == initial.facingDirection)
+    }
 }
