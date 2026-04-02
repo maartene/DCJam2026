@@ -97,6 +97,7 @@ public enum RulesEngine {
     // MARK: - Turning
 
     private static func applyTurn(_ dir: TurnDirection, to state: GameState) -> GameState {
+        if case .combat = state.screenMode { return state }
         let newFacing: CardinalDirection
         switch (state.facingDirection, dir) {
         case (.north, .left):  newFacing = .west
