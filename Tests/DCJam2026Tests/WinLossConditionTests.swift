@@ -49,8 +49,7 @@ struct WinLossConditionTests {
 
     // MARK: - Error path: exit without egg is blocked
 
-    @Test("The win state is not declared when Ember reaches the exit without the egg",
-          .disabled("not yet implemented"))
+    @Test("The win state is not declared when Ember reaches the exit without the egg")
     func exitWithoutEggDoesNotTriggerWin() {
         // Given — Floor 5, no egg, at exit square
         let state = stateAtExitSquareWithEgg(false)
