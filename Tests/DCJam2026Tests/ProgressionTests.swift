@@ -156,8 +156,7 @@ struct ProgressionTests {
 
     // MARK: - Error path: duplicate upgrades not re-offered
 
-    @Test("An already-selected upgrade does not appear in a subsequent milestone prompt",
-          .disabled("not yet implemented"))
+    @Test("An already-selected upgrade does not appear in a subsequent milestone prompt")
     func alreadySelectedUpgradeNotReOffered() {
         // Given — Ember has already selected the cooldown reduction upgrade
         let takenUpgrade = UpgradePool.cooldownReductionUpgrade()
@@ -170,8 +169,7 @@ struct ProgressionTests {
         #expect(!drawn.contains(where: { $0.id == takenUpgrade.id }))
     }
 
-    @Test("The upgrade pool provides at least 3 unique choices",
-          .disabled("not yet implemented"))
+    @Test("The upgrade pool provides at least 3 unique choices")
     func upgradePoolHasEnoughUniquesForThreeChoices() {
         // Given — fresh run, no upgrades taken
         let pool = UpgradePool(alreadySelected: [])
@@ -185,8 +183,7 @@ struct ProgressionTests {
 
     // MARK: - Special charge meter transitions
 
-    @Test("The Special charge meter shows a ready state when charge reaches maximum",
-          .disabled("not yet implemented"))
+    @Test("The Special charge meter shows a ready state when charge reaches maximum")
     func specialChargeReachesFullIndicatesReady() {
         // Given — charge advanced to full via time
         let config = GameConfig.default
