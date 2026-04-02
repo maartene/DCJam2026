@@ -100,8 +100,7 @@ struct CombatTests {
 
     // MARK: - Brace error path: fatal unbraced hit triggers death
 
-    @Test("The death condition fires when an unbraced enemy attack drops HP to 0",
-          .disabled("not yet implemented"))
+    @Test("The death condition fires when an unbraced enemy attack drops HP to 0")
     func fatalUnbracedHitTriggersDeathCondition() {
         // Given — Ember at 1 HP in encounter, no Brace active
         let config = GameConfig.default
