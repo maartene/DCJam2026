@@ -123,8 +123,7 @@ struct ProgressionTests {
         }
     }
 
-    @Test("A Dash cooldown reduction upgrade measurably reduces the cooldown duration",
-          .disabled("not yet implemented"))
+    @Test("A Dash cooldown reduction upgrade measurably reduces the cooldown duration")
     func dashCooldownUpgradeReducesCooldown() {
         // Given — baseline run
         let config = GameConfig.default
