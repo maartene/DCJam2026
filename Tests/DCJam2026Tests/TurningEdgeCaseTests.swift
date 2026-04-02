@@ -22,14 +22,33 @@ struct TurningEdgeCaseTests {
 
     // MARK: - US-TM-06: Facing persists through floor transitions
 
-    @Test("Ember's facing direction is unchanged after descending to the next floor", .disabled("not yet implemented"))
-    func facingPersistsThroughFloorTransition() {}
+    @Test("Ember's facing direction is unchanged after descending to the next floor")
+    func facingPersistsThroughFloorTransition() {
+        let state = GameState.initial(config: .default)
+            .withFacingDirection(.east)
+            .withCurrentFloor(2)
 
-    @Test("Ember's facing direction is unchanged after descending from floor 2 to floor 3", .disabled("not yet implemented"))
-    func facingPersistsThroughMultipleFloorTransitions() {}
+        #expect(state.facingDirection == .east)
+    }
 
-    @Test("withCurrentFloor does not reset facing direction to North", .disabled("not yet implemented"))
-    func withCurrentFloorDoesNotResetFacing() {}
+    @Test("Ember's facing direction is unchanged after descending from floor 2 to floor 3")
+    func facingPersistsThroughMultipleFloorTransitions() {
+        let state = GameState.initial(config: .default)
+            .withFacingDirection(.south)
+            .withCurrentFloor(2)
+            .withCurrentFloor(3)
+
+        #expect(state.facingDirection == .south)
+    }
+
+    @Test("withCurrentFloor does not reset facing direction to North")
+    func withCurrentFloorDoesNotResetFacing() {
+        let state = GameState.initial(config: .default)
+            .withFacingDirection(.west)
+            .withCurrentFloor(2)
+
+        #expect(state.facingDirection != .north)
+    }
 
     // MARK: - US-TM-06: Turn command blocked in combat
 
