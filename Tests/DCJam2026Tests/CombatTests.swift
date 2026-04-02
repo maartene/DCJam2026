@@ -201,8 +201,7 @@ struct CombatTests {
 
     // MARK: - Boss: defeatable with Brace and Special
 
-    @Test("The boss is defeatable and the path to the exit opens after defeat",
-          .disabled("not yet implemented"))
+    @Test("The boss is defeatable and the path to the exit opens after defeat")
     func bossDefeatedUnblocksExit() {
         // Given — boss encounter, Ember has full Special and can brace
         var state = GameState.initial(config: GameConfig.default)
