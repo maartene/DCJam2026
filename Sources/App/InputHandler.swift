@@ -26,12 +26,19 @@ final class InputHandler {
         return mapKey(buf, count: Int(n))
     }
 
+    /// Map a raw byte sequence to a GameCommand. Exposed for testing.
+    func mapKey(bytes: [UInt8]) -> GameCommand {
+        return mapKey(bytes, count: bytes.count)
+    }
+
     private func mapKey(_ buf: [UInt8], count: Int) -> GameCommand {
         // Escape sequence: ESC [ A/B/C/D
         if count >= 3 && buf[0] == 0x1B && buf[1] == 0x5B {
             switch buf[2] {
             case 0x41: return .move(.forward)    // Arrow Up
             case 0x42: return .move(.backward)   // Arrow Down
+            case 0x43: return .turn(.right)       // Arrow Right
+            case 0x44: return .turn(.left)        // Arrow Left
             default: break
             }
         }
@@ -46,6 +53,8 @@ final class InputHandler {
         switch ch {
         case UInt8(ascii: "w"), UInt8(ascii: "W"): return .move(.forward)
         case UInt8(ascii: "s"), UInt8(ascii: "S"): return .move(.backward)
+        case UInt8(ascii: "a"), UInt8(ascii: "A"): return .turn(.left)
+        case UInt8(ascii: "d"), UInt8(ascii: "D"): return .turn(.right)
         case UInt8(ascii: "1"):                    return .dash
         case UInt8(ascii: "2"):                    return .brace
         case UInt8(ascii: "3"):                    return .special
