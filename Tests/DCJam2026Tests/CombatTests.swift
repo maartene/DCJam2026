@@ -19,10 +19,23 @@ import Testing
 @Suite("Combat — Brace and Special")
 struct CombatTests {
 
+    // MARK: - Enemy attack timer
+
+    @Test("Unbraced combat tick past attack interval reduces Ember HP")
+    func enemyAttackTimerDealsUnbracedDamage() {
+        // Given — Ember in regular encounter, no Brace active
+        let config = GameConfig.default
+        let state = gameStateInRegularEncounter()
+        let hpBefore = state.hp
+        // When — advance time past the full attack interval
+        let result = RulesEngine.apply(command: .none, to: state, deltaTime: config.enemyAttackInterval + 0.1)
+        // Then — HP decreased by the base encounter damage
+        #expect(result.hp < hpBefore)
+    }
+
     // MARK: - Brace: reduces damage
 
-    @Test("Ember takes zero damage during a successful Brace parry vs full damage when unbraced",
-          .disabled("not yet implemented"))
+    @Test("Ember takes zero damage during a successful Brace parry vs full damage when unbraced")
     func braceTakesDamage() {
         // Given — identical encounter at the moment an enemy attack lands
         let config = GameConfig.default

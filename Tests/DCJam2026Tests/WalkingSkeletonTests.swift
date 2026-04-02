@@ -160,31 +160,30 @@ struct WalkingSkeletonTests {
 
     @Test("The death screen appears when Ember's HP drops to 0")
     func deathFiresWhenHPReachesZero() {
-        // Given — Ember at 1 HP in encounter, enemy will deal at least 1 damage
+        // Given — Ember at 1 HP in encounter
         let config = GameConfig.default
         var state = GameState.initial(config: config)
         state = stateWithHP(state, hp: 1)
         state = stateWithActiveEncounter(state, isBoss: false)
-        // When — Brace receives reduced but still lethal damage at 1 HP
-        let result = RulesEngine.apply(command: .brace, to: state, deltaTime: 0.0)
+        // When — advance time past the enemy attack interval (unbraced → takes full hit)
+        let result = RulesEngine.apply(command: .none, to: state, deltaTime: config.enemyAttackInterval + 0.1)
         // Then
         if case .deathState = result.screenMode {
             // expected
         } else {
-            // Brace may absorb to 0 — use a direct damage path if RulesEngine exposes one
             Issue.record("Expected .deathState when HP drops to 0, got \(result.screenMode)")
         }
     }
 
     @Test("HP display does not show a negative value when damage exceeds remaining HP")
     func hpNeverDisplaysNegative() {
-        // Given — Ember at 1 HP, fatal blow incoming
+        // Given — Ember at 1 HP, fatal blow incoming (unbraced)
         let config = GameConfig.default
         var state = GameState.initial(config: config)
         state = stateWithHP(state, hp: 1)
         state = stateWithActiveEncounter(state, isBoss: false)
-        // When
-        let result = RulesEngine.apply(command: .brace, to: state, deltaTime: 0.0)
+        // When — advance time past the enemy attack interval
+        let result = RulesEngine.apply(command: .none, to: state, deltaTime: config.enemyAttackInterval + 0.1)
         // Then — HP floored at 0, never negative
         #expect(result.hp >= 0)
     }
