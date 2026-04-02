@@ -17,8 +17,7 @@ struct ProgressionTests {
 
     // MARK: - Egg discovery fires narrative event
 
-    @Test("Entering the egg room triggers the egg discovery narrative event",
-          .disabled("not yet implemented"))
+    @Test("Entering the egg room triggers the egg discovery narrative event")
     func enteringEggRoomTriggersNarrative() {
         // Given — Ember on Floor 2, steps onto the egg room square
         var state = GameState.initial(config: GameConfig.default)
