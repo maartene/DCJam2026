@@ -6,14 +6,20 @@ import PackageDescription
 let package = Package(
     name: "DCJam2026",
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
-        .executableTarget(
-            name: "DCJam2026"
+        // Pure domain logic — zero I/O, zero dependencies. Driving port for all acceptance tests.
+        .target(
+            name: "GameDomain",
+            path: "Sources/GameDomain"
         ),
+        // Entry point executable. Wires all modules and starts the game loop.
+        .executableTarget(
+            name: "DCJam2026",
+            dependencies: ["GameDomain"]
+        ),
+        // Acceptance tests invoke GameDomain directly. No mocks. No terminal I/O.
         .testTarget(
             name: "DCJam2026Tests",
-            dependencies: ["DCJam2026"]
+            dependencies: ["GameDomain"]
         ),
     ],
     swiftLanguageModes: [.v6]

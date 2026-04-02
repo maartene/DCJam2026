@@ -1,0 +1,518 @@
+{
+  "roadmap": {
+    "project_id": "dcjam2026-core",
+    "created_at": "2026-04-02T08:21:32Z",
+    "total_steps": 63,
+    "phases": 6
+  },
+  "phases": [
+    {
+      "id": "01",
+      "name": "Walking Skeleton",
+      "steps": [
+        {
+          "id": "01-01",
+          "name": "Ember starts with two Dash charges",
+          "criteria": "Ember has exactly 2 Dash charges when a new run begins",
+          "test_file": "Tests/DCJam2026Tests/WalkingSkeletonTests.swift",
+          "scenario_name": "emberStartsWithTwoDashCharges"
+        },
+        {
+          "id": "01-02",
+          "name": "Ember starts with empty Special charge",
+          "criteria": "Ember's Special charge is 0 when a new run begins",
+          "test_file": "Tests/DCJam2026Tests/WalkingSkeletonTests.swift",
+          "scenario_name": "emberStartsWithEmptySpecialCharge"
+        },
+        {
+          "id": "01-03",
+          "name": "Ember starts without the egg",
+          "criteria": "Ember does not carry the egg when a new run begins",
+          "test_file": "Tests/DCJam2026Tests/WalkingSkeletonTests.swift",
+          "scenario_name": "emberStartsWithoutEgg"
+        },
+        {
+          "id": "01-04",
+          "name": "Ember starts on Floor 1",
+          "criteria": "Ember begins on Floor 1 when a new run begins",
+          "test_file": "Tests/DCJam2026Tests/WalkingSkeletonTests.swift",
+          "scenario_name": "emberStartsOnFloorOne"
+        },
+        {
+          "id": "01-05",
+          "name": "Dash advances Ember three squares",
+          "criteria": "Ember's position advances 3 squares after a successful Dash through a guard",
+          "test_file": "Tests/DCJam2026Tests/WalkingSkeletonTests.swift",
+          "scenario_name": "dashAdvancesEmberThreeSquares"
+        },
+        {
+          "id": "01-06",
+          "name": "Dash decrements charge by one",
+          "criteria": "Ember's Dash charge count decrements by 1 after a successful Dash",
+          "test_file": "Tests/DCJam2026Tests/WalkingSkeletonTests.swift",
+          "scenario_name": "dashDecrementsChargeByOne"
+        },
+        {
+          "id": "01-07",
+          "name": "Dash ends the encounter",
+          "criteria": "The encounter ends after Ember uses Dash",
+          "test_file": "Tests/DCJam2026Tests/WalkingSkeletonTests.swift",
+          "scenario_name": "dashEndsEncounter"
+        },
+        {
+          "id": "01-08",
+          "name": "Normal movement locked in encounter",
+          "criteria": "Normal movement is unavailable when Ember is in an active encounter",
+          "test_file": "Tests/DCJam2026Tests/WalkingSkeletonTests.swift",
+          "scenario_name": "normalMovementLockedInEncounter"
+        },
+        {
+          "id": "01-09",
+          "name": "Descending stairs increments floor counter",
+          "criteria": "The floor counter increments when Ember steps onto the stairs",
+          "test_file": "Tests/DCJam2026Tests/WalkingSkeletonTests.swift",
+          "scenario_name": "descendingStairsIncrementsFloor"
+        },
+        {
+          "id": "01-10",
+          "name": "Descent places Ember at next floor entry",
+          "criteria": "Ember's position resets to the Floor 2 entry point after descending",
+          "test_file": "Tests/DCJam2026Tests/WalkingSkeletonTests.swift",
+          "scenario_name": "descendingPlacesEmberAtNextFloorEntry"
+        },
+        {
+          "id": "01-11",
+          "name": "Death fires when HP reaches zero",
+          "criteria": "The death screen appears when Ember's HP drops to 0",
+          "test_file": "Tests/DCJam2026Tests/WalkingSkeletonTests.swift",
+          "scenario_name": "deathFiresWhenHPReachesZero",
+          "blocked_on": "04-01"
+        },
+        {
+          "id": "01-12",
+          "name": "HP never displays a negative value",
+          "criteria": "HP display does not show a negative value when damage exceeds remaining HP",
+          "test_file": "Tests/DCJam2026Tests/WalkingSkeletonTests.swift",
+          "scenario_name": "hpNeverDisplaysNegative",
+          "blocked_on": "04-01"
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "name": "Dash Mechanics",
+      "steps": [
+        {
+          "id": "02-01",
+          "name": "Dash passes through enemy square",
+          "criteria": "Ember passes through the guard's square without stopping when she Dashes",
+          "test_file": "Tests/DCJam2026Tests/DashMechanicsTests.swift",
+          "scenario_name": "dashPassesThroughEnemySquare"
+        },
+        {
+          "id": "02-02",
+          "name": "Last charge depletes to zero",
+          "criteria": "Ember uses Dash with exactly 1 charge remaining and it depletes to 0",
+          "test_file": "Tests/DCJam2026Tests/DashMechanicsTests.swift",
+          "scenario_name": "dashWithOneRemainingChargeDepletesToZero"
+        },
+        {
+          "id": "02-03",
+          "name": "Dash cooldown begins after use",
+          "criteria": "The Dash cooldown timer begins immediately after a Dash is used",
+          "test_file": "Tests/DCJam2026Tests/DashMechanicsTests.swift",
+          "scenario_name": "dashCooldownBeginsAfterUse"
+        },
+        {
+          "id": "02-04",
+          "name": "Dash charge replenishes after cooldown",
+          "criteria": "A Dash charge replenishes after the configured cooldown duration elapses",
+          "test_file": "Tests/DCJam2026Tests/DashMechanicsTests.swift",
+          "scenario_name": "dashChargeReplenishesAfterCooldown"
+        },
+        {
+          "id": "02-05",
+          "name": "Dash not selectable with zero charges",
+          "criteria": "Dash is not selectable when both charges are depleted",
+          "test_file": "Tests/DCJam2026Tests/DashMechanicsTests.swift",
+          "scenario_name": "dashNotSelectableWithZeroCharges"
+        },
+        {
+          "id": "02-06",
+          "name": "Blocked Dash does not consume charge",
+          "criteria": "Dash charge is not consumed when Dash is attempted with 0 charges",
+          "test_file": "Tests/DCJam2026Tests/DashMechanicsTests.swift",
+          "scenario_name": "blockedDashDoesNotConsumeCharge"
+        },
+        {
+          "id": "02-07",
+          "name": "Dash blocked during boss encounter",
+          "criteria": "Dash is blocked during the boss encounter",
+          "test_file": "Tests/DCJam2026Tests/DashMechanicsTests.swift",
+          "scenario_name": "dashBlockedDuringBossEncounter"
+        },
+        {
+          "id": "02-08",
+          "name": "Blocked Dash on boss does not consume charge",
+          "criteria": "Dash charge is not consumed when Dash is attempted during the boss encounter",
+          "test_file": "Tests/DCJam2026Tests/DashMechanicsTests.swift",
+          "scenario_name": "blockedDashOnBossDoesNotConsumeCharge"
+        },
+        {
+          "id": "02-09",
+          "name": "Dash blocking driven by flag, not floor number",
+          "criteria": "Dash blocking is controlled by the boss encounter flag, not by the floor number",
+          "test_file": "Tests/DCJam2026Tests/DashMechanicsTests.swift",
+          "scenario_name": "dashBlockingDrivenByFlagNotFloorNumber"
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "name": "Floor Navigation",
+      "steps": [
+        {
+          "id": "03-01",
+          "name": "Run generates 3 to 5 floors",
+          "criteria": "A new run generates between 3 and 5 floors",
+          "test_file": "Tests/DCJam2026Tests/FloorNavigationTests.swift",
+          "scenario_name": "runGeneratesBetweenThreeAndFiveFloors"
+        },
+        {
+          "id": "03-02",
+          "name": "Floor 1 has no egg room",
+          "criteria": "Floor 1 contains no egg room",
+          "test_file": "Tests/DCJam2026Tests/FloorNavigationTests.swift",
+          "scenario_name": "floorOneHasNoEggRoom"
+        },
+        {
+          "id": "03-03",
+          "name": "Exactly one egg room on mid-floors",
+          "criteria": "Exactly one floor in the range 2 through 4 contains an egg room",
+          "test_file": "Tests/DCJam2026Tests/FloorNavigationTests.swift",
+          "scenario_name": "exactlyOneEggRoomOnMidFloors"
+        },
+        {
+          "id": "03-04",
+          "name": "Floor 5 has boss encounter and exit square",
+          "criteria": "Floor 5 contains the boss encounter and the exit square",
+          "test_file": "Tests/DCJam2026Tests/FloorNavigationTests.swift",
+          "scenario_name": "floorFiveHasBossAndExit"
+        },
+        {
+          "id": "03-05",
+          "name": "Floor 5 has no egg room",
+          "criteria": "Floor 5 contains no egg room",
+          "test_file": "Tests/DCJam2026Tests/FloorNavigationTests.swift",
+          "scenario_name": "floorFiveHasNoEggRoom"
+        },
+        {
+          "id": "03-06",
+          "name": "Every floor is navigable end to end",
+          "criteria": "Each floor has a reachable path from entry to staircase with no inescapable dead ends",
+          "test_file": "Tests/DCJam2026Tests/FloorNavigationTests.swift",
+          "scenario_name": "everyFloorIsNavigable"
+        },
+        {
+          "id": "03-07",
+          "name": "3-floor run final floor has boss and exit",
+          "criteria": "In a 3-floor run, the final floor contains the boss encounter and exit",
+          "test_file": "Tests/DCJam2026Tests/FloorNavigationTests.swift",
+          "scenario_name": "threeFloorRunFinalFloorHasBossAndExit"
+        },
+        {
+          "id": "03-08",
+          "name": "3-floor run egg room is on Floor 2",
+          "criteria": "In a 3-floor run, the egg room is on Floor 2 because Floor 3 is the final floor",
+          "test_file": "Tests/DCJam2026Tests/FloorNavigationTests.swift",
+          "scenario_name": "threeFloorRunEggRoomIsOnFloorTwo"
+        },
+        {
+          "id": "03-09",
+          "name": "Descent places Ember at floor entry point",
+          "criteria": "Ember is placed at the entry point of the new floor after descending",
+          "test_file": "Tests/DCJam2026Tests/FloorNavigationTests.swift",
+          "scenario_name": "descentPlacesEmberAtFloorEntry"
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "name": "Combat",
+      "note": "Playtest-minimal scope: 04-01, 04-04, 04-11. All other steps deferred until post-playtest.",
+      "steps": [
+        {
+          "id": "04-01",
+          "name": "Enemy attack timer fires damage when unbraced",
+          "criteria": "When combat is active the enemy attack timer decrements each tick. When it fires and no Brace window is open, Ember takes full encounter damage. When the Brace window is active the attack is absorbed (zero damage).",
+          "test_file": "Tests/DCJam2026Tests/CombatTests.swift",
+          "scenario_name": "braceTakesDamage"
+        },
+        {
+          "id": "04-02",
+          "name": "Brace keeps encounter active",
+          "criteria": "Brace keeps Ember in the encounter \u2014 it does not end combat",
+          "test_file": "Tests/DCJam2026Tests/CombatTests.swift",
+          "scenario_name": "braceKeepsEncounterActive",
+          "deferred": true
+        },
+        {
+          "id": "04-03",
+          "name": "Brace selectable with zero Dash charges",
+          "criteria": "Brace is selectable even when both Dash charges are depleted",
+          "test_file": "Tests/DCJam2026Tests/CombatTests.swift",
+          "scenario_name": "braceSelectableWithZeroDashCharges",
+          "deferred": true
+        },
+        {
+          "id": "04-04",
+          "name": "Fatal unbraced hit triggers death condition",
+          "criteria": "When an unbraced enemy attack reduces Ember's HP to zero, the death state fires and HP is clamped at 0",
+          "test_file": "Tests/DCJam2026Tests/CombatTests.swift",
+          "scenario_name": "fatalUnbracedHitTriggersDeathCondition"
+        },
+        {
+          "id": "04-05",
+          "name": "Special not selectable below full charge",
+          "criteria": "Special is not selectable when the charge meter is below full",
+          "test_file": "Tests/DCJam2026Tests/CombatTests.swift",
+          "scenario_name": "specialNotSelectableBelowFull",
+          "deferred": true
+        },
+        {
+          "id": "04-06",
+          "name": "Special unavailable at game start",
+          "criteria": "Special cannot be used at game start because the charge begins at 0",
+          "test_file": "Tests/DCJam2026Tests/CombatTests.swift",
+          "scenario_name": "specialUnavailableAtGameStart",
+          "deferred": true
+        },
+        {
+          "id": "04-07",
+          "name": "Special charge resets after use",
+          "criteria": "Ember's Special charge resets to 0 after the Special attack fires",
+          "test_file": "Tests/DCJam2026Tests/CombatTests.swift",
+          "scenario_name": "specialChargeResetsAfterUse",
+          "deferred": true
+        },
+        {
+          "id": "04-08",
+          "name": "Special deals significant damage to enemy",
+          "criteria": "The enemy takes significant damage when Ember fires Special",
+          "test_file": "Tests/DCJam2026Tests/CombatTests.swift",
+          "scenario_name": "specialDamagesEnemy",
+          "deferred": true
+        },
+        {
+          "id": "04-09",
+          "name": "Special overlay transitions back after confirmation",
+          "criteria": "After firing Special, the screen mode transitions away from the narrative overlay",
+          "test_file": "Tests/DCJam2026Tests/CombatTests.swift",
+          "scenario_name": "specialOverlayTransitionsBackAfterConfirmation",
+          "deferred": true
+        },
+        {
+          "id": "04-10",
+          "name": "Boss defeat unblocks exit",
+          "criteria": "The boss is defeatable and the path to the exit opens after defeat",
+          "test_file": "Tests/DCJam2026Tests/CombatTests.swift",
+          "scenario_name": "bossDefeatedUnblocksExit",
+          "deferred": true
+        },
+        {
+          "id": "04-11",
+          "name": "Special charge accumulates over time",
+          "criteria": "Special charge increases when time passes during dungeon navigation",
+          "test_file": "Tests/DCJam2026Tests/CombatTests.swift",
+          "scenario_name": "specialChargeAccumulatesOverTime"
+        },
+        {
+          "id": "04-12",
+          "name": "Special charge cannot be full before first encounter",
+          "criteria": "Special charge cannot reach full in the time available before the first encounter",
+          "test_file": "Tests/DCJam2026Tests/CombatTests.swift",
+          "scenario_name": "specialChargeCannotBeFullAtFirstEncounter",
+          "deferred": true
+        },
+        {
+          "id": "04-13",
+          "name": "Brace parry grants Special charge bonus",
+          "criteria": "A successful Brace parry (enemy attack lands during the invulnerability window) increases Ember's Special charge by the configured bonus amount",
+          "test_file": "Tests/DCJam2026Tests/CombatTests.swift",
+          "scenario_name": "braceParryGrantsSpecialBonus",
+          "deferred": true
+        }
+      ]
+    },
+    {
+      "id": "05",
+      "name": "Progression",
+      "steps": [
+        {
+          "id": "05-01",
+          "name": "Entering egg room triggers narrative",
+          "criteria": "Entering the egg room triggers the egg discovery narrative event",
+          "test_file": "Tests/DCJam2026Tests/ProgressionTests.swift",
+          "scenario_name": "enteringEggRoomTriggersNarrative"
+        },
+        {
+          "id": "05-02",
+          "name": "Egg indicator activates after confirmation",
+          "criteria": "The EGG indicator activates after Ember confirms the egg discovery event",
+          "test_file": "Tests/DCJam2026Tests/ProgressionTests.swift",
+          "scenario_name": "eggIndicatorActivatesAfterConfirmation"
+        },
+        {
+          "id": "05-03",
+          "name": "Dungeon resumes after egg confirmation",
+          "criteria": "The dungeon view resumes immediately after the egg discovery event is confirmed",
+          "test_file": "Tests/DCJam2026Tests/ProgressionTests.swift",
+          "scenario_name": "dungeonResumesAfterEggConfirmation"
+        },
+        {
+          "id": "05-04",
+          "name": "Egg indicator inactive until room entered",
+          "criteria": "The EGG indicator remains inactive when Ember has not yet entered the egg room",
+          "test_file": "Tests/DCJam2026Tests/ProgressionTests.swift",
+          "scenario_name": "eggIndicatorInactiveUntilRoomEntered"
+        },
+        {
+          "id": "05-05",
+          "name": "Upgrade prompt shows exactly 3 options",
+          "criteria": "The upgrade prompt shows exactly 3 options at a milestone floor transition",
+          "test_file": "Tests/DCJam2026Tests/ProgressionTests.swift",
+          "scenario_name": "upgradePromptShowsExactlyThreeOptions"
+        },
+        {
+          "id": "05-06",
+          "name": "Selecting upgrade applies immediately and resumes dungeon",
+          "criteria": "Selecting an upgrade applies its effect immediately and resumes the dungeon",
+          "test_file": "Tests/DCJam2026Tests/ProgressionTests.swift",
+          "scenario_name": "selectingUpgradeAppliesImmediately"
+        },
+        {
+          "id": "05-07",
+          "name": "Dash cooldown upgrade reduces cooldown",
+          "criteria": "A Dash cooldown reduction upgrade measurably reduces the cooldown duration",
+          "test_file": "Tests/DCJam2026Tests/ProgressionTests.swift",
+          "scenario_name": "dashCooldownUpgradeReducesCooldown"
+        },
+        {
+          "id": "05-08",
+          "name": "Dash charge cap upgrade increases capacity",
+          "criteria": "A Dash charge cap upgrade increases the maximum number of charges Ember can hold",
+          "test_file": "Tests/DCJam2026Tests/ProgressionTests.swift",
+          "scenario_name": "dashChargeCapUpgradeIncreasesCapacity"
+        },
+        {
+          "id": "05-09",
+          "name": "Already-selected upgrade not re-offered",
+          "criteria": "An already-selected upgrade does not appear in a subsequent milestone prompt",
+          "test_file": "Tests/DCJam2026Tests/ProgressionTests.swift",
+          "scenario_name": "alreadySelectedUpgradeNotReOffered"
+        },
+        {
+          "id": "05-10",
+          "name": "Upgrade pool has enough unique choices",
+          "criteria": "The upgrade pool provides at least 3 unique choices",
+          "test_file": "Tests/DCJam2026Tests/ProgressionTests.swift",
+          "scenario_name": "upgradePoolHasEnoughUniquesForThreeChoices"
+        },
+        {
+          "id": "05-11",
+          "name": "Special charge ready state at maximum",
+          "criteria": "The Special charge meter shows a ready state when charge reaches maximum",
+          "test_file": "Tests/DCJam2026Tests/ProgressionTests.swift",
+          "scenario_name": "specialChargeReachesFullIndicatesReady"
+        }
+      ]
+    },
+    {
+      "id": "06",
+      "name": "Win/Loss Conditions",
+      "steps": [
+        {
+          "id": "06-01",
+          "name": "Exit with egg fires narrative event",
+          "criteria": "Stepping onto the exit square with the egg fires the exit patio narrative event",
+          "test_file": "Tests/DCJam2026Tests/WinLossConditionTests.swift",
+          "scenario_name": "exitWithEggFiresNarrativeEvent"
+        },
+        {
+          "id": "06-02",
+          "name": "Win state declared after exit confirmation",
+          "criteria": "The win state is declared after Ember confirms the exit patio narrative",
+          "test_file": "Tests/DCJam2026Tests/WinLossConditionTests.swift",
+          "scenario_name": "winStateDeclaredAfterExitConfirmation"
+        },
+        {
+          "id": "06-03",
+          "name": "Exit without egg does not trigger win",
+          "criteria": "The win state is not declared when Ember reaches the exit without the egg",
+          "test_file": "Tests/DCJam2026Tests/WinLossConditionTests.swift",
+          "scenario_name": "exitWithoutEggDoesNotTriggerWin"
+        },
+        {
+          "id": "06-04",
+          "name": "Win state requires exit position",
+          "criteria": "Win state is not declared when Ember has the egg but is not at the exit square",
+          "test_file": "Tests/DCJam2026Tests/WinLossConditionTests.swift",
+          "scenario_name": "winStateRequiresExitPosition"
+        },
+        {
+          "id": "06-05",
+          "name": "Death screen fires at exactly zero HP",
+          "criteria": "The death screen appears when Ember's HP drops to exactly 0",
+          "test_file": "Tests/DCJam2026Tests/WinLossConditionTests.swift",
+          "scenario_name": "deathScreenFiresAtZeroHP"
+        },
+        {
+          "id": "06-06",
+          "name": "HP clamped at zero on fatal blow",
+          "criteria": "HP is displayed as 0, not a negative number, when a fatal blow is received",
+          "test_file": "Tests/DCJam2026Tests/WinLossConditionTests.swift",
+          "scenario_name": "hpClampedAtZeroOnFatalBlow"
+        },
+        {
+          "id": "06-07",
+          "name": "Restart resets all state variables",
+          "criteria": "After restarting from the death screen, Ember returns to initial game state: full HP, two Dash charges, no Special charge, no egg, Floor 1, and no active upgrades",
+          "test_file": "Tests/DCJam2026Tests/WinLossConditionTests.swift",
+          "scenario_name": "restartResetsAllStateVariables"
+        },
+        {
+          "id": "06-08",
+          "name": "Restart clears Dash cooldown timers",
+          "criteria": "The Dash cooldown timers are cleared when Ember restarts",
+          "test_file": "Tests/DCJam2026Tests/WinLossConditionTests.swift",
+          "scenario_name": "restartClearsDashCooldownTimers"
+        },
+        {
+          "id": "06-09",
+          "name": "Death fires correctly after repeated unbraced hits on Floor 1",
+          "criteria": "Death fires correctly when Ember takes repeated unbraced hits until HP reaches 0 on Floor 1",
+          "test_file": "Tests/DCJam2026Tests/WinLossConditionTests.swift",
+          "scenario_name": "deathFiresOnFloorOneBeforeDash"
+        }
+      ]
+    }
+  ],
+  "implementation_scope": {
+    "source_directories": [
+      "Sources/GameDomain/"
+    ],
+    "test_directories": [
+      "Tests/DCJam2026Tests/"
+    ],
+    "excluded_patterns": [
+      "*.o",
+      "*.d",
+      ".build/**"
+    ]
+  },
+  "validation": {
+    "status": "pending",
+    "reviewer": "TODO",
+    "approved_at": "TODO"
+  }
+}

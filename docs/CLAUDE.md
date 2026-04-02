@@ -59,7 +59,48 @@ let inputFD = open("/dev/tty", O_RDONLY | O_NONBLOCK)
 
 ### First-Person Rendering: Lookup Table
 
-First-person dungeon view uses pre-authored ASCII art frames indexed by `(depth: Int, leftOpen: Bool, rightOpen: Bool)`. No ray-casting. No procedural line drawing. ~20-25 frames. See ADR-003.
+First-person dungeon view uses pre-authored ASCII art frames. No ray-casting. No procedural line drawing. See ADR-003.
+
+**Screen layout (fixed 80×25 terminal):**
+```
+┌──────────────────────────────────────────────────────────────────────────────┐ row 1
+│                                                                              │
+│                         dungeon view (78×15 interior)                        │
+│                                                                              │ rows 2-16
+├──────────────────────────────────────────────────────────────────────────────┤ row 17
+│ HP [====] EGG [*]  (1)DASH[2](cd=12s)  (2)BRACE  (3)SPEC[====]             │ row 18
+├─Thoughts─────────────────────────────────────────────────────────────────────┤ row 19
+│ "..."                                                                        │ rows 20-22
+│ "..."                                                                        │
+│ "..."                                                                        │
+│                                                                              │ rows 23-24
+└──────────────────────────────────────────────────────────────────────────────┘ row 25
+```
+
+**Frame key — `DungeonFrameKey`:**
+```swift
+struct DungeonFrameKey: Hashable {
+    let depth: Int       // 0=close wall  1=mid wall  2=far wall (brick)  3=fog
+    let nearLeft: Bool   // opening at player's position going left
+    let nearRight: Bool  // opening at player's position going right
+    let farLeft: Bool    // opening one square ahead going left  (depth >= 1 only)
+    let farRight: Bool   // opening one square ahead going right (depth >= 1 only)
+}
+```
+
+**Depth values:**
+| depth | meaning | far-wall rendering |
+|-------|---------|-------------------|
+| 0 | wall right in front | fills most of the view |
+| 1 | wall one square ahead | solid wall face, no texture |
+| 2 | wall two squares ahead | sparse `▓░` brick detail — a few chars only |
+| 3 | corridor continues past draw distance | `·` fog dots, no wall face |
+
+**Wireframe style:** `\` `/` `|` `_` for all perspective and corridor lines. No shading, no filled regions.
+
+**Brick rule:** `▓░` used at depth=2 only, sparingly (a handful of chars on the wall face). Never repeated patterns that overwhelm the view.
+
+**Frame inventory:** 52 total combinations (4 depths × 2⁴ near/far left/right). Author only frames the dungeon generator can actually produce; fall back gracefully to the closest match for any combination not explicitly authored. Left↔right mirror symmetry halves authoring effort (~30 unique frames at most, likely far fewer in practice).
 
 ### Game Loop: Synchronous, Delta-Time Driven
 
@@ -111,6 +152,12 @@ These are domain rules that must never be violated by any implementation:
 | Egg room: floors 2-4 only, exactly one per run | REQ-04 |
 | Exit patio: floor 5 only | REQ-04 |
 | On restart: ALL state resets (hp, dash, special, egg, floor, upgrades) | INT-04 |
+| **Brace = timed invulnerability window, NOT damage reduction** | 2026-04-02 design session |
+| Brace opens a 0.5 s parry window; enemy attacks on a 2.0 s fixed timer | 2026-04-02 design session |
+| Successful parry (enemy attack lands during window): 0 damage + 15% Special bonus | 2026-04-02 design session |
+| Unbraced hit (no active window): full encounter damage | 2026-04-02 design session |
+| Brace has a 1.5 s cooldown — cannot be spammed | 2026-04-02 design session |
+| Regular encounters must be dangerous enough to require Brace (teaches mechanic before boss) | 2026-04-02 design session |
 
 ---
 
@@ -121,7 +168,10 @@ These are domain rules that must never be violated by any implementation:
 | `dashCooldownSeconds` | `45.0` | Per charge |
 | `specialChargeRatePerSecond` | `0.008` | ~125s to full charge |
 | `maxHP` | `100` | |
-| `braceDefenseMultiplier` | `0.4` | Tunable during polish |
+| `enemyAttackInterval` | `2.0` | Seconds between enemy attacks — sets combat rhythm |
+| `braceWindowDuration` | `0.5` | Invulnerability window length after Brace input |
+| `braceCooldownSeconds` | `1.5` | Cooldown before Brace can be used again |
+| `braceSpecialBonus` | `0.15` | Special charge gained on a successful parry |
 | `maxFloors` | `5` | 3 = minimum viable |
 | `upgradeChoiceCount` | `3` | From pool of 8 |
 
