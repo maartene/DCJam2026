@@ -73,16 +73,49 @@ struct MinimapTests {
 
     // MARK: - US-TM-04: Player marker overrides landmarks
 
-    @Test("Player marker overrides the encounter landmark when Ember is at the encounter cell", .disabled("not yet implemented"))
-    func playerMarkerOverridesEncounterLandmarkOnSameCell() {}
+    @Test("Player marker overrides the encounter landmark when Ember is at the encounter cell")
+    func playerMarkerOverridesEncounterLandmarkOnSameCell() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy)
+        // Encounter is at (7,3); place player there facing north
+        let state = GameState.initial(config: .default)
+            .withPlayerPosition(Position(x: 7, y: 3))
+            .withFacingDirection(.north)
+        renderer.render(state)
+        // Player at (7,3): screenRow = 2 + (6 - 3) = 5, col = 61
+        let playerCellWrites = spy.entries.filter { $0.row == 5 && $0.col == 61 }
+        let allText = playerCellWrites.map(\.string).joined()
+        #expect(allText.contains("^"), "Expected '^' at encounter cell when player is there facing north, got: \(allText)")
+    }
 
-    @Test("Player marker overrides the entry landmark when Ember is at the entry cell", .disabled("not yet implemented"))
-    func playerMarkerOverridesEntryLandmarkAtStart() {}
+    @Test("Player marker overrides the entry landmark when Ember is at the entry cell")
+    func playerMarkerOverridesEntryLandmarkAtStart() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy)
+        // Entry is at (7,0); player starts there by default
+        let state = GameState.initial(config: .default).withFacingDirection(.north)
+        renderer.render(state)
+        // Player at (7,0): screenRow = 2 + (6 - 0) = 8, col = 61
+        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 61 }
+        let allText = playerCellWrites.map(\.string).joined()
+        #expect(allText.contains("^"), "Expected '^' at entry cell when player is there facing north, got: \(allText)")
+    }
 
     // MARK: - US-TM-04: Same-frame update
 
-    @Test("Minimap reflects the new facing on the same rendered frame as a turn command", .disabled("not yet implemented"))
-    func minimapUpdatesSameFrameAsTurnCommand() {}
+    @Test("Minimap reflects the new facing on the same rendered frame as a turn command")
+    func minimapUpdatesSameFrameAsTurnCommand() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy)
+        // Apply turn left (north -> west) and render the resulting state
+        let initialState = GameState.initial(config: .default)
+        let turnedState = RulesEngine.apply(command: .turn(.left), to: initialState, deltaTime: 0)
+        renderer.render(turnedState)
+        // Player at (7,0): screenRow = 8, col = 61; after turning left from north, facing = west
+        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 61 }
+        let allText = playerCellWrites.map(\.string).joined()
+        #expect(allText.contains("<"), "Expected '<' at player cell after turning left (north->west), got: \(allText)")
+    }
 
     // MARK: - US-TM-04: Panel width constraint
 
