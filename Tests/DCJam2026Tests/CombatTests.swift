@@ -82,8 +82,7 @@ struct CombatTests {
 
     // MARK: - Brace: successful parry charges Special
 
-    @Test("A successful Brace parry adds the configured Special charge bonus",
-          .disabled("not yet implemented"))
+    @Test("A successful Brace parry adds the configured Special charge bonus")
     func braceParryGrantsSpecialBonus() {
         // Given — Ember braces at the moment an enemy attack is incoming
         let config = GameConfig.default

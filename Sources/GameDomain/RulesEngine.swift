@@ -65,9 +65,10 @@ public enum RulesEngine {
             if encounter.enemyAttackTimer <= 0 {
                 // Timer fired: deal damage or absorb with Brace.
                 if braceWasActive {
-                    // Parry — absorb hit, zero HP damage.
+                    // Parry — absorb hit, zero HP damage, grant Special charge bonus.
+                    let bonusSpecial = min(next.specialCharge + next.config.braceSpecialBonus, 1.0)
                     encounter.enemyAttackTimer = next.config.enemyAttackInterval
-                    next = next.withScreenMode(.combat(encounter: encounter))
+                    next = next.withSpecialCharge(bonusSpecial).withScreenMode(.combat(encounter: encounter))
                 } else {
                     // Full unbraced hit.
                     let damage = encounterBaseDamage(encounter)
