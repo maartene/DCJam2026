@@ -137,8 +137,7 @@ struct CombatTests {
         }
     }
 
-    @Test("Special cannot be used at game start because the charge begins at 0",
-          .disabled("not yet implemented"))
+    @Test("Special cannot be used at game start because the charge begins at 0")
     func specialUnavailableAtGameStart() {
         // Given
         let config = GameConfig.default
