@@ -67,8 +67,7 @@ struct ProgressionTests {
 
     // MARK: - Error path: egg room not visited means no event
 
-    @Test("The EGG indicator remains inactive when Ember has not yet entered the egg room",
-          .disabled("not yet implemented"))
+    @Test("The EGG indicator remains inactive when Ember has not yet entered the egg room")
     func eggIndicatorInactiveUntilRoomEntered() {
         // Given — Ember has been navigating Floor 2 but not entered egg room
         var state = GameState.initial(config: GameConfig.default)
