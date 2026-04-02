@@ -162,8 +162,7 @@ struct CombatTests {
         #expect(result.specialCharge == 0.0)
     }
 
-    @Test("The enemy takes significant damage when Ember fires Special",
-          .disabled("not yet implemented"))
+    @Test("The enemy takes significant damage when Ember fires Special")
     func specialDamagesEnemy() {
         // Given
         var state = gameStateInRegularEncounter()
