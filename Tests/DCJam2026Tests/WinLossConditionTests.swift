@@ -66,8 +66,7 @@ struct WinLossConditionTests {
 
     // MARK: - Property: both conditions required simultaneously (INT-01)
 
-    @Test("Win state is not declared when hasEgg is true but Ember is not at the exit square",
-          .disabled("not yet implemented"))
+    @Test("Win state is not declared when hasEgg is true but Ember is not at the exit square")
     func winStateRequiresExitPosition() {
         // Given — hasEgg = true, but player is mid-corridor on Floor 5
         var state = GameState.initial(config: GameConfig.default)
