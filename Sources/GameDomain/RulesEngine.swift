@@ -94,12 +94,17 @@ public enum RulesEngine {
         // Movement is locked during narrative overlays — player must confirm first.
         if case .narrativeOverlay = state.screenMode { return state }
 
-        guard direction == .forward else { return state }
         // Clear the post-dash feedback on the first step after a dash.
         let state = state.withRecentDash(false)
+        let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
+
+        // Backward movement: retreat toward entry, clamped to floor start.
+        if direction == .backward {
+            let newPos = max(state.playerPosition - 1, floor.entryPosition)
+            return state.withPlayerPosition(newPos)
+        }
 
         let newPos = state.playerPosition + 1
-        let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
 
         // Descend staircase.
         if newPos >= floor.staircasePosition && !floor.hasExitSquare {

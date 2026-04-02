@@ -17,10 +17,10 @@ let package = Package(
             dependencies: ["GameDomain"],
             path: "Sources/App"
         ),
-        // Acceptance tests invoke GameDomain directly. No mocks. No terminal I/O.
+        // Acceptance tests invoke GameDomain directly; renderer tests use TUIOutputPort spy.
         .testTarget(
             name: "DCJam2026Tests",
-            dependencies: ["GameDomain"],
+            dependencies: ["GameDomain", "DCJam2026"],
             path: "Tests/DCJam2026Tests"
         ),
     ],

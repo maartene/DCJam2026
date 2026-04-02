@@ -52,47 +52,63 @@ private func pad(_ s: String, to width: Int = 78) -> String {
     return s + String(repeating: " ", count: width - count)
 }
 
-// MARK: - depth=0: wall right in front
+// MARK: - depth=0: wall right in front (staircase)
+// Shares the same outer skeleton as d1/d2/d3. Wall face fills the level-1 space.
 
 private func frame_d0_none() -> [String] {
+    let sp76  = String(repeating: " ", count: 76)
+    let sp74  = String(repeating: " ", count: 74)
+    let us72  = String(repeating: "_", count: 72)
+    let us70  = String(repeating: "_", count: 70)
+    // medium-shade stone: close wall reads as solid, not brick-patterned
+    let stone = String(repeating: "▒", count: 70)
+    let label = String(repeating: " ", count: 28) + "[ STAIRCASE ]" + String(repeating: " ", count: 29) // 28+13+29=70
     return [
-        pad(#"\                                                                            /"#),
-        pad(#" \                                                                          / "#),
-        pad(#"  \________________________________________________________________________/  "#),
-        pad(#"  |                                                                        |  "#),
-        pad(#"  |                                                                        |  "#),
-        pad(#"  |                                                                        |  "#),
-        pad(#"  |                          [ WALL ]                                     |  "#),
-        pad(#"  |                                                                        |  "#),
-        pad(#"  |                                                                        |  "#),
-        pad(#"  |                                                                        |  "#),
-        pad(#"  |________________________________________________________________________|  "#),
-        pad(#" /                                                                          \ "#),
-        pad(#"/                                                                            \"#),
-        pad(#"                                                                              "#),
-        pad(#"                                                                              "#),
+        "|\(sp76)|",                    // row  0
+        "|\\\(sp74)/|",                 // row  1
+        "| \\\(us72)/ |",               // row  2: level-1 ceiling
+        "|  |\(us70)|  |",              // row  3: top of wall face
+        "|  |\(stone)|  |",             // row  4
+        "|  |\(stone)|  |",             // row  5
+        "|  |\(label)|  |",             // row  6: label
+        "|  |\(stone)|  |",             // row  7
+        "|  |\(stone)|  |",             // row  8
+        "|  |\(us70)|  |",              // row  9: bottom of wall face
+        "| /\(us72)\\ |",               // row 10: level-1 floor
+        "|/\(sp74)\\|",                 // row 11
+        "|\(sp76)|",                    // row 12
+        String(repeating: " ", count: 78),
+        String(repeating: " ", count: 78),
     ]
 }
 
 // MARK: - depth=1: wall one square ahead
 
 private func frame_d1_none() -> [String] {
+    let sp76  = String(repeating: " ", count: 76)
+    let sp74  = String(repeating: " ", count: 74)
+    let us72  = String(repeating: "_", count: 72)
+    let us70  = String(repeating: "_", count: 70)
+    // brick at level-1 scale: 70-char wide face, alternating rows
+    let brickA = String(repeating: "▓░", count: 35)   // 70 chars
+    let brickB = String(repeating: "░▓", count: 35)   // 70 chars
+    let label  = String(repeating: " ", count: 31) + "[ WALL ]" + String(repeating: " ", count: 31) // 31+8+31=70
     return [
-        pad(#"|                                                                            |"#),
-        pad(#"|\                                                                          /|"#),
-        pad(#"| \______________________________________________________________________/ | "#),
-        pad(#"|  |                                                                    |  | "#),
-        pad(#"|  |                                                                    |  | "#),
-        pad(#"|  |                                                                    |  | "#),
-        pad(#"|  |                        [ WALL ]                                   |  | "#),
-        pad(#"|  |                                                                    |  | "#),
-        pad(#"|  |                                                                    |  | "#),
-        pad(#"|  |____________________________________________________________________|  | "#),
-        pad(#"| /                                                                      \ | "#),
-        pad(#"|/                                                                        \| "#),
-        pad(#"|                                                                            |"#),
-        pad(#"                                                                              "#),
-        pad(#"                                                                              "#),
+        "|\(sp76)|",                    // row  0
+        "|\\\(sp74)/|",                 // row  1
+        "| \\\(us72)/ |",               // row  2: level-1 ceiling
+        "|  |\(us70)|  |",              // row  3: top of wall face
+        "|  |\(brickA)|  |",            // row  4
+        "|  |\(brickB)|  |",            // row  5
+        "|  |\(label)|  |",             // row  6: label centred in brick
+        "|  |\(brickB)|  |",            // row  7
+        "|  |\(brickA)|  |",            // row  8
+        "|  |\(us70)|  |",              // row  9: bottom of wall face
+        "| /\(us72)\\ |",               // row 10: level-1 floor
+        "|/\(sp74)\\|",                 // row 11
+        "|\(sp76)|",                    // row 12
+        String(repeating: " ", count: 78),
+        String(repeating: " ", count: 78),
     ]
 }
 
@@ -156,25 +172,34 @@ private func frame_d1_nearBoth() -> [String] {
     ]
 }
 
-// MARK: - depth=2: wall two squares ahead, sparse brick face
+// MARK: - depth=2: wall two squares ahead, brick face at level-2
+// Identical outer skeleton to d3; only content rows 5-7 differ (brick vs fog).
 
 private func frame_d2_none() -> [String] {
+    let sp76   = String(repeating: " ", count: 76)
+    let sp74   = String(repeating: " ", count: 74)
+    let us72   = String(repeating: "_", count: 72)
+    let sp70   = String(repeating: " ", count: 70)
+    let us66   = String(repeating: "_", count: 66)
+    // brick at level-2 scale: 64-char wide face
+    let brickA = String(repeating: "▓░", count: 32)   // 64 chars
+    let brickB = String(repeating: "░▓", count: 32)   // 64 chars
     return [
-        pad(#"|                                                                            |"#),
-        pad(#"|\                                                                          /|"#),
-        pad(#"| \                                                                        / |"#),
-        pad(#"|  \____________________________________________________________________/  | "#),
-        pad(#"|   |                                                                  |   | "#),
-        pad(#"|   |           ▓░▓  ░▓░  ▓░░  ░▓▓  ░▓░  ▓░▓  ░▓░            |   | "#),
-        pad(#"|   |           ░▓░  ▓░▓  ░▓▓  ▓░░  ▓░▓  ░▓░  ▓░▓            |   | "#),
-        pad(#"|   |           ▓░▓  ░▓░  ▓░▓  ░▓▓  ░▓▓  ▓░░  ░▓░            |   | "#),
-        pad(#"|   |                                                                  |   | "#),
-        pad(#"|   |__________________________________________________________________|   | "#),
-        pad(#"|  /                                                                    \  | "#),
-        pad(#"| /                                                                      \ | "#),
-        pad(#"|/                                                                        \| "#),
-        pad(#"|                                                                            |"#),
-        pad(#"                                                                              "#),
+        "|\(sp76)|",                         // row  0
+        "|\\\(sp74)/|",                      // row  1
+        "| \\\(us72)/ |",                    // row  2: level-1 ceiling
+        "|  |\(sp70)|  |",                   // row  3: level-1 walls
+        "|  | \\\(us66)/ |  |",              // row  4: level-2 ceiling
+        "|  |  |\(brickA)|  |  |",           // row  5: brick
+        "|  |  |\(brickB)|  |  |",           // row  6: brick (offset row)
+        "|  |  |\(brickA)|  |  |",           // row  7: brick
+        "|  | /\(us66)\\ |  |",              // row  8: level-2 floor
+        "|  |\(sp70)|  |",                   // row  9: level-1 walls
+        "| /\(us72)\\ |",                    // row 10: level-1 floor
+        "|/\(sp74)\\|",                      // row 11
+        "|\(sp76)|",                         // row 12
+        String(repeating: " ", count: 78),
+        String(repeating: " ", count: 78),
     ]
 }
 

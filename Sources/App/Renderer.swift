@@ -349,14 +349,38 @@ final class Renderer {
     // MARK: - Thoughts (rows 21-24)
 
     private func drawThoughts(_ lines: [String]) {
+        // Word-wrap each entry to 77 chars (1 leading space eats the last column).
+        var wrapped: [String] = []
+        for line in lines {
+            wrapped += wordWrap(line, width: 77)
+        }
         for row in 21...24 {
             output.moveCursor(row: row, col: 2)
             output.write(pad78(""))
         }
-        for (i, line) in lines.prefix(4).enumerated() {
+        for (i, line) in wrapped.prefix(4).enumerated() {
             output.moveCursor(row: 21 + i, col: 2)
             output.write(pad78(" \(line)"))
         }
+    }
+
+    // MARK: - Word wrap
+
+    private func wordWrap(_ text: String, width: Int) -> [String] {
+        var lines: [String] = []
+        var current = ""
+        for word in text.split(separator: " ", omittingEmptySubsequences: false).map(String.init) {
+            if current.isEmpty {
+                current = word
+            } else if current.count + 1 + word.count <= width {
+                current += " " + word
+            } else {
+                lines.append(current)
+                current = word
+            }
+        }
+        if !current.isEmpty { lines.append(current) }
+        return lines.isEmpty ? [""] : lines
     }
 
     // MARK: - Thought content
