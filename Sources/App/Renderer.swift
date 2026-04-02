@@ -103,19 +103,7 @@ final class Renderer {
 
     private func renderDungeon(_ state: GameState) {
         let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
-        // Depth = distance northward from player to the far wall.
-        // For the main corridor (x=7): far wall is at y=6 (staircase/exit), entry is y=0.
-        // squaresAhead = target.y - player.y; clamped to Int range for switch.
-        let targetPos = floor.hasExitSquare ? floor.exitPosition2D : floor.staircasePosition2D
-        let squaresAhead = targetPos.y - state.playerPosition.y
-        let depth: Int
-        switch squaresAhead {
-        case ...0:  depth = 0
-        case 1:     depth = 1
-        case 2:     depth = 2
-        default:    depth = 3
-        }
-        let key = DungeonFrameKey(depth: depth, nearLeft: false, nearRight: false, farLeft: false, farRight: false)
+        let key = dungeonFrameKey(grid: floor.grid, position: state.playerPosition, facing: state.facingDirection)
         let frameLines = frames[key] ?? fallbackFrame(for: key)
         for (i, line) in frameLines.enumerated() {
             output.moveCursor(row: i + 2, col: 2)

@@ -169,6 +169,426 @@
       "s": "EXECUTED",
       "d": "PASS",
       "t": "2026-04-02T18:37:36Z"
+    },
+    {
+      "sid": "02-01",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:37:49Z"
+    },
+    {
+      "sid": "02-02",
+      "p": "PREPARE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:42:18Z"
+    },
+    {
+      "sid": "02-02",
+      "p": "RED_ACCEPTANCE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:42:18Z"
+    },
+    {
+      "sid": "02-02",
+      "p": "RED_UNIT",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: FloorGrid.cell passability API already tested via grid structure tests; no new unit tests needed",
+      "t": "2026-04-02T18:42:18Z"
+    },
+    {
+      "sid": "02-02",
+      "p": "GREEN",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:42:18Z"
+    },
+    {
+      "sid": "02-02",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:42:18Z"
+    },
+    {
+      "sid": "02-03",
+      "p": "PREPARE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:44:58Z"
+    },
+    {
+      "sid": "02-03",
+      "p": "RED_ACCEPTANCE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:45:04Z"
+    },
+    {
+      "sid": "02-03",
+      "p": "RED_UNIT",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: tests passed immediately from RED_ACCEPTANCE; no additional unit tests required",
+      "t": "2026-04-02T18:45:04Z"
+    },
+    {
+      "sid": "02-03",
+      "p": "GREEN",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:45:04Z"
+    },
+    {
+      "sid": "02-03",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:45:04Z"
+    },
+    {
+      "sid": "02-04",
+      "p": "PREPARE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:47:49Z"
+    },
+    {
+      "sid": "02-04",
+      "p": "RED_ACCEPTANCE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:47:52Z"
+    },
+    {
+      "sid": "02-04",
+      "p": "RED_UNIT",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: 10 acceptance-level tests cover all distinct behaviors; no additional unit tests needed",
+      "t": "2026-04-02T18:47:57Z"
+    },
+    {
+      "sid": "02-04",
+      "p": "GREEN",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:48:01Z"
+    },
+    {
+      "sid": "02-04",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:48:01Z"
+    },
+    {
+      "sid": "03-01",
+      "p": "PREPARE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:51:09Z"
+    },
+    {
+      "sid": "03-01",
+      "p": "RED_ACCEPTANCE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:51:12Z"
+    },
+    {
+      "sid": "03-01",
+      "p": "RED_UNIT",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: 2 acceptance tests cover both distinct behaviors within budget; no additional unit tests needed",
+      "t": "2026-04-02T18:51:16Z"
+    },
+    {
+      "sid": "03-01",
+      "p": "GREEN",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:51:19Z"
+    },
+    {
+      "sid": "03-01",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:51:30Z"
+    },
+    {
+      "sid": "03-02",
+      "p": "PREPARE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:53:59Z"
+    },
+    {
+      "sid": "03-02",
+      "p": "RED_ACCEPTANCE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:54:02Z"
+    },
+    {
+      "sid": "03-02",
+      "p": "RED_UNIT",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: acceptance tests are the unit tests for this step \u2014 4 behavioral tests through driving port Renderer.render(_:)",
+      "t": "2026-04-02T18:54:06Z"
+    },
+    {
+      "sid": "03-02",
+      "p": "GREEN",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:54:10Z"
+    },
+    {
+      "sid": "03-02",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:54:10Z"
+    },
+    {
+      "sid": "03-03",
+      "p": "PREPARE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:56:15Z"
+    },
+    {
+      "sid": "03-03",
+      "p": "RED_ACCEPTANCE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:56:19Z"
+    },
+    {
+      "sid": "03-03",
+      "p": "RED_UNIT",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: renderMinimap already draws player marker last with no landmark symbols in 2D grid \u2014 all 3 tests passed immediately without any production code changes",
+      "t": "2026-04-02T18:56:23Z"
+    },
+    {
+      "sid": "03-03",
+      "p": "GREEN",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: no production code changes needed \u2014 renderMinimap already correct",
+      "t": "2026-04-02T18:56:26Z"
+    },
+    {
+      "sid": "03-03",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:56:32Z"
+    },
+    {
+      "sid": "03-04",
+      "p": "PREPARE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:59:28Z"
+    },
+    {
+      "sid": "03-04",
+      "p": "RED_ACCEPTANCE",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: No disabled acceptance tests in MinimapTests.swift; all existing minimap tests are already enabled and passing. This step is layout verification \u2014 unit tests written instead.",
+      "t": "2026-04-02T18:59:35Z"
+    },
+    {
+      "sid": "03-04",
+      "p": "RED_UNIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:59:45Z"
+    },
+    {
+      "sid": "03-04",
+      "p": "GREEN",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:59:48Z"
+    },
+    {
+      "sid": "03-04",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T18:59:59Z"
+    },
+    {
+      "sid": "04-01",
+      "p": "PREPARE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:01:27Z"
+    },
+    {
+      "sid": "04-01",
+      "p": "RED_ACCEPTANCE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:01:51Z"
+    },
+    {
+      "sid": "04-01",
+      "p": "RED_UNIT",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: acceptance tests serve as unit tests through driving port; no additional unit tests needed",
+      "t": "2026-04-02T19:01:57Z"
+    },
+    {
+      "sid": "04-01",
+      "p": "GREEN",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:02:09Z"
+    },
+    {
+      "sid": "04-01",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:02:21Z"
+    },
+    {
+      "sid": "04-02",
+      "p": "PREPARE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:03:34Z"
+    },
+    {
+      "sid": "04-02",
+      "p": "RED_ACCEPTANCE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:03:37Z"
+    },
+    {
+      "sid": "04-02",
+      "p": "RED_UNIT",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: test passed immediately, no production code changes needed",
+      "t": "2026-04-02T19:03:40Z"
+    },
+    {
+      "sid": "04-02",
+      "p": "GREEN",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:03:43Z"
+    },
+    {
+      "sid": "04-02",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:03:53Z"
+    },
+    {
+      "sid": "04-03",
+      "p": "PREPARE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:05:15Z"
+    },
+    {
+      "sid": "04-03",
+      "p": "RED_ACCEPTANCE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:05:18Z"
+    },
+    {
+      "sid": "04-03",
+      "p": "RED_UNIT",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: tests passed immediately on activation \u2014 movement locking already present in RulesEngine",
+      "t": "2026-04-02T19:05:24Z"
+    },
+    {
+      "sid": "04-03",
+      "p": "GREEN",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: no production code changes needed \u2014 regression tests passed on activation",
+      "t": "2026-04-02T19:05:24Z"
+    },
+    {
+      "sid": "04-03",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:05:24Z"
+    },
+    {
+      "sid": "05-01",
+      "p": "PREPARE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:06:38Z"
+    },
+    {
+      "sid": "05-01",
+      "p": "RED_ACCEPTANCE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:06:43Z"
+    },
+    {
+      "sid": "05-01",
+      "p": "RED_UNIT",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: withCurrentFloor already preserves facingDirection via copy-on-write; tests passed immediately without additional unit tests",
+      "t": "2026-04-02T19:06:47Z"
+    },
+    {
+      "sid": "05-01",
+      "p": "GREEN",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: no production code change required; implementation was already correct",
+      "t": "2026-04-02T19:06:51Z"
+    },
+    {
+      "sid": "05-01",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:06:54Z"
+    },
+    {
+      "sid": "05-02",
+      "p": "PREPARE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:08:46Z"
+    },
+    {
+      "sid": "05-02",
+      "p": "RED_ACCEPTANCE",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: DISTILL wave scoped this as inner-loop crafter test; no acceptance-level scenario exists for DungeonFrameKey derivation",
+      "t": "2026-04-02T19:08:48Z"
+    },
+    {
+      "sid": "05-02",
+      "p": "RED_UNIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:09:50Z"
+    },
+    {
+      "sid": "05-02",
+      "p": "GREEN",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T19:10:27Z"
     }
   ]
 }
