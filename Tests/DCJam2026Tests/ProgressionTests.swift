@@ -50,8 +50,7 @@ struct ProgressionTests {
         }
     }
 
-    @Test("The dungeon view resumes immediately after the egg discovery event is confirmed",
-          .disabled("not yet implemented"))
+    @Test("The dungeon view resumes immediately after the egg discovery event is confirmed")
     func dungeonResumesAfterEggConfirmation() {
         // Given
         var state = GameState.initial(config: GameConfig.default)
