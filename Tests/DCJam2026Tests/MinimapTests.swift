@@ -26,17 +26,50 @@ struct MinimapTests {
 
     // MARK: - US-TM-04: Player facing symbol in minimap panel
 
-    @Test("Minimap shows ^ when Ember faces North", .disabled("not yet implemented"))
-    func minimapShowsCaretNorthWhenFacingNorth() {}
+    @Test("Minimap shows ^ when Ember faces North")
+    func minimapShowsCaretNorthWhenFacingNorth() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy)
+        let state = GameState.initial(config: .default).withFacingDirection(.north)
+        renderer.render(state)
+        // Player starts at (x:7, y:0); screenRow = 2 + (6 - 0) = 8, col = 61 + 7 = 68
+        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 61 }
+        let allText = playerCellWrites.map(\.string).joined()
+        #expect(allText.contains("^"), "Expected '^' at player cell when facing north, got: \(allText)")
+    }
 
-    @Test("Minimap shows > when Ember faces East", .disabled("not yet implemented"))
-    func minimapShowsCaretEastWhenFacingEast() {}
+    @Test("Minimap shows > when Ember faces East")
+    func minimapShowsCaretEastWhenFacingEast() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy)
+        let state = GameState.initial(config: .default).withFacingDirection(.east)
+        renderer.render(state)
+        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 61 }
+        let allText = playerCellWrites.map(\.string).joined()
+        #expect(allText.contains(">"), "Expected '>' at player cell when facing east, got: \(allText)")
+    }
 
-    @Test("Minimap shows v when Ember faces South", .disabled("not yet implemented"))
-    func minimapShowsCaretSouthWhenFacingSouth() {}
+    @Test("Minimap shows v when Ember faces South")
+    func minimapShowsCaretSouthWhenFacingSouth() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy)
+        let state = GameState.initial(config: .default).withFacingDirection(.south)
+        renderer.render(state)
+        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 61 }
+        let allText = playerCellWrites.map(\.string).joined()
+        #expect(allText.contains("v"), "Expected 'v' at player cell when facing south, got: \(allText)")
+    }
 
-    @Test("Minimap shows < when Ember faces West", .disabled("not yet implemented"))
-    func minimapShowsCaretWestWhenFacingWest() {}
+    @Test("Minimap shows < when Ember faces West")
+    func minimapShowsCaretWestWhenFacingWest() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy)
+        let state = GameState.initial(config: .default).withFacingDirection(.west)
+        renderer.render(state)
+        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 61 }
+        let allText = playerCellWrites.map(\.string).joined()
+        #expect(allText.contains("<"), "Expected '<' at player cell when facing west, got: \(allText)")
+    }
 
     // MARK: - US-TM-04: Player marker overrides landmarks
 

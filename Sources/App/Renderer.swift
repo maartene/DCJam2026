@@ -110,7 +110,7 @@ final class Renderer {
         output.moveCursor(row: 2, col: 80 - floorLabel.count)
         output.write(floorLabel)
 
-        renderMinimap(floor: floor)
+        renderMinimap(floor: floor, state: state)
     }
 
     // MARK: - Combat view (rows 2-16)
@@ -439,16 +439,28 @@ final class Renderer {
 
     /// Renders the 15×7 floor grid into the right panel (cols 61-79, rows 2-8).
     /// Wall cells render as '#', passable corridor cells as '.'.
-    func renderMinimap(floor: FloorMap) {
+    /// The player's position renders as a facing indicator: ^ > v <
+    func renderMinimap(floor: FloorMap, state: GameState) {
+        let facingChar: Character
+        switch state.facingDirection {
+        case .north: facingChar = "^"
+        case .east:  facingChar = ">"
+        case .south: facingChar = "v"
+        case .west:  facingChar = "<"
+        }
         for y in stride(from: floor.grid.height - 1, through: 0, by: -1) {
             let screenRow = 2 + (floor.grid.height - 1 - y)
-            var rowString = ""
+            var rowChars = [Character]()
             for x in 0..<floor.grid.width {
-                let cell = floor.grid.cell(x: x, y: y)
-                rowString += cell.isPassable ? "." : "#"
+                if x == state.playerPosition.x && y == state.playerPosition.y {
+                    rowChars.append(facingChar)
+                } else {
+                    let cell = floor.grid.cell(x: x, y: y)
+                    rowChars.append(cell.isPassable ? "." : "#")
+                }
             }
             output.moveCursor(row: screenRow, col: 61)
-            output.write(rowString)
+            output.write(String(rowChars))
         }
     }
 
