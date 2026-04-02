@@ -97,9 +97,33 @@ struct TurningEdgeCaseTests {
 
     // MARK: - US-TM-06: Movement lock in combat is unaffected by facing
 
-    @Test("Normal movement is still locked in combat even after Ember has turned", .disabled("not yet implemented"))
-    func movementLockedInCombatRegardlessOfFacing() {}
+    @Test("Normal movement is still locked in combat even after Ember has turned")
+    func movementLockedInCombatRegardlessOfFacing() {
+        let encounter = EncounterModel.guard(isBossEncounter: false)
+        let facings: [CardinalDirection] = [.north, .east, .south, .west]
 
-    @Test("Ember's HP is unchanged when move is blocked in combat (no position change, no damage from move)", .disabled("not yet implemented"))
-    func hpUnchangedWhenMoveBlockedInCombat() {}
+        for facing in facings {
+            let state = GameState.initial(config: .default)
+                .withFacingDirection(facing)
+                .withScreenMode(.combat(encounter: encounter))
+            let initialPosition = state.playerPosition
+
+            let result = RulesEngine.apply(command: .move(.forward), to: state, deltaTime: 0)
+
+            #expect(result.playerPosition == initialPosition,
+                "Expected position unchanged after .moveForward in combat with facing \(facing)")
+        }
+    }
+
+    @Test("Ember's HP is unchanged when move is blocked in combat (no position change, no damage from move)")
+    func hpUnchangedWhenMoveBlockedInCombat() {
+        let encounter = EncounterModel(isBossEncounter: false, enemyHP: 40, enemyAttackTimer: 5.0)
+        let state = GameState.initial(config: .default)
+            .withScreenMode(.combat(encounter: encounter))
+        let initialHP = state.hp
+
+        let result = RulesEngine.apply(command: .move(.forward), to: state, deltaTime: 0)
+
+        #expect(result.hp == initialHP)
+    }
 }
