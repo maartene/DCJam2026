@@ -151,8 +151,7 @@ struct CombatTests {
 
     // MARK: - Special: full charge fires and resets
 
-    @Test("Ember's Special charge resets to 0 after the Special attack fires",
-          .disabled("not yet implemented"))
+    @Test("Ember's Special charge resets to 0 after the Special attack fires")
     func specialChargeResetsAfterUse() {
         // Given — charge at full
         var state = gameStateInRegularEncounter()
