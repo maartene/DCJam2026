@@ -186,8 +186,7 @@ struct CombatTests {
         #expect(enemyHPAfter < enemyHPBefore || encounterEnded)
     }
 
-    @Test("After firing Special, the screen mode transitions away from the narrative overlay",
-          .disabled("not yet implemented"))
+    @Test("After firing Special, the screen mode transitions away from the narrative overlay")
     func specialOverlayTransitionsBackAfterConfirmation() {
         // Given — Special fired, narrative overlay is showing
         var state = GameState.initial(config: GameConfig.default)
