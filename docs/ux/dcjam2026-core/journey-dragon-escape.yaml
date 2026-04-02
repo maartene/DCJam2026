@@ -1,0 +1,306 @@
+---
+# Journey Schema: Dragon Escape
+# Feature: dcjam2026-core
+# Date: 2026-04-02
+# Author: Luna (Product Owner — DISCUSS wave)
+
+journey:
+  id: dragon-escape
+  title: "Dragon Escape — reclaim the egg, reach the exit"
+  persona:
+    name: Ember
+    role: young dragon
+    context: "Trapped in the dungeon where a hero killed their parent and stole their egg"
+    motivation: "Recover the egg and escape to the surface — not to fight, to flee forward"
+    emotional_start: disoriented and urgent
+    emotional_end: exhaled relief
+
+  emotional_arc:
+    - step: game_start
+      emotion: tension
+      intensity: 2
+      note: "Player reads the situation. Dragon. Dungeon. Egg missing. The weight of it."
+    - step: first_dash
+      emotion: delight
+      intensity: 7
+      note: "First pass-through. Surprise. This is the primary verb. It clicks."
+    - step: option_starved
+      emotion: tension
+      intensity: 5
+      note: "Dash on cooldown, Special empty. Only Brace. Intentional strategic pressure."
+    - step: special_first_use
+      emotion: power
+      intensity: 9
+      note: "Badass beat. Full-screen. Dragon identity fully expressed."
+    - step: egg_discovery
+      emotion: relief
+      intensity: 8
+      note: "Actual relief. The egg exists. The mission is not lost. Pacing slows."
+    - step: boss_encounter
+      emotion: dread
+      intensity: 6
+      note: "Something cannot be Dashed through. Stakes escalate."
+    - step: exit_patio
+      emotion: relief
+      intensity: 9
+      note: "Earned exhale. Not triumph. The egg is safe. You made it."
+
+  steps:
+    - id: game_start
+      name: "Game Start"
+      trigger: "Player launches the game"
+      actor: Ember
+      action: "Reads narrative prompt, sees UI state"
+      ui_state:
+        hp: full
+        dash_charges: 2
+        special_charge: 0
+        has_egg: false
+      observable_outcome: "Player understands they are a dragon with 2 Dash charges and an empty Special meter"
+      shared_artifacts:
+        - GameState.dashCharges
+        - GameState.specialCharge
+        - GameState.hasEgg
+      emotional_beat: orientation
+      floor: null
+
+    - id: floor1_first_encounter
+      name: "First Encounter — Dash Teaching Moment"
+      trigger: "Player reaches first enemy-occupied square on Floor 1"
+      actor: Ember
+      action: "Selects Dash from the encounter action list"
+      ui_state:
+        dash_charges: 2
+        special_charge: 0
+        actions_visible: [Dash, Brace]
+        special_greyed_out: true
+      precondition: "Special charge is 0 — visibly unavailable in action list"
+      observable_outcome:
+        - "Ember passes through the guard square without stopping"
+        - "Player advances forward in the dungeon"
+        - "Dash charge decreases to 1"
+        - "Combat text uses dragon vocabulary: 'You surge past the guard'"
+      shared_artifacts:
+        - GameState.dashCharges
+        - FloorMap.playerPosition
+      emotional_beat: delight
+      floor: 1
+      notes: "Special is shown but unavailable — its empty state is the entire tutorial. No text explanation needed."
+
+    - id: floor1_option_starved
+      name: "Option-Starved Window"
+      trigger: "Both Dash charges depleted, Special still below activation threshold"
+      actor: Ember
+      action: "Selects Brace (only available non-Dash option)"
+      ui_state:
+        dash_charges: 0
+        special_charge: low
+        dash_cooldown_visible: true
+        actions_visible: [Brace]
+      observable_outcome:
+        - "Ember absorbs the blow with reduced damage"
+        - "Brace text uses dragon vocabulary: 'You lower your wings'"
+        - "Dash cooldown timer is visible — player knows charges are returning"
+      shared_artifacts:
+        - GameState.dashCharges
+        - GameState.dashCooldownRemaining
+      emotional_beat: tension
+      floor: 1
+      notes: "This window is intentional. Requirements must not try to remove it."
+
+    - id: floor1_stairs
+      name: "First Stairs — Descent"
+      trigger: "Player reaches staircase square on Floor 1"
+      actor: Ember
+      action: "Steps onto stairs"
+      observable_outcome:
+        - "Floor counter increments to Floor 2"
+        - "Floor descriptor text renders"
+        - "Player position resets to Floor 2 entry point"
+      shared_artifacts:
+        - GameState.currentFloor
+        - FloorMap.stairsPosition
+      emotional_beat: anticipation
+      floor: 1
+
+    - id: regular_floors
+      name: "Regular Floors (2–4) — Core Loop"
+      trigger: "Player navigates each regular floor"
+      actor: Ember
+      action: "Uses Dash, Brace, Special as available; manages charge economy"
+      ui_state:
+        special_charge: growing_over_time
+      observable_outcome:
+        - "Enemy density increases floor over floor"
+        - "Special charge meter fills visibly"
+        - "At least one milestone upgrade prompt appears after a floor is cleared"
+      shared_artifacts:
+        - GameState.dashCharges
+        - GameState.specialCharge
+        - GameState.currentFloor
+        - UpgradePool
+      emotional_beat: learning_and_tension
+      floor: "2-4"
+
+    - id: milestone_upgrade
+      name: "Milestone Upgrade Choice"
+      trigger: "Player clears a floor at a defined milestone point"
+      actor: Ember
+      action: "Reads upgrade options; selects one"
+      ui_state:
+        overlay: upgrade_prompt
+        upgrade_options: 3_from_pool
+      precondition: "Pool of 6-8 upgrades defined; player shown 3 at random"
+      observable_outcome:
+        - "Upgrade prompt displays with exactly 3 choices"
+        - "Player selects one choice"
+        - "Selected upgrade effect applies immediately"
+        - "Dungeon resumes with upgrade active"
+      shared_artifacts:
+        - UpgradePool
+        - GameState.activeUpgrades
+      emotional_beat: empowerment
+      floor: "milestone floor"
+      notes: "Primary upgrade levers: Dash cooldown reduction, Dash charge cap increase. Other upgrades (HP, special charge rate) fill the pool."
+
+    - id: egg_discovery
+      name: "Egg Discovery — Relief Beat"
+      trigger: "Player enters the egg room on one of Floors 2–4"
+      actor: Ember
+      action: "Player moves into egg room; full-screen narrative event fires"
+      precondition:
+        - "Egg room exists on exactly one floor in range 2–4"
+        - "Not on Floor 1 (no earned relief)"
+        - "Not on Floor 5 (that floor belongs to boss/exit)"
+        - "Not systematically biased toward Floor 2"
+      ui_state:
+        fullscreen_event: true
+        egg_indicator: activates
+      observable_outcome:
+        - "Full-screen or large text block renders with egg discovery narrative"
+        - "Pacing slows — player must press a key to continue"
+        - "EGG indicator activates in status bar after confirmation"
+        - "Text is distinct from item-pickup text"
+      shared_artifacts:
+        - GameState.hasEgg
+        - FloorMap.eggRoomId
+      emotional_beat: actual_relief
+      floor: "one of 2-4"
+      notes: "This is DEC-03 emotional beat #2. Must not be designed as a standard item pickup. Text must reflect the narrative frame (DEC-05)."
+
+    - id: special_attack
+      name: "Special Attack Use — Badass Beat"
+      trigger: "Player selects Special when charge meter is full"
+      actor: Ember
+      action: "Activates Special attack during an encounter"
+      precondition: "GameState.specialCharge == full"
+      ui_state:
+        fullscreen_event: true
+        special_charge: depletes_to_zero_after
+      observable_outcome:
+        - "Full-screen or ASCII-bordered event interrupts normal dungeon display"
+        - "Combat text is dramatic and dragon-specific: breath weapon, fire, roar"
+        - "Enemy is defeated or heavily damaged"
+        - "Special charge meter resets to 0 after use"
+        - "Feedback is visually distinct from normal Brace text"
+      shared_artifacts:
+        - GameState.specialCharge
+        - GameState.currentEncounter
+      emotional_beat: power_fantasy_badass
+      floor: "any"
+      notes: "This is DEC-03 emotional beat #1. DEC-10 ensures this cannot happen on the first encounter. Must be designed differently from egg discovery beat."
+
+    - id: boss_encounter
+      name: "Floor 5 — Boss Encounter"
+      trigger: "Player enters boss square on Floor 5"
+      actor: Ember
+      action: "Attempts to Dash — blocked. Must engage with Brace and Special."
+      precondition: "Boss is flagged as un-Dashable (explicit boss type)"
+      observable_outcome:
+        - "Dash option shown but blocked with explanation: 'The guardian holds the corridor. You cannot pass.'"
+        - "Player must use Brace and Special to defeat boss"
+        - "Boss is the only encounter type where Dash is blocked"
+      shared_artifacts:
+        - GameState.currentEncounter
+        - GameState.dashCharges
+      emotional_beat: dread_then_resolve
+      floor: 5
+      notes: "Boss is the exception to the dash-through rule. Telegraphed as exceptional, not a general rule change."
+
+    - id: exit_patio
+      name: "Exit Patio — Final Relief Beat"
+      trigger: "Player reaches exit square on Floor 5 with egg in possession"
+      actor: Ember
+      action: "Steps onto exit patio"
+      precondition:
+        - "GameState.hasEgg == true"
+        - "PlayerPosition == exit square on Floor 5"
+      observable_outcome:
+        - "Full-screen narrative event fires: exit patio description"
+        - "Pacing is slow and deliberate — not a score screen"
+        - "Text references the egg, the parent, the hero — the narrative frame (DEC-05)"
+        - "Win state is declared after player presses key"
+      shared_artifacts:
+        - GameState.hasEgg
+        - GameState.currentFloor
+        - FloorMap.exitPosition
+      emotional_beat: earned_relief
+      floor: 5
+      notes: "This is DEC-03 emotional beat #3 (exit component). Not triumph — exhale. Distinct from special attack beat."
+
+  failure_paths:
+    - id: death
+      trigger: "GameState.hp <= 0"
+      outcome: "Death screen. Dragon-vocabulary message. Offer restart."
+      notes: "Jam requires a death/fail condition."
+
+    - id: exit_without_egg
+      trigger: "Player reaches exit square without egg"
+      outcome: "Exit is blocked or player is prompted: 'You cannot leave without the egg.'"
+      notes: "Win condition requires both hasEgg AND at exit. Exit-only is not a win."
+
+  vocabulary:
+    movement:
+      - "you surge past"
+      - "you lunge through"
+      - "you burst forward"
+      - "the dungeon opens ahead"
+    brace:
+      - "you lower your wings"
+      - "scales absorb the blow"
+      - "not ideal, but you endure"
+    special:
+      - "fire pours from you"
+      - "you open your throat"
+      - "roar"
+      - "the guardian ends"
+    egg_discovery:
+      - "your egg"
+      - "warm, pulse-lit"
+      - "not too late"
+    exit:
+      - "real light"
+      - "you are warm"
+      - "you cleaned it up"
+
+  floor_structure:
+    minimum_floors: 3
+    target_floors: 5
+    floors:
+      - id: 1
+        type: starter
+        purpose: "Introduce Dash organically. First encounter has empty Special — teaches Dash priority."
+        egg_allowed: false
+        boss: false
+      - id: "2-4"
+        type: regular
+        purpose: "Core loop. Enemy density increases. Special charges. One floor has egg."
+        egg_allowed: true
+        egg_placement: "Exactly one of floors 2-4. Not biased toward floor 2."
+        boss: false
+      - id: 5
+        type: boss_and_exit
+        purpose: "Boss encounter (un-Dashable). Special beat. Exit patio relief."
+        egg_allowed: false
+        boss: true
+        exit: true
