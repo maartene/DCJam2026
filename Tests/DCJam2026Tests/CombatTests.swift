@@ -65,8 +65,7 @@ struct CombatTests {
         }
     }
 
-    @Test("Brace is selectable even when both Dash charges are depleted",
-          .disabled("not yet implemented"))
+    @Test("Brace is selectable even when both Dash charges are depleted")
     func braceSelectableWithZeroDashCharges() {
         // Given — Dash at 0, Special below full
         var state = gameStateInRegularEncounter()
