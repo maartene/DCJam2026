@@ -234,8 +234,7 @@ struct CombatTests {
 
     // MARK: - Property: Special cannot be full at first encounter (INT-02)
 
-    @Test("Special charge cannot reach full in the time available before the first encounter",
-          .disabled("not yet implemented"))
+    @Test("Special charge cannot reach full in the time available before the first encounter")
     func specialChargeCannotBeFullAtFirstEncounter() {
         // Given — typical Floor 1 walk time: at most 20 seconds
         let config = GameConfig.default
