@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Build & test on Linux ────────────────────────────────────────────────────
+  linux:
+    name: Build & Test (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Swift
+        uses: SwiftyLab/setup-swift@latest
+
+      - name: Build (debug)
+        run: swift build
+
+      - name: Run tests
+        run: swift test
+
+      - name: Build release binary
+        run: swift build -c release --product DCJam2026
+
+      - name: Upload Linux binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: DCJam2026-linux-x86_64
+          path: .build/release/DCJam2026
+          if-no-files-found: error
+
