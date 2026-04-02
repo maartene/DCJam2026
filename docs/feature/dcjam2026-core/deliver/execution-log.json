@@ -491,6 +491,41 @@
       "s": "EXECUTED",
       "d": "PASS",
       "t": "2026-04-02T10:41:41Z"
+    },
+    {
+      "sid": "01-07",
+      "p": "PREPARE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T14:28:16Z"
+    },
+    {
+      "sid": "01-07",
+      "p": "RED_ACCEPTANCE",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T14:28:20Z"
+    },
+    {
+      "sid": "01-07",
+      "p": "RED_UNIT",
+      "s": "SKIPPED",
+      "d": "NOT_APPLICABLE: implementation pre-existed; acceptance test passed immediately",
+      "t": "2026-04-02T14:28:26Z"
+    },
+    {
+      "sid": "01-07",
+      "p": "GREEN",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T14:28:31Z"
+    },
+    {
+      "sid": "01-07",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-02T14:28:34Z"
     }
   ]
 }
