@@ -18,6 +18,8 @@ public struct GameState: Sendable {
     public var braceCooldownTimer: Double
     /// True for the first dungeon tick after a successful Dash — used to show feedback text.
     public var recentDash: Bool
+    /// The cardinal direction Ember is currently facing.
+    public var facingDirection: CardinalDirection
 
     public var specialIsReady: Bool { specialCharge >= 1.0 }
     public var braceWindowActive: Bool { braceWindowTimer > 0 }
@@ -37,7 +39,8 @@ public struct GameState: Sendable {
             config: config,
             braceWindowTimer: 0.0,
             braceCooldownTimer: 0.0,
-            recentDash: false
+            recentDash: false,
+            facingDirection: .north
         )
     }
 
@@ -93,5 +96,9 @@ public struct GameState: Sendable {
 
     public func withRecentDash(_ didDash: Bool) -> GameState {
         var copy = self; copy.recentDash = didDash; return copy
+    }
+
+    public func withFacingDirection(_ direction: CardinalDirection) -> GameState {
+        var copy = self; copy.facingDirection = direction; return copy
     }
 }

@@ -2,6 +2,7 @@
 
 public enum GameCommand: Sendable {
     case move(MoveDirection)
+    case turn(TurnDirection)
     case dash
     case brace
     case special

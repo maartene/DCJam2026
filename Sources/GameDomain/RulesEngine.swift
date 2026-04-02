@@ -14,6 +14,9 @@ public enum RulesEngine {
         case .move(let direction):
             return applyMove(direction, to: next)
 
+        case .turn(let dir):
+            return applyTurn(dir, to: next)
+
         case .dash:
             return applyDash(to: next)
 
@@ -89,6 +92,23 @@ public enum RulesEngine {
         let newHP = max(state.hp - encounter.baseDamage, 0)
         let afterHit = state.withHP(newHP).withScreenMode(.combat(encounter: resetEncounter))
         return newHP == 0 ? afterHit.withScreenMode(.deathState) : afterHit
+    }
+
+    // MARK: - Turning
+
+    private static func applyTurn(_ dir: TurnDirection, to state: GameState) -> GameState {
+        let newFacing: CardinalDirection
+        switch (state.facingDirection, dir) {
+        case (.north, .left):  newFacing = .west
+        case (.north, .right): newFacing = .east
+        case (.east, .left):   newFacing = .north
+        case (.east, .right):  newFacing = .south
+        case (.south, .left):  newFacing = .east
+        case (.south, .right): newFacing = .west
+        case (.west, .left):   newFacing = .south
+        case (.west, .right):  newFacing = .north
+        }
+        return state.withFacingDirection(newFacing)
     }
 
     // MARK: - Movement
