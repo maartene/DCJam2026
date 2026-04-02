@@ -47,8 +47,7 @@ struct WalkingSkeletonTests {
         #expect(state.specialCharge == 0.0)
     }
 
-    @Test("Ember does not carry the egg when a new run begins",
-          .disabled("not yet implemented"))
+    @Test("Ember does not carry the egg when a new run begins")
     func emberStartsWithoutEgg() {
         // Given
         let config = GameConfig.default
@@ -58,8 +57,7 @@ struct WalkingSkeletonTests {
         #expect(state.hasEgg == false)
     }
 
-    @Test("Ember begins on Floor 1 when a new run begins",
-          .disabled("not yet implemented"))
+    @Test("Ember begins on Floor 1 when a new run begins")
     func emberStartsOnFloorOne() {
         // Given
         let config = GameConfig.default
