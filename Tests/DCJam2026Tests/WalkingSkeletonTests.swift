@@ -158,8 +158,7 @@ struct WalkingSkeletonTests {
 
     // MARK: - Ember dies when HP reaches 0
 
-    @Test("The death screen appears when Ember's HP drops to 0",
-          .disabled("not yet implemented"))
+    @Test("The death screen appears when Ember's HP drops to 0")
     func deathFiresWhenHPReachesZero() {
         // Given — Ember at 1 HP in encounter, enemy will deal at least 1 damage
         let config = GameConfig.default
@@ -177,8 +176,7 @@ struct WalkingSkeletonTests {
         }
     }
 
-    @Test("HP display does not show a negative value when damage exceeds remaining HP",
-          .disabled("not yet implemented"))
+    @Test("HP display does not show a negative value when damage exceeds remaining HP")
     func hpNeverDisplaysNegative() {
         // Given — Ember at 1 HP, fatal blow incoming
         let config = GameConfig.default
