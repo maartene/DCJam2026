@@ -108,6 +108,19 @@ struct TurnKeyBindingTests {
 
     // MARK: - US-TM-05: Rapid turn round-trip
 
-    @Test("Pressing 'd' then 'a' rapidly returns Ember to her original facing", .disabled("not yet implemented"))
-    func rapidRightThenLeftReturnsToOriginalFacing() {}
+    @Test("Pressing 'd' then 'a' rapidly returns Ember to her original facing")
+    func rapidRightThenLeftReturnsToOriginalFacing() {
+        let handler = InputHandler()
+        let initial = GameState.initial(config: .default)
+
+        // 'd' → .turn(.right), apply to initial state (north → east)
+        let rightCommand = handler.mapKey(bytes: [0x64])
+        let afterRight = RulesEngine.apply(command: rightCommand, to: initial, deltaTime: 0)
+
+        // 'a' → .turn(.left), apply to turned state (east → north)
+        let leftCommand = handler.mapKey(bytes: [0x61])
+        let afterLeft = RulesEngine.apply(command: leftCommand, to: afterRight, deltaTime: 0)
+
+        #expect(afterLeft.facingDirection == initial.facingDirection)
+    }
 }
