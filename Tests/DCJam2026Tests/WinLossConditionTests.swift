@@ -31,8 +31,7 @@ struct WinLossConditionTests {
         }
     }
 
-    @Test("The win state is declared after Ember confirms the exit patio narrative",
-          .disabled("not yet implemented"))
+    @Test("The win state is declared after Ember confirms the exit patio narrative")
     func winStateDeclaredAfterExitConfirmation() {
         // Given — exit patio overlay showing
         var state = GameState.initial(config: GameConfig.default)
