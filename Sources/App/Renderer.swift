@@ -109,6 +109,8 @@ final class Renderer {
         let floorLabel = " Floor \(state.currentFloor)/\(state.config.maxFloors) "
         output.moveCursor(row: 2, col: 80 - floorLabel.count)
         output.write(floorLabel)
+
+        renderMinimap(floor: floor)
     }
 
     // MARK: - Combat view (rows 2-16)
@@ -430,6 +432,23 @@ final class Renderer {
         case .eggDiscovery:  return ["There it is. The egg. I reach out and it pulses — warm, alive. Let's go."]
         case .exitPatio:     return ["Open sky. Cold air on my scales. I made it this far — one leap and I'm free."]
         case .specialAttack: return ["The heat rises in my chest and I let it out. Nothing in that corridor is standing."]
+        }
+    }
+
+    // MARK: - 2D Minimap (rows 2-8, cols 61-75, panel cols 61-79)
+
+    /// Renders the 15×7 floor grid into the right panel (cols 61-79, rows 2-8).
+    /// Wall cells render as '#', passable corridor cells as '.'.
+    func renderMinimap(floor: FloorMap) {
+        for y in stride(from: floor.grid.height - 1, through: 0, by: -1) {
+            let screenRow = 2 + (floor.grid.height - 1 - y)
+            var rowString = ""
+            for x in 0..<floor.grid.width {
+                let cell = floor.grid.cell(x: x, y: y)
+                rowString += cell.isPassable ? "." : "#"
+            }
+            output.moveCursor(row: screenRow, col: 61)
+            output.write(rowString)
         }
     }
 

@@ -2,14 +2,15 @@ import Testing
 @testable import DCJam2026
 @testable import GameDomain
 
-// Captures every (row, string) pair written through the port.
+// Captures every (row, col, string) triple written through the port.
 final class TUIOutputSpy: TUIOutputPort {
-    struct Entry { let row: Int; let string: String }
+    struct Entry { let row: Int; let col: Int; let string: String }
     var entries: [Entry] = []
     private var currentRow = 0
+    private var currentCol = 0
 
-    func write(_ string: String) { entries.append(Entry(row: currentRow, string: string)) }
-    func moveCursor(row: Int, col: Int) { currentRow = row }
+    func write(_ string: String) { entries.append(Entry(row: currentRow, col: currentCol, string: string)) }
+    func moveCursor(row: Int, col: Int) { currentRow = row; currentCol = col }
     func clearScreen() {}
     func hideCursor() {}
     func showCursor() {}
