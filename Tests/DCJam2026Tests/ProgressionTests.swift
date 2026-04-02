@@ -105,8 +105,7 @@ struct ProgressionTests {
         // test passes vacuously and the crafter must wire the milestone to the correct floor.
     }
 
-    @Test("Selecting an upgrade applies its effect immediately and resumes the dungeon",
-          .disabled("not yet implemented"))
+    @Test("Selecting an upgrade applies its effect immediately and resumes the dungeon")
     func selectingUpgradeAppliesImmediately() {
         // Given — upgrade prompt showing
         let upgrade = UpgradePool.cooldownReductionUpgrade()
