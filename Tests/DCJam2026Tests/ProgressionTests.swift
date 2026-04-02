@@ -140,19 +140,18 @@ struct ProgressionTests {
         #expect(effectiveCooldown < baseCooldown)
     }
 
-    @Test("A Dash charge cap upgrade increases the maximum number of charges Ember can hold",
-          .disabled("not yet implemented"))
+    @Test("A Dash charge cap upgrade increases the maximum number of charges Ember can hold")
     func dashChargeCapUpgradeIncreasesCapacity() {
         // Given
         let config = GameConfig.default
-        let baseCap = config.dashStartingCharges // default = 2
+        let baseCap = config.dashChargeCap
         let upgrade = UpgradePool.chargeCapUpgrade()
         var state = GameState.initial(config: config)
-        state = state.withActiveUpgrades([upgrade])
-        // When — the upgrade takes effect on the next refill
-        let result = RulesEngine.apply(command: .none, to: state, deltaTime: 0.0)
+        state = state.withScreenMode(.upgradePrompt(choices: [upgrade]))
+        // When — selectUpgrade routes through applyUpgrade -> applyEffect, modifying config
+        let upgraded = RulesEngine.apply(command: .selectUpgrade(upgrade), to: state, deltaTime: 0.0)
         // Then
-        #expect(result.config.dashChargeCap > baseCap)
+        #expect(upgraded.config.dashChargeCap > baseCap)
     }
 
     // MARK: - Error path: duplicate upgrades not re-offered
