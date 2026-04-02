@@ -69,8 +69,7 @@ struct WalkingSkeletonTests {
 
     // MARK: - Ember passes through a guard using Dash
 
-    @Test("Ember's position advances 3 squares after a successful Dash through a guard",
-          .disabled("not yet implemented"))
+    @Test("Ember's position advances 3 squares after a successful Dash through a guard")
     func dashAdvancesEmberThreeSquares() {
         // Given — Ember on Floor 1, 1 Dash charge, in encounter with regular enemy
         let config = GameConfig.default
