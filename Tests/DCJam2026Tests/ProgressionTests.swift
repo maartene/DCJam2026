@@ -90,8 +90,7 @@ struct ProgressionTests {
 
     // MARK: - Milestone upgrade prompt
 
-    @Test("The upgrade prompt shows exactly 3 options at a milestone floor transition",
-          .disabled("not yet implemented"))
+    @Test("The upgrade prompt shows exactly 3 options at a milestone floor transition")
     func upgradePromptShowsExactlyThreeOptions() {
         // Given — Ember has cleared a milestone floor
         var state = GameState.initial(config: GameConfig.default)
