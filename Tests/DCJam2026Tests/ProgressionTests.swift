@@ -201,7 +201,7 @@ struct ProgressionTests {
 
 private extension ProgressionTests {
 
-    func adjacentToEggRoom(_ floor: FloorMap) -> Int {
+    func adjacentToEggRoom(_ floor: FloorMap) -> Position {
         // Returns the position one step before the egg room entry
         guard let eggPos = floor.eggRoomPosition else { return floor.entryPosition }
         return eggPos - 1

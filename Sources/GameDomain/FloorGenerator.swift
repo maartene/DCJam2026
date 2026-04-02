@@ -2,17 +2,20 @@
 
 public enum FloorGenerator {
 
-    // MARK: - Floor layout constants
+    // MARK: - Grid constants
 
-    private static let entryPosition = 0
-    private static let standardStaircasePosition = 10
-    private static let standardExitPosition = 10
-    private static let eggRoomPosition = 5
-    private static let standardEncounterPosition = 5
-    private static let postEggEncounterPosition = 7    // guard after egg room
-    private static let bossEncounterPosition = 7
+    public static let gridWidth = 15
+    public static let gridHeight = 7
 
-    /// Generate a single floor. Entry is at position 0; staircase at a fixed depth.
+    // MARK: - 2D landmark positions (ADR-004 L-shaped corridor topology)
+
+    private static let entry2D         = Position(x: 7, y: 0)
+    private static let staircase2D     = Position(x: 7, y: 6)
+    private static let encounter2D     = Position(x: 7, y: 3)
+    private static let egg2D           = Position(x: 2, y: 3)
+    private static let bossEncounter2D = Position(x: 7, y: 3)
+
+    /// Generate a single floor. Entry is at (7,0); staircase at (7,6).
     /// Egg room defaults to floor 2 for mid-floors; absent on floor 1 and final floor.
     public static func generate(floorNumber: Int, config: GameConfig) -> FloorMap {
         generate(floorNumber: floorNumber, config: config, eggFloor: 2)
@@ -23,15 +26,18 @@ public enum FloorGenerator {
         let isFinalFloor = floorNumber == config.maxFloors
         let isFirstFloor = floorNumber == 1
         let hasEggRoom = !isFirstFloor && !isFinalFloor && floorNumber == eggFloor
-        let eggPos: Int? = hasEggRoom ? eggRoomPosition : nil
-        let encounterPos: Int?
+        let eggPos2D: Position? = hasEggRoom ? egg2D : nil
+
+        let encounterPos2D: Position?
         if isFinalFloor {
-            encounterPos = bossEncounterPosition
-        } else if hasEggRoom {
-            encounterPos = postEggEncounterPosition
+            encounterPos2D = bossEncounter2D
+        } else if hasEggRoom || (!isFirstFloor && !isFinalFloor) {
+            encounterPos2D = encounter2D
         } else {
-            encounterPos = standardEncounterPosition
+            encounterPos2D = encounter2D
         }
+
+        let grid = buildGrid(eggPosition: eggPos2D)
 
         return FloorMap(
             floorNumber: floorNumber,
@@ -39,12 +45,26 @@ public enum FloorGenerator {
             hasBossEncounter: isFinalFloor,
             hasExitSquare: isFinalFloor,
             isNavigable: true,
-            entryPosition: entryPosition,
-            staircasePosition: isFinalFloor ? Int.max : standardStaircasePosition,
-            exitPosition: isFinalFloor ? standardExitPosition : 0,
-            eggRoomPosition: eggPos,
-            encounterPosition: encounterPos
+            entryPosition2D: entry2D,
+            staircasePosition2D: staircase2D,
+            exitPosition2D: isFinalFloor ? staircase2D : staircase2D,
+            eggRoomPosition2D: eggPos2D,
+            encounterPosition2D: encounterPos2D,
+            grid: grid
         )
+    }
+
+    /// Build the 15×7 L-shaped corridor grid.
+    /// Passable cells: main corridor x=7 (all y 0..6), branch y=3 (x=2..7).
+    private static func buildGrid(eggPosition: Position?) -> FloorGrid {
+        let rows: [[FloorCell]] = (0..<gridHeight).map { y in
+            (0..<gridWidth).map { x in
+                let isMainCorridor = (x == 7)
+                let isBranchCorridor = (y == 3 && x >= 2 && x <= 7)
+                return FloorCell(isPassable: isMainCorridor || isBranchCorridor)
+            }
+        }
+        return FloorGrid(width: gridWidth, height: gridHeight, cells: rows)
     }
 
     /// Generate a complete run of floors using a reproducible seed.

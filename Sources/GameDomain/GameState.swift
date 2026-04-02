@@ -6,7 +6,7 @@ public struct GameState: Sendable {
     public var specialCharge: Double
     public var hasEgg: Bool
     public var currentFloor: Int
-    public var playerPosition: Int
+    public var playerPosition: Position
     public var screenMode: ScreenMode
     public var timerModel: TimerModel
     public var activeUpgrades: [Upgrade]
@@ -32,7 +32,7 @@ public struct GameState: Sendable {
             specialCharge: 0.0,
             hasEgg: false,
             currentFloor: 1,
-            playerPosition: 0,
+            playerPosition: Position(x: 7, y: 0),
             screenMode: .dungeon,
             timerModel: .empty,
             activeUpgrades: [],
@@ -66,7 +66,7 @@ public struct GameState: Sendable {
         var copy = self; copy.currentFloor = floor; return copy
     }
 
-    public func withPlayerPosition(_ position: Int) -> GameState {
+    public func withPlayerPosition(_ position: Position) -> GameState {
         var copy = self; copy.playerPosition = position; return copy
     }
 

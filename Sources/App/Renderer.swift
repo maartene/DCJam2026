@@ -87,9 +87,11 @@ final class Renderer {
 
     private func renderDungeon(_ state: GameState) {
         let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
-        // Use exitPosition on the final floor; staircasePosition otherwise.
-        let targetPos = floor.hasExitSquare ? floor.exitPosition : floor.staircasePosition
-        let squaresAhead = targetPos - state.playerPosition
+        // Depth = distance northward from player to the far wall.
+        // For the main corridor (x=7): far wall is at y=6 (staircase/exit), entry is y=0.
+        // squaresAhead = target.y - player.y; clamped to Int range for switch.
+        let targetPos = floor.hasExitSquare ? floor.exitPosition2D : floor.staircasePosition2D
+        let squaresAhead = targetPos.y - state.playerPosition.y
         let depth: Int
         switch squaresAhead {
         case ...0:  depth = 0
@@ -387,23 +389,25 @@ final class Renderer {
     }
 
     /// Builds a minimap string: [E...G..○..S] showing entry, guard, player, staircase/exit.
+    /// The minimap shows the y-axis of the main corridor (x=7), from y=0 (south/entry) upward.
     private func buildMinimap(_ state: GameState) -> String {
         let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
-        let end = floor.hasExitSquare ? floor.exitPosition : min(floor.staircasePosition, 10)
-        var cells = [Character](repeating: ".", count: end + 1)
+        let endY = floor.hasExitSquare ? floor.exitPosition2D.y : min(floor.staircasePosition2D.y, 6)
+        var cells = [Character](repeating: ".", count: endY + 1)
 
-        // Landmarks
+        // Landmarks (use y-coordinate of 2D position)
         cells[0] = "E"
-        cells[end] = floor.hasExitSquare ? "X" : "S"
-        if let eggPos = floor.eggRoomPosition, eggPos <= end {
-            cells[eggPos] = state.hasEgg ? "e" : "*"
+        cells[endY] = floor.hasExitSquare ? "X" : "S"
+        if let eggPos = floor.eggRoomPosition2D, eggPos.y <= endY {
+            cells[eggPos.y] = state.hasEgg ? "e" : "*"
         }
-        if let enc = floor.encounterPosition, enc <= end {
-            cells[enc] = floor.hasBossEncounter ? "B" : "G"
+        if let enc = floor.encounterPosition2D, enc.y <= endY {
+            cells[enc.y] = floor.hasBossEncounter ? "B" : "G"
         }
-        // Player (overrides landmark if on same square)
-        let pos = min(state.playerPosition, end)
-        cells[pos] = "○"
+        // Player (overrides landmark if on same square; use y for corridor position)
+        let posY = min(state.playerPosition.y, endY)
+        let clampedPosY = max(0, posY)
+        cells[clampedPosY] = "○"
 
         let bar = "[" + String(cells) + "]"
         return "Floor \(state.currentFloor):  \(bar)   E=entry  G=guard  *=egg  S=stairs  X=exit"

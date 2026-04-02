@@ -192,7 +192,7 @@ private extension WinLossConditionTests {
         return state
     }
 
-    func adjacentToExit(_ floor: FloorMap) -> Int {
+    func adjacentToExit(_ floor: FloorMap) -> Position {
         return floor.exitPosition - 1
     }
 }
