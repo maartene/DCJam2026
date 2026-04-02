@@ -2,51 +2,35 @@
 
 public enum FloorGenerator {
 
+    // MARK: - Floor layout constants
+
+    private static let entryPosition = 0
+    private static let standardStaircasePosition = 10
+    private static let standardExitPosition = 10
+    private static let eggRoomPosition = 5
+    private static let standardEncounterPosition = 5
+    private static let postEggEncounterPosition = 7    // guard after egg room
+    private static let bossEncounterPosition = 7
+
     /// Generate a single floor. Entry is at position 0; staircase at a fixed depth.
     /// Egg room defaults to floor 2 for mid-floors; absent on floor 1 and final floor.
     public static func generate(floorNumber: Int, config: GameConfig) -> FloorMap {
-        let isFinalFloor = floorNumber == config.maxFloors
-        let isFirstFloor = floorNumber == 1
-        let hasEggRoom = !isFirstFloor && !isFinalFloor && floorNumber == 2
-        let eggPos: Int? = hasEggRoom ? 5 : nil
-        // Encounter placement: floor 2 puts guard after egg room (pos 7); boss floor at pos 7;
-        // all other floors at pos 5.
-        let encounterPos: Int?
-        if isFinalFloor {
-            encounterPos = 7   // boss
-        } else if floorNumber == 2 {
-            encounterPos = 7   // guard appears after egg room (egg at 5)
-        } else {
-            encounterPos = 5   // standard guard mid-corridor
-        }
-
-        return FloorMap(
-            floorNumber: floorNumber,
-            hasEggRoom: hasEggRoom,
-            hasBossEncounter: isFinalFloor,
-            hasExitSquare: isFinalFloor,
-            isNavigable: true,
-            entryPosition: 0,
-            staircasePosition: isFinalFloor ? Int.max : 10,
-            exitPosition: isFinalFloor ? 10 : 0,
-            eggRoomPosition: eggPos,
-            encounterPosition: encounterPos
-        )
+        generate(floorNumber: floorNumber, config: config, eggFloor: 2)
     }
 
-    /// Internal overload used by generateRun — knows which floor holds the egg.
+    /// Shared floor builder — knows which floor holds the egg room.
     private static func generate(floorNumber: Int, config: GameConfig, eggFloor: Int) -> FloorMap {
         let isFinalFloor = floorNumber == config.maxFloors
         let isFirstFloor = floorNumber == 1
         let hasEggRoom = !isFirstFloor && !isFinalFloor && floorNumber == eggFloor
-        let eggPos: Int? = hasEggRoom ? 5 : nil
+        let eggPos: Int? = hasEggRoom ? eggRoomPosition : nil
         let encounterPos: Int?
         if isFinalFloor {
-            encounterPos = 7
+            encounterPos = bossEncounterPosition
         } else if hasEggRoom {
-            encounterPos = 7   // guard appears after egg room
+            encounterPos = postEggEncounterPosition
         } else {
-            encounterPos = 5
+            encounterPos = standardEncounterPosition
         }
 
         return FloorMap(
@@ -55,9 +39,9 @@ public enum FloorGenerator {
             hasBossEncounter: isFinalFloor,
             hasExitSquare: isFinalFloor,
             isNavigable: true,
-            entryPosition: 0,
-            staircasePosition: isFinalFloor ? Int.max : 10,
-            exitPosition: isFinalFloor ? 10 : 0,
+            entryPosition: entryPosition,
+            staircasePosition: isFinalFloor ? Int.max : standardStaircasePosition,
+            exitPosition: isFinalFloor ? standardExitPosition : 0,
             eggRoomPosition: eggPos,
             encounterPosition: encounterPos
         )

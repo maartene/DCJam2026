@@ -14,6 +14,4 @@ public enum GameCommand: Sendable {
 public enum MoveDirection: Sendable {
     case forward
     case backward
-    case turnLeft
-    case turnRight
 }

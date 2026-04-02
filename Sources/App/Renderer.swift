@@ -58,35 +58,29 @@ final class Renderer {
         output.moveCursor(row: 1, col: 1)
         output.write("┌" + String(repeating: "─", count: 78) + "┐")
 
-        for row in 2...16 {
-            output.moveCursor(row: row, col: 1)
-            output.write("│")
-            output.moveCursor(row: row, col: 80)
-            output.write("│")
-        }
+        drawSideBars(rows: 2...16)
 
         output.moveCursor(row: 17, col: 1)
         output.write("├" + String(repeating: "─", count: 78) + "┤")
 
-        for row in 18...19 {
-            output.moveCursor(row: row, col: 1)
-            output.write("│")
-            output.moveCursor(row: row, col: 80)
-            output.write("│")
-        }
+        drawSideBars(rows: 18...19)
 
         output.moveCursor(row: 20, col: 1)
         output.write("├─Thoughts" + String(repeating: "─", count: 69) + "┤")
 
-        for row in 21...24 {
+        drawSideBars(rows: 21...24)
+
+        output.moveCursor(row: 25, col: 1)
+        output.write("└" + String(repeating: "─", count: 78) + "┘")
+    }
+
+    private func drawSideBars(rows: ClosedRange<Int>) {
+        for row in rows {
             output.moveCursor(row: row, col: 1)
             output.write("│")
             output.moveCursor(row: row, col: 80)
             output.write("│")
         }
-
-        output.moveCursor(row: 25, col: 1)
-        output.write("└" + String(repeating: "─", count: 78) + "┘")
     }
 
     // MARK: - Dungeon view (rows 2-16, cols 2-79 = 78×15 interior)
@@ -125,18 +119,20 @@ final class Renderer {
         }
     }
 
+    private static let enemyHPBarWidth = 20
+    private static let specialMeterWidth = 8
+    private static let hpBarWidth = 10
+
     private func buildCombatFrame(_ state: GameState, encounter: EncounterModel) -> [String] {
-        let isBoss = encounter.isBossEncounter
-        let maxEnemyHP = isBoss ? 120 : 40
-        let enemyFillCount = Int(Double(encounter.enemyHP) / Double(maxEnemyHP) * 20.0)
-        let clamped = max(0, min(enemyFillCount, 20))
-        let enemyBar = String(repeating: "█", count: clamped) + String(repeating: "░", count: 20 - clamped)
+        let enemyFillCount = Int(Double(encounter.enemyHP) / Double(encounter.maxHP) * Double(Self.enemyHPBarWidth))
+        let clamped = max(0, min(enemyFillCount, Self.enemyHPBarWidth))
+        let enemyBar = String(repeating: "█", count: clamped) + String(repeating: "░", count: Self.enemyHPBarWidth - clamped)
         let attackIn = String(format: "%.1f", max(0.0, encounter.enemyAttackTimer))
-        let enemyName = isBoss ? "DRAGON WARDEN" : "DUNGEON GUARD"
+        let enemyName = encounter.isBossEncounter ? "DRAGON WARDEN" : "DUNGEON GUARD"
         let enemyHP = encounter.enemyHP
 
         let art: [String]
-        if isBoss {
+        if encounter.isBossEncounter {
             art = [
                 #"              /\___/\"#,
                 #"             /  o o  \"#,
@@ -181,10 +177,7 @@ final class Renderer {
     // MARK: - Narrative overlay (rows 2-16)
 
     private func renderNarrativeOverlay(_ event: NarrativeEvent) {
-        for row in 2...16 {
-            output.moveCursor(row: row, col: 2)
-            output.write(pad78(""))
-        }
+        clearMainView()
         let (title, body) = narrativeContent(event)
         output.moveCursor(row: 5, col: 2)
         output.write(pad78(centered("* * *  \(title)  * * *", width: 78)))
@@ -230,10 +223,7 @@ final class Renderer {
     // MARK: - Upgrade prompt (rows 2-16)
 
     private func renderUpgradePrompt(_ state: GameState, choices: [Upgrade]) {
-        for row in 2...16 {
-            output.moveCursor(row: row, col: 2)
-            output.write(pad78(""))
-        }
+        clearMainView()
         output.moveCursor(row: 3, col: 2)
         output.write(pad78(centered("=== UPGRADE AVAILABLE ===", width: 78)))
         output.moveCursor(row: 4, col: 2)
@@ -266,10 +256,7 @@ final class Renderer {
     // MARK: - Death screen
 
     private func renderDeathScreen(_ state: GameState) {
-        for row in 2...16 {
-            output.moveCursor(row: row, col: 2)
-            output.write(pad78(""))
-        }
+        clearMainView()
         output.moveCursor(row: 5, col: 2)
         output.write(pad78(centered("- - - - - - - - - - - - - - -", width: 78)))
         output.moveCursor(row: 7, col: 2)
@@ -290,10 +277,7 @@ final class Renderer {
     // MARK: - Win screen
 
     private func renderWinScreen(_ state: GameState) {
-        for row in 2...16 {
-            output.moveCursor(row: row, col: 2)
-            output.write(pad78(""))
-        }
+        clearMainView()
         output.moveCursor(row: 4, col: 2)
         output.write(pad78(centered("* * * * * * * * * * * * * * *", width: 78)))
         output.moveCursor(row: 6, col: 2)
@@ -316,18 +300,18 @@ final class Renderer {
     // MARK: - Status bar (row 18)
 
     private func drawStatusBar(_ state: GameState) {
-        let hpFilled = Int(Double(state.hp) / Double(state.config.maxHP) * 10.0)
-        let hpClamped = max(0, min(hpFilled, 10))
-        let hpBar = String(repeating: "█", count: hpClamped) + String(repeating: "░", count: 10 - hpClamped)
+        let hpFilled = Int(Double(state.hp) / Double(state.config.maxHP) * Double(Self.hpBarWidth))
+        let hpClamped = max(0, min(hpFilled, Self.hpBarWidth))
+        let hpBar = String(repeating: "█", count: hpClamped) + String(repeating: "░", count: Self.hpBarWidth - hpClamped)
         let eggSymbol = state.hasEgg ? "*" : " "
 
         let cooldown = state.timerModel.activeCooldownDuration
         let dashCooldownStr = cooldown > 0 ? String(format: " (cd=%.0fs)", cooldown) : ""
         let braceCooldownStr = state.braceOnCooldown ? String(format: " (cd=%.1fs)", state.braceCooldownTimer) : ""
 
-        let specFilled = Int(state.specialCharge * 8.0)
-        let specClamped = max(0, min(specFilled, 8))
-        let specBar = String(repeating: "█", count: specClamped) + String(repeating: "░", count: 8 - specClamped)
+        let specFilled = Int(state.specialCharge * Double(Self.specialMeterWidth))
+        let specClamped = max(0, min(specFilled, Self.specialMeterWidth))
+        let specBar = String(repeating: "█", count: specClamped) + String(repeating: "░", count: Self.specialMeterWidth - specClamped)
 
         var bar = " HP [\(hpBar)]"
         bar += " EGG [\(eggSymbol)]"
@@ -446,6 +430,14 @@ final class Renderer {
     }
 
     // MARK: - Helpers
+
+    /// Blanks the main view area (rows 2-16, col 2 onwards) before drawing a full-screen overlay.
+    private func clearMainView() {
+        for row in 2...16 {
+            output.moveCursor(row: row, col: 2)
+            output.write(pad78(""))
+        }
+    }
 
     private func pad78(_ s: String) -> String {
         let count = s.count

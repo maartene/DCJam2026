@@ -78,13 +78,4 @@ final class ANSITerminal: TUIOutputPort {
         buffer.removeAll(keepingCapacity: true)
     }
 
-    // MARK: - Color helpers
-
-    func colorCode(_ code: Int) -> String {
-        "\u{1B}[\(code)m"
-    }
-
-    func resetColor() -> String {
-        "\u{1B}[0m"
-    }
 }

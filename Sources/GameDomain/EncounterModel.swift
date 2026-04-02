@@ -6,15 +6,22 @@ public struct EncounterModel: Sendable {
     /// Seconds remaining until the enemy's next attack. Counts down each tick.
     public var enemyAttackTimer: Double
 
+    /// Starting HP for this encounter type (used for HP bar rendering).
+    public var maxHP: Int { isBossEncounter ? 120 : 40 }
+
+    /// Damage dealt to the player on an unbraced hit.
+    public var baseDamage: Int { isBossEncounter ? 25 : 15 }
+
     public static func `guard`(isBossEncounter: Bool) -> EncounterModel {
-        EncounterModel(
+        let startingHP = isBossEncounter ? 120 : 40
+        return EncounterModel(
             isBossEncounter: isBossEncounter,
-            enemyHP: isBossEncounter ? 120 : 40,
+            enemyHP: startingHP,
             enemyAttackTimer: GameConfig.default.enemyAttackInterval
         )
     }
 
     public static func boss() -> EncounterModel {
-        EncounterModel(isBossEncounter: true, enemyHP: 120, enemyAttackTimer: GameConfig.default.enemyAttackInterval)
+        `guard`(isBossEncounter: true)
     }
 }

@@ -62,29 +62,33 @@ public enum RulesEngine {
         // Enemy attack timer fires only in combat.
         if case .combat(var encounter) = next.screenMode {
             encounter.enemyAttackTimer -= deltaTime
-            if encounter.enemyAttackTimer <= 0 {
-                // Timer fired: deal damage or absorb with Brace.
-                if braceWasActive {
-                    // Parry — absorb hit, zero HP damage, grant Special charge bonus.
-                    let bonusSpecial = min(next.specialCharge + next.config.braceSpecialBonus, 1.0)
-                    encounter.enemyAttackTimer = next.config.enemyAttackInterval
-                    next = next.withSpecialCharge(bonusSpecial).withScreenMode(.combat(encounter: encounter))
-                } else {
-                    // Full unbraced hit.
-                    let damage = encounterBaseDamage(encounter)
-                    let newHP = max(next.hp - damage, 0)
-                    encounter.enemyAttackTimer = next.config.enemyAttackInterval
-                    next = next.withHP(newHP).withScreenMode(.combat(encounter: encounter))
-                    if newHP == 0 {
-                        next = next.withScreenMode(.deathState)
-                    }
-                }
-            } else {
-                next = next.withScreenMode(.combat(encounter: encounter))
-            }
+            next = applyEnemyAttackTick(to: next, encounter: encounter, braceWasActive: braceWasActive)
         }
 
         return next
+    }
+
+    private static func applyEnemyAttackTick(
+        to state: GameState,
+        encounter: EncounterModel,
+        braceWasActive: Bool
+    ) -> GameState {
+        guard encounter.enemyAttackTimer <= 0 else {
+            return state.withScreenMode(.combat(encounter: encounter))
+        }
+        var resetEncounter = encounter
+        resetEncounter.enemyAttackTimer = state.config.enemyAttackInterval
+
+        if braceWasActive {
+            // Parry — absorb hit, zero HP damage, grant Special charge bonus.
+            let bonusSpecial = min(state.specialCharge + state.config.braceSpecialBonus, 1.0)
+            return state.withSpecialCharge(bonusSpecial).withScreenMode(.combat(encounter: resetEncounter))
+        }
+
+        // Full unbraced hit.
+        let newHP = max(state.hp - encounter.baseDamage, 0)
+        let afterHit = state.withHP(newHP).withScreenMode(.combat(encounter: resetEncounter))
+        return newHP == 0 ? afterHit.withScreenMode(.deathState) : afterHit
     }
 
     // MARK: - Movement
@@ -152,7 +156,7 @@ public enum RulesEngine {
         return state
             .withDashCharges(newCharges)
             .withTimerModel(newTimer)
-            .withPlayerPosition(state.playerPosition + 3)
+            .withPlayerPosition(state.playerPosition + dashAdvanceSquares)
             .withScreenMode(.dungeon)
             .withRecentDash(true)
     }
@@ -172,12 +176,14 @@ public enum RulesEngine {
 
     // MARK: - Special
 
+    private static let specialAttackDamage = 60
+    private static let dashAdvanceSquares = 3
+
     private static func applySpecial(to state: GameState) -> GameState {
         guard case .combat(var encounter) = state.screenMode else { return state }
         guard state.specialIsReady else { return state }
 
-        let specialDamage = 60
-        encounter.enemyHP -= specialDamage
+        encounter.enemyHP -= specialAttackDamage
 
         let next = state.withSpecialCharge(0.0)
         if encounter.enemyHP <= 0 {
@@ -227,9 +233,4 @@ public enum RulesEngine {
         }
     }
 
-    // MARK: - Helpers
-
-    private static func encounterBaseDamage(_ encounter: EncounterModel) -> Int {
-        encounter.isBossEncounter ? 25 : 15
-    }
 }

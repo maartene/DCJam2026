@@ -44,54 +44,54 @@ public struct GameState: Sendable {
     // MARK: - Functional update helpers
 
     public func withHP(_ hp: Int) -> GameState {
-        var s = self; s.hp = hp; return s
+        var copy = self; copy.hp = hp; return copy
     }
 
     public func withDashCharges(_ charges: Int) -> GameState {
-        var s = self; s.dashCharges = charges; return s
+        var copy = self; copy.dashCharges = charges; return copy
     }
 
     public func withSpecialCharge(_ charge: Double) -> GameState {
-        var s = self; s.specialCharge = charge; return s
+        var copy = self; copy.specialCharge = charge; return copy
     }
 
     public func withHasEgg(_ hasEgg: Bool) -> GameState {
-        var s = self; s.hasEgg = hasEgg; return s
+        var copy = self; copy.hasEgg = hasEgg; return copy
     }
 
     public func withCurrentFloor(_ floor: Int) -> GameState {
-        var s = self; s.currentFloor = floor; return s
+        var copy = self; copy.currentFloor = floor; return copy
     }
 
-    public func withPlayerPosition(_ pos: Int) -> GameState {
-        var s = self; s.playerPosition = pos; return s
+    public func withPlayerPosition(_ position: Int) -> GameState {
+        var copy = self; copy.playerPosition = position; return copy
     }
 
     public func withScreenMode(_ mode: ScreenMode) -> GameState {
-        var s = self; s.screenMode = mode; return s
+        var copy = self; copy.screenMode = mode; return copy
     }
 
     public func withTimerModel(_ model: TimerModel) -> GameState {
-        var s = self; s.timerModel = model; return s
+        var copy = self; copy.timerModel = model; return copy
     }
 
     public func withActiveUpgrades(_ upgrades: [Upgrade]) -> GameState {
-        var s = self; s.activeUpgrades = upgrades; return s
+        var copy = self; copy.activeUpgrades = upgrades; return copy
     }
 
     public func withConfig(_ config: GameConfig) -> GameState {
-        var s = self; s.config = config; return s
+        var copy = self; copy.config = config; return copy
     }
 
-    public func withBraceWindowTimer(_ t: Double) -> GameState {
-        var s = self; s.braceWindowTimer = t; return s
+    public func withBraceWindowTimer(_ seconds: Double) -> GameState {
+        var copy = self; copy.braceWindowTimer = seconds; return copy
     }
 
-    public func withBraceCooldownTimer(_ t: Double) -> GameState {
-        var s = self; s.braceCooldownTimer = t; return s
+    public func withBraceCooldownTimer(_ seconds: Double) -> GameState {
+        var copy = self; copy.braceCooldownTimer = seconds; return copy
     }
 
-    public func withRecentDash(_ v: Bool) -> GameState {
-        var s = self; s.recentDash = v; return s
+    public func withRecentDash(_ didDash: Bool) -> GameState {
+        var copy = self; copy.recentDash = didDash; return copy
     }
 }
