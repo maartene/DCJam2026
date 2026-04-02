@@ -82,8 +82,7 @@ struct WalkingSkeletonTests {
         #expect(result.playerPosition == startPosition + 3)
     }
 
-    @Test("Ember's Dash charge count decrements by 1 after a successful Dash",
-          .disabled("not yet implemented"))
+    @Test("Ember's Dash charge count decrements by 1 after a successful Dash")
     func dashDecrementsChargeByOne() {
         // Given
         let config = GameConfig.default
@@ -96,8 +95,7 @@ struct WalkingSkeletonTests {
         #expect(result.dashCharges == chargesBefore - 1)
     }
 
-    @Test("The encounter ends after Ember uses Dash",
-          .disabled("not yet implemented"))
+    @Test("The encounter ends after Ember uses Dash")
     func dashEndsEncounter() {
         // Given
         let config = GameConfig.default
@@ -113,8 +111,7 @@ struct WalkingSkeletonTests {
         }
     }
 
-    @Test("Normal movement is unavailable when Ember is in an active encounter",
-          .disabled("not yet implemented"))
+    @Test("Normal movement is unavailable when Ember is in an active encounter")
     func normalMovementLockedInEncounter() {
         // Given
         let config = GameConfig.default
