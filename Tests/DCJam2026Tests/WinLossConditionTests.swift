@@ -104,8 +104,7 @@ struct WinLossConditionTests {
 
     // MARK: - Error path: HP never goes negative
 
-    @Test("HP is displayed as 0, not a negative number, when a fatal blow is received",
-          .disabled("not yet implemented"))
+    @Test("HP is displayed as 0, not a negative number, when a fatal blow is received")
     func hpClampedAtZeroOnFatalBlow() {
         // Given — overkill scenario: 5 HP, enemy deals 50 damage (if brace doesn't fully absorb)
         var state = GameState.initial(config: GameConfig.default)
@@ -120,8 +119,7 @@ struct WinLossConditionTests {
 
     // MARK: - Restart resets ALL state (INT-04)
 
-    @Test("Restart from the death screen resets HP, Dash, Special, egg, floor, and upgrades",
-          .disabled("not yet implemented"))
+    @Test("Restart from the death screen resets HP, Dash, Special, egg, floor, and upgrades")
     func restartResetsAllStateVariables() {
         // Given — Ember died mid-run with partial state
         var state = GameState.initial(config: GameConfig.default)
@@ -144,8 +142,7 @@ struct WinLossConditionTests {
         #expect(result.activeUpgrades.isEmpty)
     }
 
-    @Test("The Dash cooldown timers are cleared when Ember restarts",
-          .disabled("not yet implemented"))
+    @Test("The Dash cooldown timers are cleared when Ember restarts")
     func restartClearsDashCooldownTimers() {
         // Given — Ember had both charges on cooldown when she died
         var state = GameState.initial(config: GameConfig.default)
@@ -159,8 +156,7 @@ struct WinLossConditionTests {
 
     // MARK: - Error path: death on Floor 1 before using Dash
 
-    @Test("Death fires correctly when Ember braces repeatedly and HP reaches 0 on Floor 1",
-          .disabled("not yet implemented"))
+    @Test("Death fires correctly when Ember braces repeatedly and HP reaches 0 on Floor 1")
     func deathFiresOnFloorOneBeforeDash() {
         // Given — Ember on Floor 1, has never Dashed, low HP from bracing
         var state = GameState.initial(config: GameConfig.default)
