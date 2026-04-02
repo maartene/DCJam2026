@@ -66,8 +66,7 @@ struct DashMechanicsTests {
 
     // MARK: - Error path: Dash unavailable at 0 charges
 
-    @Test("Dash is not selectable when both charges are depleted",
-          .disabled("not yet implemented"))
+    @Test("Dash is not selectable when both charges are depleted")
     func dashNotSelectableWithZeroCharges() {
         // Given — 0 Dash charges, in active encounter
         let state = gameStateInRegularEncounter(dashCharges: 0)
@@ -83,8 +82,7 @@ struct DashMechanicsTests {
         }
     }
 
-    @Test("Dash charge is not consumed when Dash is attempted with 0 charges",
-          .disabled("not yet implemented"))
+    @Test("Dash charge is not consumed when Dash is attempted with 0 charges")
     func blockedDashDoesNotConsumeCharge() {
         // Given
         let state = gameStateInRegularEncounter(dashCharges: 0)
@@ -96,8 +94,7 @@ struct DashMechanicsTests {
 
     // MARK: - Error path: Boss encounter blocks Dash (SA-11 flag)
 
-    @Test("Dash is blocked during the boss encounter",
-          .disabled("not yet implemented"))
+    @Test("Dash is blocked during the boss encounter")
     func dashBlockedDuringBossEncounter() {
         // Given — boss encounter (isBossEncounter = true), Ember has 2 charges
         let state = gameStateInBossEncounter(dashCharges: 2)
@@ -115,8 +112,7 @@ struct DashMechanicsTests {
         }
     }
 
-    @Test("Dash charge is not consumed when Dash is attempted during the boss encounter",
-          .disabled("not yet implemented"))
+    @Test("Dash charge is not consumed when Dash is attempted during the boss encounter")
     func blockedDashOnBossDoesNotConsumeCharge() {
         // Given
         let state = gameStateInBossEncounter(dashCharges: 2)
@@ -126,8 +122,7 @@ struct DashMechanicsTests {
         #expect(result.dashCharges == 2)
     }
 
-    @Test("Dash blocking is controlled by the boss encounter flag, not by the floor number",
-          .disabled("not yet implemented"))
+    @Test("Dash blocking is controlled by the boss encounter flag, not by the floor number")
     func dashBlockingDrivenByFlagNotFloorNumber() {
         // Given — regular encounter on Floor 5 (not boss; flag is false)
         var state = GameState.initial(config: GameConfig.default)
