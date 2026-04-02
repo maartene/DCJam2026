@@ -130,8 +130,7 @@ struct WalkingSkeletonTests {
 
     // MARK: - Ember descends stairs to the next floor
 
-    @Test("The floor counter increments when Ember steps onto the stairs",
-          .disabled("not yet implemented"))
+    @Test("The floor counter increments when Ember steps onto the stairs")
     func descendingStairsIncrementsFloor() {
         // Given — Ember on Floor 1, at the staircase position
         let config = GameConfig.default
@@ -144,8 +143,7 @@ struct WalkingSkeletonTests {
         #expect(result.currentFloor == floorBefore + 1)
     }
 
-    @Test("Ember's position resets to the Floor 2 entry point after descending",
-          .disabled("not yet implemented"))
+    @Test("Ember's position resets to the Floor 2 entry point after descending")
     func descendingPlacesEmberAtNextFloorEntry() {
         // Given
         let config = GameConfig.default
