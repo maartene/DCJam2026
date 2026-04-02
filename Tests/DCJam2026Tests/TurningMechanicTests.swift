@@ -40,14 +40,42 @@ struct TurningMechanicTests {
 
     // MARK: - US-TM-01: CardinalDirection domain type
 
-    @Test("Ember faces North when a new run begins", .disabled("not yet implemented"))
-    func newRunInitialisesToNorthFacing() {}
+    @Test("Ember faces North when a new run begins")
+    func newRunInitialisesToNorthFacing() {
+        let state = GameState.initial(config: .default)
+        #expect(state.facingDirection == .north)
+    }
 
-    @Test("withFacingDirection produces a new state with the updated facing direction", .disabled("not yet implemented"))
-    func withFacingDirectionReturnsCopiedState() {}
+    @Test("withFacingDirection produces a new state with the updated facing direction")
+    func withFacingDirectionReturnsCopiedState() {
+        let original = GameState.initial(config: .default)
+        let result = original.withFacingDirection(.east)
 
-    @Test("All four cardinal directions are representable as CardinalDirection values", .disabled("not yet implemented"))
-    func allFourCardinalDirectionsExist() {}
+        #expect(result.facingDirection == .east)
+        // All other fields must be unchanged
+        #expect(result.hp == original.hp)
+        #expect(result.dashCharges == original.dashCharges)
+        #expect(result.specialCharge == original.specialCharge)
+        #expect(result.hasEgg == original.hasEgg)
+        #expect(result.currentFloor == original.currentFloor)
+        #expect(result.playerPosition == original.playerPosition)
+        // screenMode: verify still .dungeon (initial value) — ScreenMode has associated values so no ==
+        if case .dungeon = result.screenMode { } else { Issue.record("screenMode changed") }
+        #expect(result.timerModel.cooldownSlots == original.timerModel.cooldownSlots)
+        #expect(result.activeUpgrades == original.activeUpgrades)
+        #expect(result.braceWindowTimer == original.braceWindowTimer)
+        #expect(result.braceCooldownTimer == original.braceCooldownTimer)
+        #expect(result.recentDash == original.recentDash)
+    }
+
+    @Test("All four cardinal directions are representable as CardinalDirection values")
+    func allFourCardinalDirectionsExist() {
+        #expect(CardinalDirection.allCases.count == 4)
+        #expect(CardinalDirection.allCases.contains(.north))
+        #expect(CardinalDirection.allCases.contains(.east))
+        #expect(CardinalDirection.allCases.contains(.south))
+        #expect(CardinalDirection.allCases.contains(.west))
+    }
 
     // MARK: - US-TM-02: Rotation table
 
