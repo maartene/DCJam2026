@@ -35,8 +35,7 @@ struct ProgressionTests {
         }
     }
 
-    @Test("The EGG indicator activates after Ember confirms the egg discovery event",
-          .disabled("not yet implemented"))
+    @Test("The EGG indicator activates after Ember confirms the egg discovery event")
     func eggIndicatorActivatesAfterConfirmation() {
         // Given — narrative event is showing
         var state = GameState.initial(config: GameConfig.default)
