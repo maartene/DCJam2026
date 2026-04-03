@@ -23,8 +23,11 @@ func buildFrameTable() -> [DungeonFrameKey: [String]] {
     table[DungeonFrameKey(depth: 2, nearLeft: false, nearRight: true,  farLeft: false, farRight: false)] = frame_d2_nearRight()
     table[DungeonFrameKey(depth: 2, nearLeft: true,  nearRight: true,  farLeft: false, farRight: false)] = frame_d2_nearBoth()
 
-    // depth=3: fog
+    // depth=3: fog (plain and near-opening variants)
     table[DungeonFrameKey(depth: 3, nearLeft: false, nearRight: false, farLeft: false, farRight: false)] = frame_d3_fog()
+    table[DungeonFrameKey(depth: 3, nearLeft: true,  nearRight: false, farLeft: false, farRight: false)] = frame_d3_nearLeft()
+    table[DungeonFrameKey(depth: 3, nearLeft: false, nearRight: true,  farLeft: false, farRight: false)] = frame_d3_nearRight()
+    table[DungeonFrameKey(depth: 3, nearLeft: true,  nearRight: true,  farLeft: false, farRight: false)] = frame_d3_nearBoth()
 
     return table
 }
@@ -32,11 +35,15 @@ func buildFrameTable() -> [DungeonFrameKey: [String]] {
 // MARK: - Fallback
 
 func fallbackFrame(for key: DungeonFrameKey) -> [String] {
+    // Promote far openings to near: a corridor visible 1 step ahead on the side
+    // is approximated by the near-open variant (slightly imprecise but far better than no opening).
+    let promotedLeft  = key.nearLeft  || key.farLeft
+    let promotedRight = key.nearRight || key.farRight
     let candidates: [DungeonFrameKey] = [
-        DungeonFrameKey(depth: key.depth, nearLeft: key.nearLeft,  nearRight: key.nearRight,  farLeft: false, farRight: false),
-        DungeonFrameKey(depth: key.depth, nearLeft: key.nearLeft,  nearRight: false,           farLeft: false, farRight: false),
-        DungeonFrameKey(depth: key.depth, nearLeft: false,          nearRight: key.nearRight,  farLeft: false, farRight: false),
-        DungeonFrameKey(depth: key.depth, nearLeft: false,          nearRight: false,           farLeft: false, farRight: false),
+        DungeonFrameKey(depth: key.depth, nearLeft: promotedLeft,  nearRight: promotedRight, farLeft: false, farRight: false),
+        DungeonFrameKey(depth: key.depth, nearLeft: promotedLeft,  nearRight: false,          farLeft: false, farRight: false),
+        DungeonFrameKey(depth: key.depth, nearLeft: false,          nearRight: promotedRight, farLeft: false, farRight: false),
+        DungeonFrameKey(depth: key.depth, nearLeft: false,          nearRight: false,          farLeft: false, farRight: false),
     ]
     let table = buildFrameTable()
     for candidate in candidates {
@@ -275,6 +282,78 @@ private func frame_d2_nearBoth() -> [String] {
         pad(#"                                                      "#),
         pad(#"                                                      "#),
         pad(#"                                                      "#),
+    ]
+}
+
+// MARK: - depth=3: fog variants with near side openings
+
+// nearLeft: left wall open at player position, fog corridor ahead
+private func frame_d3_nearLeft() -> [String] {
+    // Inner fog content: 36 chars wide (same as depth=2 near inner face)
+    let fog   = "  " + String(repeating: "· ", count: 16) + "  "   // 2+32+2 = 36
+    let fogC  = "    " + String(repeating: "· ", count: 14) + "    " // 4+28+4 = 36
+    return [
+        pad(#"                                                    |"#),  // row  0
+        pad(#"  \                                                /|"#),  // row  1
+        pad(#"   \                                              / |"#),  // row  2
+        pad(#"    \____________________________________________/  | "#), // row  3
+        pad(#"    |                                          |   | "#), // row  4
+        pad("    |\(fog)|   | "),                                        // row  5: fog
+        pad("    |\(fogC)|   | "),                                       // row  6: fog centre
+        pad("    |\(fog)|   | "),                                        // row  7: fog
+        pad(#"    |                                          |   | "#), // row  8
+        pad(#"    |__________________________________________|   | "#), // row  9
+        pad(#"   /                                          \  | "#),  // row 10
+        pad(#"  /                                            \ | "#),  // row 11
+        pad(#"                                                \| "#),  // row 12
+        pad(#"                                                    |"#), // row 13
+        pad(#"                                                      "#),// row 14
+    ]
+}
+
+// nearRight: right wall open at player position, fog corridor ahead
+private func frame_d3_nearRight() -> [String] {
+    let fog   = "  " + String(repeating: "· ", count: 16) + "  "
+    let fogC  = "    " + String(repeating: "· ", count: 14) + "    "
+    return [
+        pad(#"|                                                    "#),  // row  0
+        pad(#"|\                                                /  "#),  // row  1
+        pad(#"| \                                              /   "#),  // row  2
+        pad(#"|  \____________________________________________/ /   "#), // row  3
+        pad(#"|   |                                          |     "#), // row  4
+        pad("|   |\(fog)|     "),                                        // row  5: fog
+        pad("|   |\(fogC)|     "),                                       // row  6: fog centre
+        pad("|   |\(fog)|     "),                                        // row  7: fog
+        pad(#"|   |                                          |     "#), // row  8
+        pad(#"|   |__________________________________________|     "#), // row  9
+        pad(#"|  /                                          \    "#),  // row 10
+        pad(#"| /                                            \   "#),  // row 11
+        pad(#"|/                                                   "#), // row 12
+        pad(#"|                                                    "#), // row 13
+        pad(#"                                                      "#),// row 14
+    ]
+}
+
+// nearBoth: both side walls open at player position, fog corridor ahead
+private func frame_d3_nearBoth() -> [String] {
+    let fog   = "  " + String(repeating: "· ", count: 16) + "  "
+    let fogC  = "    " + String(repeating: "· ", count: 14) + "    "
+    return [
+        pad(#"                                                      "#), // row  0
+        pad(#"  \                                                /  "#), // row  1
+        pad(#"   \                                              /   "#), // row  2
+        pad(#"    \____________________________________________/     "#),// row  3
+        pad(#"    |                                          |     "#), // row  4
+        pad("    |\(fog)|     "),                                        // row  5: fog
+        pad("    |\(fogC)|     "),                                       // row  6: fog centre
+        pad("    |\(fog)|     "),                                        // row  7: fog
+        pad(#"    |                                          |     "#), // row  8
+        pad(#"    |__________________________________________|     "#), // row  9
+        pad(#"   /                                          \    "#),  // row 10
+        pad(#"  /                                            \   "#),  // row 11
+        pad(#"                                                      "#), // row 12
+        pad(#"                                                      "#), // row 13
+        pad(#"                                                      "#), // row 14
     ]
 }
 
