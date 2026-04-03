@@ -30,9 +30,9 @@ public struct GameConfig: Sendable {
     )
 
     public static func withFloorCount(_ count: Int) -> GameConfig {
-        var c = GameConfig.default
-        c.maxFloors = count
-        return c
+        var config = GameConfig.default
+        config.maxFloors = count
+        return config
     }
 
     // MARK: - Derived

@@ -158,8 +158,8 @@ public enum RulesEngine {
         let state = state.withRecentDash(false)
         let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
 
-        let d = delta(facing: state.facingDirection, direction: direction)
-        let newPos = Position(x: state.playerPosition.x + d.dx, y: state.playerPosition.y + d.dy)
+        let moveDelta = delta(facing: state.facingDirection, direction: direction)
+        let newPos = Position(x: state.playerPosition.x + moveDelta.dx, y: state.playerPosition.y + moveDelta.dy)
 
         // Descend staircase — triggers when stepping onto or through the staircase cell.
         // Checked before the passability guard: the "step through" case lands out-of-bounds.
