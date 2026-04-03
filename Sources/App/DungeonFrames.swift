@@ -95,8 +95,6 @@ private func frame_d1_none() -> [String] {
     // brick: 25 pairs = 50 chars
     let brickA = String(repeating: "▓░", count: 25)
     let brickB = String(repeating: "░▓", count: 25)
-    // "[ WALL ]" = 8 chars; (50-8)/2 = 21 each side
-    let label  = String(repeating: " ", count: 21) + "[ WALL ]" + String(repeating: " ", count: 21)
     return [
         "|\(sp56)|",                    // row  0
         "|\\\(sp54)/|",                 // row  1
@@ -104,7 +102,7 @@ private func frame_d1_none() -> [String] {
         "|  |\(us50)|  |",              // row  3: top of wall face
         "|  |\(brickA)|  |",            // row  4
         "|  |\(brickB)|  |",            // row  5
-        "|  |\(label)|  |",             // row  6: label centred in brick
+        "|  |\(brickA)|  |",            // row  6
         "|  |\(brickB)|  |",            // row  7
         "|  |\(brickA)|  |",            // row  8
         "|  |\(us50)|  |",              // row  9: bottom of wall face
@@ -126,7 +124,7 @@ private func frame_d1_nearLeft() -> [String] {
         pad(#"   |                                            | /  "#),
         pad(#"   |                                            |/   "#),
         pad(#"   |                                            /    "#),
-        pad(#"   |             [ WALL ]                      /|    "#),
+        pad(#"   |                                           /|    "#),
         pad(#"   |                                            \    "#),
         pad(#"   |                                            |\   "#),
         pad(#"   |____________________________________________|\ "#),
@@ -147,7 +145,7 @@ private func frame_d1_nearRight() -> [String] {
         pad(#"\ |                                            |     "#),
         pad(#" \|                                            |     "#),
         pad(#"  \                                            |     "#),
-        pad(#"  |\             [ WALL ]                      |     "#),
+        pad(#"  |\                                           |     "#),
         pad(#"  /                                            |     "#),
         pad(#" /|                                            |     "#),
         pad(#"/ |____________________________________________|     "#),
@@ -168,7 +166,7 @@ private func frame_d1_nearBoth() -> [String] {
         pad(#"   |                                              |  "#),
         pad(#"   |                                              |  "#),
         pad(#"   |                                              |  "#),
-        pad(#"   |              [ WALL ]                       |  "#),
+        pad(#"   |                                              |  "#),
         pad(#"   |                                              |  "#),
         pad(#"   |                                              |  "#),
         pad(#"   |______________________________________________|  "#),
@@ -313,9 +311,12 @@ private func frame_d3_nearLeft() -> [String] {
 
 // nearRight: right wall open at player position, fog corridor ahead
 // Rows 3-9: left junction (3 chars) + fog44 (44) + "|     " (6) = 53 → padded to 58.
+// Row 6 uses fog43 (43 chars) because the "  |\" junction is 4 chars, keeping the
+// right | at the same column as all other rows.
 // First 4 chars fall in the left bright zone.
 private func frame_d3_nearRight() -> [String] {
-    let fog44 = "  " + String(repeating: "· ", count: 20) + "  "  // 44 chars
+    let fog44 = "  " + String(repeating: "· ", count: 20) + "  "   // 44 chars
+    let fog43 = "  " + String(repeating: "· ", count: 19) + "   "  // 43 chars (row 6 only)
     let us44  = String(repeating: "_", count: 44)
     return [
         pad(#"|                                                    "#),  // row  0
@@ -324,7 +325,7 @@ private func frame_d3_nearRight() -> [String] {
         pad("\\ |\(String(repeating: " ", count: 44))|     "),           // row  3: "\ | " bright
         pad(" \\|\(fog44)|     "),                                        // row  4: " \| " bright
         pad("  \\\(fog44)|     "),                                        // row  5: "  \ " bright
-        pad("  |\\\(fog44)|     "),                                       // row  6: "  |\" bright
+        pad("  |\\\(fog43)|     "),                                       // row  6: "  |\" — fog43 keeps right | aligned
         pad("  /\(fog44)|     "),                                         // row  7: "  / " bright
         pad(" /|\(fog44)|     "),                                         // row  8: " /| " bright
         pad("/ |\(us44)|     "),                                          // row  9: "/ |_" bright
