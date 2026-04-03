@@ -2,7 +2,9 @@
 
 ## TODO
 - [ ] BUG: After defeating guard, he does not leave
-- [ ] the boss should be a "bigger warden", not a cat. We're cleaning up after the human's mess, so the boss should be a bad a$$ human.
+- [ ] the boss should be a "bigger warden", not a cat. We're cleaning up after the human's mess, so the boss should be a bad a$$ human
+- [ ] Web build???
+- [ ] polish: legend for minimap (what do the symbols mean?)
 
 ## In progress
 
