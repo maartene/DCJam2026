@@ -173,9 +173,9 @@ import Testing
     // MARK: - Special charge meter transitions
 
     @Test func `The Special charge meter shows a ready state when charge reaches maximum`() {
-        // Given — charge advanced to full via time
+        // Given — dungeon mode (startScreen pauses timers by design)
         let config = GameConfig.default
-        let state = GameState.initial(config: config)
+        let state = GameState.initial(config: config).withScreenMode(.dungeon)
         // Advance time to fill charge completely (~125 seconds at default rate)
         let timeToFull = 1.0 / config.specialChargeRatePerSecond + 1.0
         let result = RulesEngine.apply(command: .none, to: state, deltaTime: timeToFull)

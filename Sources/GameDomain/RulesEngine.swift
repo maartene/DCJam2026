@@ -4,8 +4,18 @@
 public enum RulesEngine {
 
     public static func apply(command: GameCommand, to state: GameState, deltaTime: Double) -> GameState {
+        // Start screen: timers are paused; any non-idle command transitions to dungeon then continues.
+        let resolvedState: GameState
+        if case .startScreen = state.screenMode {
+            guard command != .none else { return state }
+            // Transition to dungeon, then process the command normally (no timer advance on start screen).
+            resolvedState = state.withScreenMode(.dungeon)
+        } else {
+            resolvedState = state
+        }
+
         // Advance timers first on every tick.
-        let next = advanceTimers(state, deltaTime: deltaTime)
+        let next = advanceTimers(resolvedState, deltaTime: deltaTime)
 
         switch command {
         case .none:
@@ -37,6 +47,18 @@ public enum RulesEngine {
         }
     }
 
+    // MARK: - Start screen
+
+    private static func applyStartScreen(command: GameCommand, state: GameState) -> GameState {
+        // Any non-quit command transitions to dungeon. Quit is handled by the game loop, not RulesEngine.
+        switch command {
+        case .none:
+            return state
+        default:
+            return state.withScreenMode(.dungeon)
+        }
+    }
+
     // MARK: - Timer advancement
 
     private static func advanceTimers(_ state: GameState, deltaTime: Double) -> GameState {
@@ -55,12 +77,27 @@ public enum RulesEngine {
         // it covers any attack that fires during this tick (discrete-tick game rule).
         let braceWasActive = state.braceWindowTimer > 0
 
+        // Decrement transient overlay frame counter; clear when it reaches zero.
+        let newOverlay: TransientOverlay?
+        switch state.transientOverlay {
+        case .braceSuccess(let f) where f > 1:
+            newOverlay = .braceSuccess(framesRemaining: f - 1)
+        case .braceHit(let f) where f > 1:
+            newOverlay = .braceHit(framesRemaining: f - 1)
+        case .dash(let f) where f > 1:
+            newOverlay = .dash(framesRemaining: f - 1)
+        default:
+            // framesRemaining == 1 (expires this tick) or nil
+            newOverlay = nil
+        }
+
         var next = state
             .withTimerModel(newTimerModel)
             .withDashCharges(newCharges)
             .withSpecialCharge(newSpecial)
             .withBraceWindowTimer(newBraceWindow)
             .withBraceCooldownTimer(newBraceCooldown)
+            .withTransientOverlay(newOverlay)
 
         // Enemy attack timer fires only in combat.
         if case .combat(var encounter) = next.screenMode {
@@ -85,13 +122,26 @@ public enum RulesEngine {
         if braceWasActive {
             // Parry — absorb hit, zero HP damage, grant Special charge bonus.
             let bonusSpecial = min(state.specialCharge + state.config.braceSpecialBonus, 1.0)
-            return state.withSpecialCharge(bonusSpecial).withScreenMode(.combat(encounter: resetEncounter))
+            return state
+                .withSpecialCharge(bonusSpecial)
+                .withScreenMode(.combat(encounter: resetEncounter))
+                .withTransientOverlay(.braceSuccess(framesRemaining: TransientOverlay.defaultDuration))
         }
 
         // Full unbraced hit.
         let newHP = max(state.hp - encounter.baseDamage, 0)
-        let afterHit = state.withHP(newHP).withScreenMode(.combat(encounter: resetEncounter))
-        return newHP == 0 ? afterHit.withScreenMode(.deathState) : afterHit
+        if newHP == 0 {
+            // Fatal hit — death state, no overlay.
+            return state
+                .withHP(0)
+                .withScreenMode(.deathState)
+                .withTransientOverlay(nil)
+        }
+        // Non-fatal unbraced hit.
+        return state
+            .withHP(newHP)
+            .withScreenMode(.combat(encounter: resetEncounter))
+            .withTransientOverlay(.braceHit(framesRemaining: TransientOverlay.defaultDuration))
     }
 
     // MARK: - Turning
@@ -177,6 +227,7 @@ public enum RulesEngine {
             .withPlayerPosition(state.playerPosition + dashAdvanceSquares)
             .withScreenMode(.dungeon)
             .withRecentDash(true)
+            .withTransientOverlay(.dash(framesRemaining: TransientOverlay.defaultDuration))
     }
 
     // MARK: - Brace

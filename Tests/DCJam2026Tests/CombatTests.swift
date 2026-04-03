@@ -207,9 +207,9 @@ import Testing
     // MARK: - Special charge accumulates over time
 
     @Test func `Special charge increases when time passes during dungeon navigation`() {
-        // Given
+        // Given — dungeon mode (startScreen pauses timers by design)
         let config = GameConfig.default
-        let state = GameState.initial(config: config)
+        let state = GameState.initial(config: config).withScreenMode(.dungeon)
         let chargeBefore = state.specialCharge
         // When — advance time by 30 seconds (well under first-encounter window)
         let result = RulesEngine.apply(command: .none, to: state, deltaTime: 30.0)

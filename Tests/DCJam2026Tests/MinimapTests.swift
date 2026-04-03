@@ -28,10 +28,10 @@ import Testing
     @Test func `Minimap shows ^ when Ember faces North`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
-        let state = GameState.initial(config: .default).withFacingDirection(.north)
+        let state = GameState.initial(config: .default).withScreenMode(.dungeon).withFacingDirection(.north)
         renderer.render(state)
-        // Player starts at (x:7, y:0); screenRow = 2 + (6 - 0) = 8, col = 61 + 7 = 68
-        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 61 }
+        // Player at (x:7, y:0); per-cell write at screenRow=8, col=61+7=68
+        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 68 }
         let allText = playerCellWrites.map(\.string).joined()
         #expect(allText.contains("^"), "Expected '^' at player cell when facing north, got: \(allText)")
     }
@@ -39,9 +39,9 @@ import Testing
     @Test func `Minimap shows > when Ember faces East`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
-        let state = GameState.initial(config: .default).withFacingDirection(.east)
+        let state = GameState.initial(config: .default).withScreenMode(.dungeon).withFacingDirection(.east)
         renderer.render(state)
-        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 61 }
+        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 68 }
         let allText = playerCellWrites.map(\.string).joined()
         #expect(allText.contains(">"), "Expected '>' at player cell when facing east, got: \(allText)")
     }
@@ -49,9 +49,9 @@ import Testing
     @Test func `Minimap shows v when Ember faces South`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
-        let state = GameState.initial(config: .default).withFacingDirection(.south)
+        let state = GameState.initial(config: .default).withScreenMode(.dungeon).withFacingDirection(.south)
         renderer.render(state)
-        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 61 }
+        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 68 }
         let allText = playerCellWrites.map(\.string).joined()
         #expect(allText.contains("v"), "Expected 'v' at player cell when facing south, got: \(allText)")
     }
@@ -59,9 +59,9 @@ import Testing
     @Test func `Minimap shows < when Ember faces West`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
-        let state = GameState.initial(config: .default).withFacingDirection(.west)
+        let state = GameState.initial(config: .default).withScreenMode(.dungeon).withFacingDirection(.west)
         renderer.render(state)
-        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 61 }
+        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 68 }
         let allText = playerCellWrites.map(\.string).joined()
         #expect(allText.contains("<"), "Expected '<' at player cell when facing west, got: \(allText)")
     }
@@ -73,11 +73,12 @@ import Testing
         let renderer = Renderer(output: spy)
         // Encounter is at (7,3); place player there facing north
         let state = GameState.initial(config: .default)
+            .withScreenMode(.dungeon)
             .withPlayerPosition(Position(x: 7, y: 3))
             .withFacingDirection(.north)
         renderer.render(state)
-        // Player at (7,3): screenRow = 2 + (6 - 3) = 5, col = 61
-        let playerCellWrites = spy.entries.filter { $0.row == 5 && $0.col == 61 }
+        // Player at (7,3): screenRow = 2 + (6 - 3) = 5, col = 61 + 7 = 68
+        let playerCellWrites = spy.entries.filter { $0.row == 5 && $0.col == 68 }
         let allText = playerCellWrites.map(\.string).joined()
         #expect(allText.contains("^"), "Expected '^' at encounter cell when player is there facing north, got: \(allText)")
     }
@@ -86,10 +87,10 @@ import Testing
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
         // Entry is at (7,0); player starts there by default
-        let state = GameState.initial(config: .default).withFacingDirection(.north)
+        let state = GameState.initial(config: .default).withScreenMode(.dungeon).withFacingDirection(.north)
         renderer.render(state)
-        // Player at (7,0): screenRow = 2 + (6 - 0) = 8, col = 61
-        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 61 }
+        // Player at (7,0): screenRow = 2 + (6 - 0) = 8, col = 61 + 7 = 68
+        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 68 }
         let allText = playerCellWrites.map(\.string).joined()
         #expect(allText.contains("^"), "Expected '^' at entry cell when player is there facing north, got: \(allText)")
     }
@@ -100,11 +101,12 @@ import Testing
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
         // Apply turn left (north -> west) and render the resulting state
+        // Turn command on startScreen transitions to dungeon first, so turnedState is in dungeon mode.
         let initialState = GameState.initial(config: .default)
         let turnedState = RulesEngine.apply(command: .turn(.left), to: initialState, deltaTime: 0)
         renderer.render(turnedState)
-        // Player at (7,0): screenRow = 8, col = 61; after turning left from north, facing = west
-        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 61 }
+        // Player at (7,0): screenRow = 8, col = 61 + 7 = 68; after turning left from north, facing = west
+        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 68 }
         let allText = playerCellWrites.map(\.string).joined()
         #expect(allText.contains("<"), "Expected '<' at player cell after turning left (north->west), got: \(allText)")
     }
@@ -114,7 +116,7 @@ import Testing
     @Test func `Each minimap panel row fits within the 19-column minimap panel width`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
-        let state = GameState.initial(config: .default)
+        let state = GameState.initial(config: .default).withScreenMode(.dungeon)
         renderer.render(state)
 
         // Filter to writes that start in the minimap panel region (rows 2-16, cols 61-79)
@@ -131,7 +133,7 @@ import Testing
     @Test func `Minimap renders wall cells as # and corridor cells as a non-wall character`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
-        let state = GameState.initial(config: .default)
+        let state = GameState.initial(config: .default).withScreenMode(.dungeon)
         renderer.render(state)
 
         // Filter to writes that start in the minimap panel region (rows 2-16, cols 61-79)
@@ -159,20 +161,22 @@ import Testing
     //   B6: staircase 'S' on non-final floor
     //   B7: exit 'X' on final floor
 
-    // Minimap grid: y=6 renders at screen row 2; y=0 renders at screen row 8.
-    // Each row is written to col 61 as a 15-character string; character x is at string index x.
+    // Minimap uses per-cell writes: each cell at (screenRow, col=61+x). y=6→row 2; y=0→row 8.
     private func minimapCharAt(x: Int, y: Int, spy: TUIOutputSpy) -> Character? {
         let targetRow = 2 + (6 - y)   // screenRow formula from Renderer.renderMinimap
-        guard let entry = spy.entries.first(where: { $0.row == targetRow && $0.col == 61 }) else {
+        let targetCol = 61 + x
+        guard let entry = spy.entries.first(where: { $0.row == targetRow && $0.col == targetCol }) else {
             return nil
         }
-        guard x >= 0 && x < entry.string.count else { return nil }
-        return entry.string[entry.string.index(entry.string.startIndex, offsetBy: x)]
+        // Strip ANSI escape sequences to recover the plain display character
+        let stripped = entry.string.replacingOccurrences(
+            of: "\u{1B}\\[[0-9;]*m", with: "", options: .regularExpression)
+        return stripped.first
     }
 
     private func render(_ state: GameState) -> TUIOutputSpy {
         let spy = TUIOutputSpy()
-        Renderer(output: spy).render(state)
+        Renderer(output: spy).render(state.withScreenMode(.dungeon))
         return spy
     }
 
