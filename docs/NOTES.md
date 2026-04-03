@@ -1,7 +1,8 @@
 # NOTES
 
 ## TODO
-- [ ] Discuss: graphics pass: improve dungeon graphics
+- [ ] BUG: After defeating guard, he does not leave
+- [ ] the boss should be a "bigger warden", not a cat. We're cleaning up after the human's mess, so the boss should be a bad a$$ human.
 
 ## In progress
 
@@ -17,3 +18,4 @@
     - [X] brace requires feedback when succesful (you now only see the charge meter change, but thats not where your attention is). Maybe use an overlay that says "***Blocked***" (or the dragon equivalent) or "**OUCH**" when you fail to block a hit?
     - [X] an overley when dashing that says something like __ZOOM__ (but a better Dragon word) because its difficult to see otherwise. 
     - [X] an overlay when you use the SPECIAL.
+- [X] Discuss: graphics pass: improve dungeon graphics
