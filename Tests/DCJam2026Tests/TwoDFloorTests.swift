@@ -10,7 +10,7 @@ import Testing
 //
 // Grid topology (ADR-004, data-models.md):
 //   15×7 L-shaped corridor. Main corridor x=7, y=0..6. Branch y=3, x=2..7.
-//   Entry=(7,0), staircase=(7,6), egg=(2,3), encounter=(7,4).
+//   Entry=(7,0), staircase=(7,6), egg=(2,3), encounter=(7,2).
 //   Origin south-west; y northward; x eastward.
 //
 // Mandate compliance:
@@ -139,13 +139,13 @@ struct TwoDFloorTests {
 
     @Test("Encounter proximity check still fires when Ember steps onto the encounter cell")
     func encounterProximityCheckAppliedAfterMove() {
-        // Ember is one step south of the encounter cell (7,4), facing North.
+        // Ember is one step south of the encounter cell (7,2), facing North.
         let start = GameState.initial(config: .default)
-            .withPlayerPosition(Position(x: 7, y: 3))
+            .withPlayerPosition(Position(x: 7, y: 1))
             .withFacingDirection(.north)
         let result = RulesEngine.apply(command: .move(.forward), to: start, deltaTime: 0)
         if case .combat = result.screenMode {
-            // Expected: stepping onto encounter cell (7,4) triggers combat mode.
+            // Expected: stepping onto encounter cell (7,2) triggers combat mode.
         } else {
             Issue.record("Expected .combat screen mode after stepping onto encounter cell, got \(result.screenMode)")
         }
@@ -208,6 +208,6 @@ struct TwoDFloorTests {
         let floor = FloorGenerator.generate(floorNumber: 1, config: .default)
         #expect(floor.entryPosition2D == Position(x: 7, y: 0))
         #expect(floor.staircasePosition2D == Position(x: 7, y: 6))
-        #expect(floor.encounterPosition2D == Position(x: 7, y: 4))
+        #expect(floor.encounterPosition2D == Position(x: 7, y: 2))
     }
 }

@@ -197,10 +197,10 @@ struct MinimapLandmarkTests {
 
     @Test("Minimap shows G at the guard encounter cell on a non-final floor")
     func minimapShowsGuardSymbol() {
-        // Floor 1, player at entry; encounter is at (7,4) on non-final floor
+        // Floor 1, player at entry; encounter is at (7,2) on non-final floor
         let state = GameState.initial(config: .default).withPlayerPosition(Position(x: 7, y: 0))
         let spy = render(state)
-        #expect(minimapCharAt(x: 7, y: 4, spy: spy) == "G", "Expected 'G' at encounter (7,4)")
+        #expect(minimapCharAt(x: 7, y: 2, spy: spy) == "G", "Expected 'G' at encounter (7,2)")
     }
 
     @Test("Minimap shows B at the boss encounter cell on the final floor")
