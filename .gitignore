@@ -9,3 +9,4 @@ DerivedData/
 .claude
 .vscode
 .nwave
+dist/
