@@ -33,12 +33,10 @@ final class Renderer {
         case .dungeon:
             renderDungeon(state)
             drawStatusBar(state)
-            drawControlsBar("W/S: move forward/back   1: Dash through guard   2: Brace   3: Special   R: restart   Q: quit")
             drawThoughts(dungeonThoughts(state))
         case .combat(let encounter):
             renderCombat(state, encounter: encounter)
             drawStatusBar(state)
-            drawControlsBar("1: Dash through (costs 1 charge)   2: Brace (parry window)   3: Special (needs full meter)")
             drawThoughts(combatThoughts(state, encounter: encounter))
         case .narrativeOverlay(let event):
             renderNarrativeOverlay(event)
@@ -504,7 +502,6 @@ final class Renderer {
     // MARK: - Thought content
 
     private func dungeonThoughts(_ state: GameState) -> [String] {
-        let minimapLine = buildMinimap(state)
         let flavor: String
         if state.recentDash {
             flavor = "I tear through! Wings snap, scales scrape stone — the guard never had a chance."
@@ -517,7 +514,7 @@ final class Renderer {
         } else {
             flavor = "Deeper now. The air is thicker, heavier. My claws find the floor and I press on."
         }
-        return [minimapLine, flavor]
+        return [flavor]
     }
 
     /// Builds a minimap string: [E...G..○..S] showing entry, guard, player, staircase/exit.
@@ -637,9 +634,27 @@ final class Renderer {
     }
 
     private func pad78(_ s: String) -> String {
-        let count = s.count
-        if count >= 78 { return String(s.prefix(78)) }
-        return s + String(repeating: " ", count: 78 - count)
+        let visible = visibleLength(s)
+        if visible >= 78 { return s }
+        return s + String(repeating: " ", count: 78 - visible)
+    }
+
+    /// Counts printable characters, skipping ANSI escape sequences (\e[...m).
+    private func visibleLength(_ s: String) -> Int {
+        var count = 0
+        var i = s.startIndex
+        while i < s.endIndex {
+            if s[i] == "\u{1B}", s.index(after: i) < s.endIndex, s[s.index(after: i)] == "[" {
+                var j = s.index(after: s.index(after: i))
+                while j < s.endIndex && s[j] != "m" { j = s.index(after: j) }
+                if j < s.endIndex { j = s.index(after: j) }
+                i = j
+            } else {
+                count += 1
+                i = s.index(after: i)
+            }
+        }
+        return count
     }
 
     private func centered(_ s: String, width: Int) -> String {
