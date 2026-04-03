@@ -2,7 +2,11 @@
 // All terminal output is buffered and flushed atomically via looping write.
 // STDOUT_FILENO stays blocking; only /dev/tty (input fd) is opened O_NONBLOCK.
 
+#if canImport(Darwin)
 import Darwin
+#elseif canImport(Glibc)
+import Glibc
+#endif
 
 final class ANSITerminal: TUIOutputPort {
 
@@ -24,8 +28,7 @@ final class ANSITerminal: TUIOutputPort {
         // Disable XON/XOFF flow control and CR translation
         raw.c_iflag &= ~tcflag_t(IXON | ICRNL)
         // Minimum 1 byte read, no timeout
-        raw.c_cc.16 = 1  // VMIN
-        raw.c_cc.17 = 0  // VTIME
+        setTermiosCCDefaults(&raw)
         tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw)
         rawModeEnabled = true
     }
@@ -65,7 +68,11 @@ final class ANSITerminal: TUIOutputPort {
             var offset = 0
             let bytes = ptr.count
             while offset < bytes {
+                #if canImport(Darwin)
                 let n = Darwin.write(STDOUT_FILENO, base + offset, bytes - offset)
+                #elseif canImport(Glibc)
+                let n = Glibc.write(STDOUT_FILENO, base + offset, bytes - offset)
+                #endif
                 if n > 0 {
                     offset += n
                 } else if errno == EINTR {
