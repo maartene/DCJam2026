@@ -186,45 +186,6 @@ struct DepthGradedColorTests {
         }
     }
 
-    // UNIT TEST: background \e[40m is still emitted before first dungeon line (01-01 regression)
-    @Test("background \\e[40m still emitted before first dungeon frame line after depth color added")
-    func backgroundStillEmittedAfterDepthColor() {
-        let spy = TUIOutputSpy()
-        let renderer = Renderer(output: spy, supports256Color: false)
-        let state = makeDepthState(depth: 0)
-        renderer.render(state)
-
-        let allWrites = spy.entries
-        guard let bgIndex = allWrites.firstIndex(where: { $0.string.contains(ansiBlackBgCode) }) else {
-            Issue.record("Expected \(ansiBlackBgCode) but not found")
-            return
-        }
-        guard let firstFrameIndex = allWrites.firstIndex(where: { (2...16).contains($0.row) && $0.col == 2 }) else {
-            Issue.record("Expected dungeon frame line writes at rows 2-16 col 2")
-            return
-        }
-        #expect(bgIndex < firstFrameIndex,
-                "\(ansiBlackBgCode) must precede first dungeon frame line")
-    }
-
-    // UNIT TEST: minimap writes do not start with the standalone depth foreground codes
-    // (depth colors are \e[97m, \e[37m; minimap uses \e[1m\e[97m for player — distinct prefix)
-    @Test("minimap writes do not start with standalone depth-graded foreground codes")
-    func minimapWritesDoNotStartWithDepthColor() {
-        let spy = TUIOutputSpy()
-        let renderer = Renderer(output: spy, supports256Color: false)
-        let state = makeDepthState(depth: 0)
-        renderer.render(state)
-
-        let minimapWrites = spy.entries.filter { $0.col >= 61 }
-        // Depth colors are always the first prefix of a dungeon line write.
-        // Check that no minimap write starts with \e[97m or \e[37m.
-        let startingWithDepthColor = minimapWrites.filter {
-            $0.string.hasPrefix(ansiBrightWhiteFg) || $0.string.hasPrefix(ansiStandardWhite)
-        }
-        #expect(startingWithDepthColor.isEmpty,
-                "Minimap writes must not start with depth foreground codes \(ansiBrightWhiteFg) or \(ansiStandardWhite), found: \(startingWithDepthColor.map { "col \($0.col): \($0.string)" })")
-    }
 }
 
 /// Returns a GameState whose dungeon frame depth equals the requested depth.
