@@ -3,28 +3,48 @@
 // Fits within the 58-column dungeon view panel (cols 2-59 in the 80-col layout).
 // Style: \ / | _ for structure; ▓░ at depth=2 only (sparingly); · for depth=3 fog.
 
+// MARK: - Base corridor grid builder
+
+/// Returns a mutable [[Character]] grid (58 cols × 15 rows) with both walls intact
+/// for the given depth (0-3). The grid captures the structural skeleton of the corridor:
+/// outer walls, perspective diagonals, depth-specific ceiling/floor geometry, and wall face.
+func baseCorridorGrid(depth: Int) -> [[Character]] {
+    let strings: [String]
+    switch depth {
+    case 0:  strings = frame_d0_none()
+    case 1:  strings = frame_d1_none()
+    case 2:  strings = frame_d2_none()
+    default: strings = frame_d3_fog()
+    }
+    return strings.map { Array($0) }
+}
+
 // MARK: - Frame table builder
 
 func buildFrameTable() -> [DungeonFrameKey: [String]] {
     var table: [DungeonFrameKey: [String]] = [:]
 
     // depth=0: wall dead ahead, no side openings
-    table[DungeonFrameKey(depth: 0, nearLeft: false, nearRight: false, farLeft: false, farRight: false)] = frame_d0_none()
+    table[DungeonFrameKey(depth: 0, nearLeft: false, nearRight: false, farLeft: false, farRight: false)] =
+        baseCorridorGrid(depth: 0).map { String($0) }
 
     // depth=1: wall one square ahead
-    table[DungeonFrameKey(depth: 1, nearLeft: false, nearRight: false, farLeft: false, farRight: false)] = frame_d1_none()
+    table[DungeonFrameKey(depth: 1, nearLeft: false, nearRight: false, farLeft: false, farRight: false)] =
+        baseCorridorGrid(depth: 1).map { String($0) }
     table[DungeonFrameKey(depth: 1, nearLeft: true,  nearRight: false, farLeft: false, farRight: false)] = frame_d1_nearLeft()
     table[DungeonFrameKey(depth: 1, nearLeft: false, nearRight: true,  farLeft: false, farRight: false)] = frame_d1_nearRight()
     table[DungeonFrameKey(depth: 1, nearLeft: true,  nearRight: true,  farLeft: false, farRight: false)] = frame_d1_nearBoth()
 
     // depth=2: wall two squares ahead, sparse brick
-    table[DungeonFrameKey(depth: 2, nearLeft: false, nearRight: false, farLeft: false, farRight: false)] = frame_d2_none()
+    table[DungeonFrameKey(depth: 2, nearLeft: false, nearRight: false, farLeft: false, farRight: false)] =
+        baseCorridorGrid(depth: 2).map { String($0) }
     table[DungeonFrameKey(depth: 2, nearLeft: true,  nearRight: false, farLeft: false, farRight: false)] = frame_d2_nearLeft()
     table[DungeonFrameKey(depth: 2, nearLeft: false, nearRight: true,  farLeft: false, farRight: false)] = frame_d2_nearRight()
     table[DungeonFrameKey(depth: 2, nearLeft: true,  nearRight: true,  farLeft: false, farRight: false)] = frame_d2_nearBoth()
 
     // depth=3: fog (plain and near-opening variants)
-    table[DungeonFrameKey(depth: 3, nearLeft: false, nearRight: false, farLeft: false, farRight: false)] = frame_d3_fog()
+    table[DungeonFrameKey(depth: 3, nearLeft: false, nearRight: false, farLeft: false, farRight: false)] =
+        baseCorridorGrid(depth: 3).map { String($0) }
     table[DungeonFrameKey(depth: 3, nearLeft: true,  nearRight: false, farLeft: false, farRight: false)] = frame_d3_nearLeft()
     table[DungeonFrameKey(depth: 3, nearLeft: false, nearRight: true,  farLeft: false, farRight: false)] = frame_d3_nearRight()
     table[DungeonFrameKey(depth: 3, nearLeft: true,  nearRight: true,  farLeft: false, farRight: false)] = frame_d3_nearBoth()
