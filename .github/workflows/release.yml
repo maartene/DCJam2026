@@ -15,12 +15,14 @@ jobs:
           - arch: x86_64
             runner: ubuntu-latest
             sdk: x86_64-swift-linux-musl
+            extra_flags:
           - arch: aarch64
             runner: ubuntu-24.04-arm
-            sdk: aarch64-swift-linux-musl
-            # Target ARMv8.0 baseline so mimalloc doesn't emit LSE atomics
-            # (ARMv8.1+), which crash on Raspberry Pi 3/4 (Cortex-A53/A72)
-            extra_flags: -Xcc -march=armv8-a -Xcxx -march=armv8-a
+            # Static SDK bundles a pre-compiled mimalloc that uses LSE atomics
+            # (ARMv8.1+), crashing on Raspberry Pi 3/4 (Cortex-A53/A72).
+            # Use -static-stdlib instead: statically links Swift stdlib only,
+            # leaving allocation to the system malloc — no mimalloc involved.
+            extra_flags: -Xswiftc -static-stdlib
     steps:
       - uses: actions/checkout@v4
 
@@ -30,11 +32,15 @@ jobs:
           swift-version: "6.3"
 
       - name: Install Swift Static Linux SDK
+        if: matrix.sdk != ''
         run: |
           swift sdk install https://download.swift.org/swift-6.3-release/static-sdk/swift-6.3-RELEASE/swift-6.3-RELEASE_static-linux-0.1.0.artifactbundle.tar.gz --checksum d2078b69bdeb5c31202c10e9d8a11d6f66f82938b51a4b75f032ccb35c4c286c
-            
+
       - name: Build release binary (static)
-        run: swift build -c release --product DCJam2026 --swift-sdk ${{ matrix.sdk }} ${{ matrix.extra_flags }}
+        run: |
+          swift build -c release --product DCJam2026 \
+            ${{ matrix.sdk && format('--swift-sdk {0}', matrix.sdk) || '' }} \
+            ${{ matrix.extra_flags }}
 
       - name: Package binary into zip
         run: |
