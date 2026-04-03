@@ -1,0 +1,307 @@
+{
+  "feature_id": "game-polish-v1",
+  "project_id": "game-polish-v1",
+  "created_at": "2026-04-03T11:00:00Z",
+  "total_steps": 14,
+  "phases": ["PREPARE", "RED_ACCEPTANCE", "RED_UNIT", "GREEN", "COMMIT"],
+  "validation": {
+    "status": "approved"
+  },
+  "steps": [
+    {
+      "step_id": "01-01",
+      "name": "TransientOverlay type (new file)",
+      "description": "Create Sources/GameDomain/TransientOverlay.swift defining the public enum TransientOverlay: Equatable, Sendable with cases braceSuccess(framesRemaining: Int), braceHit(framesRemaining: Int), and dash(framesRemaining: Int). Include public static let defaultDuration: Int = 23.",
+      "acceptance_criteria": [
+        "TransientOverlay compiles inside the GameDomain module with zero imports",
+        "TransientOverlay conforms to Equatable and Sendable",
+        "braceSuccess(framesRemaining: 23) == braceSuccess(framesRemaining: 23) evaluates to true",
+        "braceSuccess(framesRemaining: 23) == braceHit(framesRemaining: 23) evaluates to false",
+        "TransientOverlay.defaultDuration equals 23"
+      ],
+      "files_to_modify": [
+        "Sources/GameDomain/TransientOverlay.swift"
+      ],
+      "dependencies": [],
+      "estimated_hours": 0.5,
+      "implementation_notes": "New file — no existing file to modify. GameDomain has zero imports; this file must import nothing. framesRemaining carries only the countdown; display text (SHIELDED!/STRUCK!/SWOOSH!) is owned by Renderer, not this type."
+    },
+    {
+      "step_id": "01-02",
+      "name": "ANSIColors helper file (new file)",
+      "description": "Create Sources/App/ANSIColors.swift containing module-private ANSI escape string constants and a colored(_:code:) helper that returns the input string wrapped with the given ANSI code and a trailing reset sequence (\\u{1B}[0m).",
+      "acceptance_criteria": [
+        "ANSIColors.swift compiles inside the App module",
+        "colored(\"HP\", code: \"\\u{1B}[32m\") returns \"\\u{1B}[32mHP\\u{1B}[0m\"",
+        "All color constants listed in the data-models doc are present: green (32m), yellow (33m), red (31m), bold bright cyan (1m+96m), dim cyan (36m), bright red (91m), bold bright red (1m+91m), bright yellow (93m), dim yellow (33m), bright cyan (96m), bold bright white (1m+97m), dark gray (90m)",
+        "No ANSI escape literal appears in any other App source file after this step (raw \\u{1B}[ is banned outside this file)"
+      ],
+      "files_to_modify": [
+        "Sources/App/ANSIColors.swift"
+      ],
+      "dependencies": [],
+      "estimated_hours": 0.5,
+      "implementation_notes": "New file. Module-private (internal access) is correct — these are not exported to GameDomain. The colored() helper must append \\u{1B}[0m unconditionally so callers cannot forget the reset. This is a structural enforcement requirement per ANSI_COLOR_RULE in the architecture."
+    },
+    {
+      "step_id": "02-01",
+      "name": "ScreenMode.startScreen case",
+      "description": "Add the case startScreen to the ScreenMode enum in Sources/GameDomain/ScreenMode.swift. No associated value is needed.",
+      "acceptance_criteria": [
+        "ScreenMode.startScreen is a valid case and the project builds without warnings",
+        "Existing exhaustive switch statements on ScreenMode produce a compile error until they handle .startScreen (this is the desired compile-driven forcing function)",
+        "ScreenMode conforms to Sendable after the addition (no new non-Sendable associated values are introduced)"
+      ],
+      "files_to_modify": [
+        "Sources/GameDomain/ScreenMode.swift"
+      ],
+      "dependencies": [],
+      "estimated_hours": 0.25,
+      "implementation_notes": "Intentionally causes compile errors in any exhaustive switch on ScreenMode. This is correct behavior — it forces the crafter to visit Renderer and RulesEngine and handle the case explicitly, rather than silently falling through."
+    },
+    {
+      "step_id": "02-02",
+      "name": "GameState transientOverlay field and startScreen initial mode",
+      "description": "Modify Sources/GameDomain/GameState.swift to add the public stored property transientOverlay: TransientOverlay? (default nil), the withTransientOverlay(_ overlay: TransientOverlay?) -> GameState functional update helper, and update GameState.initial(config:) to set screenMode: .startScreen and transientOverlay: nil.",
+      "acceptance_criteria": [
+        "GameState.initial(config:).screenMode equals .startScreen",
+        "GameState.initial(config:).transientOverlay is nil",
+        "withTransientOverlay(.braceSuccess(framesRemaining: 23)) returns a GameState whose transientOverlay equals .braceSuccess(framesRemaining: 23)",
+        "withTransientOverlay(nil) returns a GameState whose transientOverlay is nil",
+        "All other fields of GameState are unaffected by withTransientOverlay",
+        "Project builds — all existing with-helper call sites remain compatible"
+      ],
+      "files_to_modify": [
+        "Sources/GameDomain/GameState.swift"
+      ],
+      "dependencies": [
+        "01-01",
+        "02-01"
+      ],
+      "estimated_hours": 0.5,
+      "implementation_notes": "withTransientOverlay follows the identical copy-assign-return pattern of all existing with-helpers (e.g., withHP, withScreenMode). GameDomain must not import App — TransientOverlay is defined in GameDomain so no import boundary is crossed."
+    },
+    {
+      "step_id": "02-03",
+      "name": "RulesEngine: startScreen transition and transient overlay lifecycle",
+      "description": "Modify Sources/GameDomain/RulesEngine.swift to: (1) extend applyConfirmOverlay (or equivalent) to transition screenMode from .startScreen to .dungeon on any non-quit command; (2) extend applyEnemyAttackTick to set .braceSuccess(framesRemaining: 23) on successful parry, .braceHit(framesRemaining: 23) on unbraced hit that does not kill, and nil + .deathState on fatal hit; (3) extend applyDash to set .dash(framesRemaining: 23) on a successful dash; (4) extend advanceTimers to decrement framesRemaining each tick and set transientOverlay to nil when it reaches zero.",
+      "acceptance_criteria": [
+        "Given state.screenMode == .startScreen, any non-quit command produces a state with screenMode == .dungeon",
+        "Given a successful parry, the resulting state has transientOverlay == .braceSuccess(framesRemaining: 23)",
+        "Given an unbraced hit that does not kill the player, the resulting state has transientOverlay == .braceHit(framesRemaining: 23)",
+        "Given a fatal hit (hp would reach 0), the resulting state has transientOverlay == nil and screenMode == .deathState",
+        "Given state.transientOverlay == .braceSuccess(framesRemaining: 5) after one advanceTimers tick, the resulting state has transientOverlay == .braceSuccess(framesRemaining: 4)",
+        "Given state.transientOverlay == .braceSuccess(framesRemaining: 1) after one advanceTimers tick, the resulting state has transientOverlay == nil",
+        "Given a successful dash, the resulting state has transientOverlay == .dash(framesRemaining: 23)",
+        "Given state.screenMode == .startScreen, timers are not advanced (game is paused on start screen)"
+      ],
+      "files_to_modify": [
+        "Sources/GameDomain/RulesEngine.swift"
+      ],
+      "dependencies": [
+        "01-01",
+        "02-01",
+        "02-02"
+      ],
+      "estimated_hours": 1.5,
+      "implementation_notes": "Priority ordering matters in applyEnemyAttackTick: fatal hit (deathState + nil overlay) must be set before checking for braceHit — do not accidentally set braceHit then overwrite with deathState, as the overlay nil-out is architecturally required on death. The startScreen timer-pause rule prevents the game world from advancing while the player has not yet started — check screenMode == .startScreen at the top of the tick and return early."
+    },
+    {
+      "step_id": "03-01",
+      "name": "InputHandler: remove Q/Shift-Q quit branch",
+      "description": "Modify Sources/App/InputHandler.swift to delete the q and Q key mappings from mapKey(). The quit command must no longer be reachable via keyboard input. ESC remains as the only quit path if it was already mapped; verify no other quit trigger exists.",
+      "acceptance_criteria": [
+        "mapKey() given the byte sequence for 'q' (0x71) returns GameCommand.none or equivalent no-op, not quit",
+        "mapKey() given the byte sequence for 'Q' (0x51) returns GameCommand.none or equivalent no-op, not quit",
+        "The project builds and all other key mappings are unaffected",
+        "The start screen rendered content does not mention Q as a control"
+      ],
+      "files_to_modify": [
+        "Sources/App/InputHandler.swift"
+      ],
+      "dependencies": [],
+      "estimated_hours": 0.25,
+      "implementation_notes": "Standalone change with no domain dependencies. Verify whether ESC is also mapped to quit — per architecture the start screen dismissal uses confirmOverlay, so ESC may remain as the dedicated quit key. Only q/Q are removed per US-P01. Do not remove ESC quit if it is the intended escape path."
+    },
+    {
+      "step_id": "03-02",
+      "name": "Renderer: start screen branch",
+      "description": "Modify Sources/App/Renderer.swift to add a renderStartScreen() method and a case .startScreen branch in the render(_:) dispatch. The start screen uses the full 80x25 area, calls clearScreen(), renders the title DRAGON ESCAPE centered and bold, DCJam 2026 subtitle, narrative hook, controls table (W/S/A/D/1/2/3/ESC), and the prompt [ Press any key to begin ]. Q must not appear anywhere in the rendered content.",
+      "acceptance_criteria": [
+        "When render() is called with a state whose screenMode is .startScreen, drawChrome() is NOT called",
+        "When render() is called with a state whose screenMode is .startScreen, drawStatusBar() is NOT called",
+        "The rendered output contains the text DRAGON ESCAPE",
+        "The rendered output contains the text Press any key to begin",
+        "The rendered output does not contain the character Q as a control reference",
+        "When render() is called with a state whose screenMode is .dungeon, the start screen is not rendered (existing dungeon render is unaffected)"
+      ],
+      "files_to_modify": [
+        "Sources/App/Renderer.swift"
+      ],
+      "dependencies": [
+        "02-01",
+        "02-02",
+        "02-03"
+      ],
+      "estimated_hours": 1.0,
+      "implementation_notes": "renderStartScreen() must not call drawChrome(), drawStatusBar(), renderMinimap(), or renderThoughts(). It is a full-screen takeover. The render(_:) switch must handle .startScreen before the default dungeon path. Center calculations use terminal width 80 and height 25."
+    },
+    {
+      "step_id": "03-03",
+      "name": "Renderer: egg pickup narrative content update (US-P03)",
+      "description": "Modify Sources/App/Renderer.swift to update the narrativeContent case for .eggDiscovery with the spike2-authored text and ANSI color codes. The egg discovery screen must use ANSIColors constants, not raw escape literals.",
+      "acceptance_criteria": [
+        "The output for narrativeContent(.eggDiscovery) contains the spike2 egg discovery text (dragon-vocabulary narrative describing finding the egg)",
+        "All colored segments in the egg discovery output are terminated with an ANSI reset sequence",
+        "No raw \\u{1B}[ escape literal is introduced outside ANSIColors.swift",
+        "The existing keypress-dismiss mechanic for narrativeOverlay screens is unaffected"
+      ],
+      "files_to_modify": [
+        "Sources/App/Renderer.swift"
+      ],
+      "dependencies": [
+        "01-02"
+      ],
+      "estimated_hours": 0.5,
+      "implementation_notes": "Content-only change inside narrativeContent(). Source the exact text from docs/feature/game-polish-v1/discuss/user-stories.md or the spike2 artifacts. Use ANSIColors.colored() or the defined constants rather than inline escape strings."
+    },
+    {
+      "step_id": "03-04",
+      "name": "Renderer: win screen content and stats (US-P04)",
+      "description": "Modify Sources/App/Renderer.swift to replace the renderWinScreen content with spike2-authored text, ANSI colors, a stat block showing floors cleared and HP remaining from GameState, and update the prompt from [ press any key ] to [ Press R to play again ].",
+      "acceptance_criteria": [
+        "The win screen output contains a stat block including the player's current HP value",
+        "The win screen output contains a stat block including the floors cleared count",
+        "The win screen prompt reads Press R to play again (not press any key)",
+        "All colored segments in the win screen output are terminated with an ANSI reset sequence",
+        "No raw \\u{1B}[ escape literal is introduced outside ANSIColors.swift",
+        "The restart GameCommand (R key) remains the mechanism to restart — no new command is introduced"
+      ],
+      "files_to_modify": [
+        "Sources/App/Renderer.swift"
+      ],
+      "dependencies": [
+        "01-02"
+      ],
+      "estimated_hours": 0.75,
+      "implementation_notes": "renderWinScreen(state:) already receives GameState — hp and currentFloor are available. The restart command (R) is already mapped in InputHandler; this step only changes the rendered prompt text. Use ANSIColors constants."
+    },
+    {
+      "step_id": "03-05",
+      "name": "Renderer: HP bar color in status bar (US-P05a)",
+      "description": "Modify Sources/App/Renderer.swift drawStatusBar() to wrap the HP bar segment in a threshold-derived ANSI color: green at >= 40% max HP, yellow at >= 20% and < 40%, red at < 20%. Use ANSIColors constants and the colored() helper.",
+      "acceptance_criteria": [
+        "When hp >= 0.40 * maxHP, the HP bar segment in the status bar output contains the ANSI green code (\\u{1B}[32m)",
+        "When hp >= 0.20 * maxHP and hp < 0.40 * maxHP, the HP bar segment contains the ANSI yellow code (\\u{1B}[33m)",
+        "When hp < 0.20 * maxHP, the HP bar segment contains the ANSI red code (\\u{1B}[31m)",
+        "Every HP bar colored segment is immediately followed by an ANSI reset (\\u{1B}[0m)",
+        "The 40% threshold is inclusive (hp == 0.40 * maxHP uses green, not yellow)",
+        "The 20% threshold is inclusive (hp == 0.20 * maxHP uses yellow, not red)"
+      ],
+      "files_to_modify": [
+        "Sources/App/Renderer.swift"
+      ],
+      "dependencies": [
+        "01-02"
+      ],
+      "estimated_hours": 0.5,
+      "implementation_notes": "Threshold arithmetic: Double(state.hp) / Double(state.config.maxHP). Boundary semantics: >= 0.40 green, >= 0.20 yellow, else red. Do not use integer arithmetic — rounding errors at boundary values will cause flicker. Use ANSIColors.colored() so the reset is enforced structurally."
+    },
+    {
+      "step_id": "03-06",
+      "name": "Renderer: special charge and cooldown colors in status bar (US-P05b)",
+      "description": "Modify Sources/App/Renderer.swift drawStatusBar() to add ANSI color to the special/charge bar (bold bright cyan when ready, dim cyan when charging) and cooldown indicators (yellow when dash or brace cooldown is active). Use ANSIColors constants.",
+      "acceptance_criteria": [
+        "When specialIsReady is true, the special bar segment contains the bold bright cyan ANSI codes (\\u{1B}[1m\\u{1B}[96m)",
+        "When specialIsReady is false, the special bar segment contains the dim cyan ANSI code (\\u{1B}[36m)",
+        "When a dash cooldown is active, the dash cooldown indicator contains the yellow ANSI code (\\u{1B}[33m)",
+        "When braceOnCooldown is true, the brace cooldown indicator contains the yellow ANSI code (\\u{1B}[33m)",
+        "Every colored segment in the status bar is terminated with an ANSI reset (\\u{1B}[0m)",
+        "No raw \\u{1B}[ escape literal is introduced outside ANSIColors.swift"
+      ],
+      "files_to_modify": [
+        "Sources/App/Renderer.swift"
+      ],
+      "dependencies": [
+        "01-02",
+        "03-05"
+      ],
+      "estimated_hours": 0.5,
+      "implementation_notes": "Depends on 03-05 only to ensure the status bar refactor from HP color is already in place, reducing merge conflicts. specialIsReady and braceOnCooldown are computed from GameState fields already available to drawStatusBar. Use ANSIColors.colored() to enforce reset."
+    },
+    {
+      "step_id": "03-07",
+      "name": "Renderer: per-cell minimap color (US-P05c)",
+      "description": "Modify Sources/App/Renderer.swift renderMinimap() to switch from whole-row string writes to per-cell writes. Each cell calls output.moveCursor(row: screenRow, col: 61 + x) then output.write(ansiColor + char + ansiReset) using the color mapping from the data-models doc.",
+      "acceptance_criteria": [
+        "Player direction characters (^>v<) appear in bold bright white (\\u{1B}[1m\\u{1B}[97m)",
+        "G (guard) characters appear in bright red (\\u{1B}[91m)",
+        "B (boss) characters appear in bold bright red (\\u{1B}[1m\\u{1B}[91m)",
+        "* (egg uncollected) characters appear in bright yellow (\\u{1B}[93m)",
+        "e (egg collected) characters appear in dim yellow (\\u{1B}[33m)",
+        "S (staircase) characters appear in bright cyan (\\u{1B}[96m)",
+        "X (exit) characters appear in bold bright cyan (\\u{1B}[1m\\u{1B}[96m)",
+        "E (entry) characters appear in dim cyan (\\u{1B}[36m)",
+        "# (wall) characters appear in dark gray (\\u{1B}[90m)",
+        ". (passable) characters have no ANSI color prefix",
+        "Every colored character write is terminated with an ANSI reset (\\u{1B}[0m)",
+        "No raw \\u{1B}[ escape literal is introduced outside ANSIColors.swift"
+      ],
+      "files_to_modify": [
+        "Sources/App/Renderer.swift"
+      ],
+      "dependencies": [
+        "01-02"
+      ],
+      "estimated_hours": 1.0,
+      "implementation_notes": "The minimap is in the right panel, cols 61-79 (15-cell-wide floor grid). The per-cell write loop replaces the existing String(rowChars) row-write. Each cell: moveCursor then write(color + char + reset). The '.' passable cell has no color code — write the character directly without wrapping. This increases the number of write() calls significantly; this is acceptable for a 30Hz terminal game."
+    },
+    {
+      "step_id": "04-01",
+      "name": "Renderer: transient overlay layer for brace feedback (US-P06)",
+      "description": "Modify Sources/App/Renderer.swift to add an overlay rendering pass after the base dungeon/combat screen. When state.transientOverlay is non-nil and screenMode is .dungeon or .combat, render the overlay word centered in the main view at row 9 with the appropriate ANSI color (SHIELDED! in bright cyan for braceSuccess, STRUCK! in bright red for braceHit).",
+      "acceptance_criteria": [
+        "When state.transientOverlay == .braceSuccess and screenMode is .dungeon, the rendered output contains the text SHIELDED!",
+        "When state.transientOverlay == .braceSuccess, SHIELDED! is wrapped in the bright cyan ANSI code (\\u{1B}[96m)",
+        "When state.transientOverlay == .braceHit and screenMode is .dungeon, the rendered output contains the text STRUCK!",
+        "When state.transientOverlay == .braceHit, STRUCK! is wrapped in the bright red ANSI code (\\u{1B}[91m)",
+        "When screenMode is .startScreen, .narrativeOverlay, .upgradePrompt, .deathState, or .winState, no overlay word is rendered regardless of transientOverlay value",
+        "When state.transientOverlay is nil, no overlay word is rendered",
+        "Every overlay word is terminated with an ANSI reset (\\u{1B}[0m)",
+        "The overlay is rendered at row 9 of the terminal, centered within the main dungeon view (cols 1-60)"
+      ],
+      "files_to_modify": [
+        "Sources/App/Renderer.swift"
+      ],
+      "dependencies": [
+        "01-01",
+        "01-02",
+        "02-02",
+        "02-03",
+        "03-02"
+      ],
+      "estimated_hours": 1.0,
+      "implementation_notes": "The overlay rendering pass must occur AFTER the base dungeon frame is written, so the word paints on top of the frame art. The centering calculation: (60 - word.count) / 2 + 1 for the start column within the 60-wide main view. The overlay word text is owned by Renderer (not TransientOverlay type). Use a switch on the overlay case to select the correct word and ANSIColors constant."
+    },
+    {
+      "step_id": "04-02",
+      "name": "Renderer: dash overlay word (US-P07)",
+      "description": "Extend the transient overlay rendering pass in Sources/App/Renderer.swift to handle the .dash case, rendering SWOOSH! in bold white at row 9 centered in the main view.",
+      "acceptance_criteria": [
+        "When state.transientOverlay == .dash and screenMode is .dungeon or .combat, the rendered output contains the text SWOOSH!",
+        "SWOOSH! is wrapped in the bold white ANSI codes (\\u{1B}[1m\\u{1B}[97m)",
+        "SWOOSH! is rendered at row 9 centered within the main dungeon view (cols 1-60)",
+        "The SWOOSH! word is terminated with an ANSI reset (\\u{1B}[0m)",
+        "No regression on SHIELDED! and STRUCK! rendering from step 04-01"
+      ],
+      "files_to_modify": [
+        "Sources/App/Renderer.swift"
+      ],
+      "dependencies": [
+        "04-01"
+      ],
+      "estimated_hours": 0.25,
+      "implementation_notes": "Minimal addition to the overlay switch added in 04-01. The .dash case adds one branch. The RulesEngine already sets .dash overlay in step 02-03. This step is purely a Renderer extension."
+    }
+  ]
+}
