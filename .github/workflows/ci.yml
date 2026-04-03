@@ -29,20 +29,3 @@ jobs:
 
       - name: Run tests
         run: swift test
-
-      - name: Build release binary
-        run: swift build -c release --product DCJam2026
-
-      - name: Package binary into zip
-        run: |
-          mkdir -p dist
-          cp .build/release/DCJam2026 dist/
-          cd dist && zip DCJam2026-linux-${{ matrix.arch }}.zip DCJam2026
-
-      - name: Upload Linux zip
-        uses: actions/upload-artifact@v4
-        with:
-          name: DCJam2026-linux-${{ matrix.arch }}
-          path: dist/DCJam2026-linux-${{ matrix.arch }}.zip
-          if-no-files-found: error
-

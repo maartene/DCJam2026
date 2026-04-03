@@ -1,12 +1,15 @@
 // GameLoop — synchronous 30Hz game loop. No async/await, no DispatchQueue.
 // Pure blocking while loop on the main thread.
 
-#if canImport(Darwin)
-import Darwin
-#elseif canImport(Glibc)
-import Glibc
-#endif
 import GameDomain
+
+#if canImport(Darwin)
+    import Darwin
+#elseif canImport(Glibc)
+    import Glibc
+#elseif canImport(Musl)
+    import Musl
+#endif
 
 final class GameLoop {
 

@@ -3,9 +3,11 @@
 // STDOUT_FILENO stays blocking; only /dev/tty (input fd) is opened O_NONBLOCK.
 
 #if canImport(Darwin)
-import Darwin
+    import Darwin
 #elseif canImport(Glibc)
-import Glibc
+    import Glibc
+#elseif canImport(Musl)
+    import Musl
 #endif
 
 final class ANSITerminal: TUIOutputPort {

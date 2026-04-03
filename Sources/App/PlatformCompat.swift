@@ -2,22 +2,28 @@
 // Use #if canImport(Darwin) / #elseif canImport(Glibc) guards throughout.
 
 #if canImport(Darwin)
-import Darwin
+    import Darwin
 #elseif canImport(Glibc)
-import Glibc
+    import Glibc
+#elseif canImport(Musl)
+    import Musl
 #endif
 
 /// Returns the current monotonic clock value in nanoseconds.
 func monoTimeNanoseconds() -> UInt64 {
-#if canImport(Darwin)
-    return clock_gettime_nsec_np(CLOCK_MONOTONIC)
-#elseif canImport(Glibc)
-    var ts = timespec()
-    clock_gettime(CLOCK_MONOTONIC, &ts)
-    return UInt64(ts.tv_sec) * 1_000_000_000 + UInt64(ts.tv_nsec)
-#else
-    return 0
-#endif
+    #if canImport(Darwin)
+        return clock_gettime_nsec_np(CLOCK_MONOTONIC)
+    #elseif canImport(Glibc)
+        var ts = timespec()
+        clock_gettime(CLOCK_MONOTONIC, &ts)
+        return UInt64(ts.tv_sec) * 1_000_000_000 + UInt64(ts.tv_nsec)
+    #elseif canImport(Musl)
+        var ts = timespec()
+        clock_gettime(CLOCK_MONOTONIC, &ts)
+        return UInt64(ts.tv_sec) * 1_000_000_000 + UInt64(ts.tv_nsec)
+    #else
+        return 0
+    #endif
 }
 
 /// Configures a termios struct for single-byte, non-blocking character reads:
@@ -34,11 +40,11 @@ func setTermiosCCDefaults(_ raw: inout termios) {
 /// Returns the number of bytes written, or -1 on error (errno is set).
 @discardableResult
 func platformWrite(_ fd: Int32, _ ptr: UnsafeRawPointer, _ count: Int) -> Int {
-#if canImport(Darwin)
-    return Darwin.write(fd, ptr, count)
-#elseif canImport(Glibc)
-    return Glibc.write(fd, ptr, count)
-#else
-    return Foundation.write(fd, ptr, count)
-#endif
+    #if canImport(Darwin)
+        return Darwin.write(fd, ptr, count)
+    #elseif canImport(Glibc)
+        return Glibc.write(fd, ptr, count)
+    #else
+        return Foundation.write(fd, ptr, count)
+    #endif
 }
