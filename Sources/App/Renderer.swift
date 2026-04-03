@@ -204,10 +204,14 @@ final class Renderer {
         let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
         let key = dungeonFrameKey(grid: floor.grid, position: state.playerPosition, facing: state.facingDirection)
         let frameLines = frames[key] ?? fallbackFrame(for: key)
+        output.moveCursor(row: Self.mainViewFirstRow, col: 1)
+        output.write("\u{1B}[40m")
         for (i, line) in frameLines.enumerated() {
             output.moveCursor(row: i + Self.mainViewFirstRow, col: 2)
             output.write(line)
         }
+        output.moveCursor(row: Self.mainViewLastRow + 1, col: 1)
+        output.write(ansiReset)
 
         let floorLabel = " Floor \(state.currentFloor)/\(state.config.maxFloors) "
         output.moveCursor(row: 2, col: 80 - floorLabel.count)
