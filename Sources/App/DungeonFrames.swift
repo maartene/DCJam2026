@@ -3,7 +3,7 @@
 // Fits within the 58-column dungeon view panel (cols 2-59 in the 80-col layout).
 // Style: \ / | _ for structure; ▓░ at depth=2 only (sparingly); · for depth=3 fog.
 
-// MARK: - Near-opening modifier
+// MARK: - Opening modifiers
 
 enum Side { case left, right }
 
@@ -24,6 +24,30 @@ func applyNearOpening(_ grid: inout [[Character]], side: Side) {
         grid[2][2] = " "
         grid[10][2] = " "
         grid[11][1] = " "
+    }
+}
+
+/// Removes the D=1 inner wall on one side for rows 4-8 (the gap zone between D=2 ceiling and floor).
+/// Rows 0-3 and 9-14 are NOT touched (lintels and outer walls remain intact).
+/// The D=0 outer wall is completely untouched.
+func applyFarOpening(_ grid: inout [[Character]], side: Side) {
+    switch side {
+    case .right:
+        grid[4][52] = " "
+        grid[4][54] = " "
+        grid[5][54] = " "
+        grid[6][54] = " "
+        grid[7][54] = " "
+        grid[8][52] = " "
+        grid[8][54] = " "
+    case .left:
+        grid[4][5] = " "
+        grid[4][3] = " "
+        grid[5][3] = " "
+        grid[6][3] = " "
+        grid[7][3] = " "
+        grid[8][5] = " "
+        grid[8][3] = " "
     }
 }
 
@@ -48,29 +72,34 @@ func baseCorridorGrid(depth: Int) -> [[Character]] {
 func buildFrameTable() -> [DungeonFrameKey: [String]] {
     var table: [DungeonFrameKey: [String]] = [:]
 
-    for depth in 0...3 {
-        // none: base grid as-is
-        table[DungeonFrameKey(depth: depth, nearLeft: false, nearRight: false, farLeft: false, farRight: false)] =
-            baseCorridorGrid(depth: depth).map { String($0) }
+    // Depth 0: near-opening variants only (far openings make no visual sense at depth 0)
+    for nearLeft in [false, true] {
+        for nearRight in [false, true] {
+            var g = baseCorridorGrid(depth: 0)
+            if nearLeft  { applyNearOpening(&g, side: .left) }
+            if nearRight { applyNearOpening(&g, side: .right) }
+            table[DungeonFrameKey(depth: 0, nearLeft: nearLeft, nearRight: nearRight, farLeft: false, farRight: false)] =
+                g.map { String($0) }
+        }
+    }
 
-        // nearLeft
-        var gL = baseCorridorGrid(depth: depth)
-        applyNearOpening(&gL, side: .left)
-        table[DungeonFrameKey(depth: depth, nearLeft: true, nearRight: false, farLeft: false, farRight: false)] =
-            gL.map { String($0) }
-
-        // nearRight
-        var gR = baseCorridorGrid(depth: depth)
-        applyNearOpening(&gR, side: .right)
-        table[DungeonFrameKey(depth: depth, nearLeft: false, nearRight: true, farLeft: false, farRight: false)] =
-            gR.map { String($0) }
-
-        // nearBoth
-        var gB = baseCorridorGrid(depth: depth)
-        applyNearOpening(&gB, side: .left)
-        applyNearOpening(&gB, side: .right)
-        table[DungeonFrameKey(depth: depth, nearLeft: true, nearRight: true, farLeft: false, farRight: false)] =
-            gB.map { String($0) }
+    // Depths 1-3: all 16 combinations of near/far openings
+    for depth in 1...3 {
+        for nearLeft in [false, true] {
+            for nearRight in [false, true] {
+                for farLeft in [false, true] {
+                    for farRight in [false, true] {
+                        var g = baseCorridorGrid(depth: depth)
+                        if nearLeft  { applyNearOpening(&g, side: .left) }
+                        if nearRight { applyNearOpening(&g, side: .right) }
+                        if farLeft   { applyFarOpening(&g, side: .left) }
+                        if farRight  { applyFarOpening(&g, side: .right) }
+                        table[DungeonFrameKey(depth: depth, nearLeft: nearLeft, nearRight: nearRight, farLeft: farLeft, farRight: farRight)] =
+                            g.map { String($0) }
+                    }
+                }
+            }
+        }
     }
 
     return table
@@ -79,8 +108,10 @@ func buildFrameTable() -> [DungeonFrameKey: [String]] {
 // MARK: - Fallback
 
 func fallbackFrame(for key: DungeonFrameKey) -> [String] {
-    // Strip farLeft/farRight (no frames use them) then progressively simplify nearLeft/nearRight.
+    // Try exact match first (all combinations are now in the table),
+    // then progressively simplify near/far flags as a safety net.
     let candidates: [DungeonFrameKey] = [
+        key,
         DungeonFrameKey(depth: key.depth, nearLeft: key.nearLeft, nearRight: key.nearRight, farLeft: false, farRight: false),
         DungeonFrameKey(depth: key.depth, nearLeft: key.nearLeft, nearRight: false,          farLeft: false, farRight: false),
         DungeonFrameKey(depth: key.depth, nearLeft: false,         nearRight: key.nearRight, farLeft: false, farRight: false),
