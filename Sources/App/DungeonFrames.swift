@@ -285,49 +285,54 @@ private func frame_d2_nearBoth() -> [String] {
 // MARK: - depth=3: fog variants with near side openings
 
 // nearLeft: left wall open at player position, fog corridor ahead
+// Each row 3-9 is exactly 58 chars: "     |" (6) + fog44 (44) + "    " (4) + junction (4).
+// The last 4 chars fall in the right bright zone — they are the mirror of nearRight's
+// left junction chars (\↔/, reversed): rows 3-9 = " | /", " |/ ", " /  ", "/|  ", " \  ", " |\ ", "_| \"
 private func frame_d3_nearLeft() -> [String] {
-    // Inner fog content: 36 chars wide (same as depth=2 near inner face)
-    let fog   = "  " + String(repeating: "· ", count: 16) + "  "   // 2+32+2 = 36
-    let fogC  = "    " + String(repeating: "· ", count: 14) + "    " // 4+28+4 = 36
+    let fog44 = "  " + String(repeating: "· ", count: 20) + "  "  // 44 chars
+    let us48  = String(repeating: "_", count: 48)
+    func r(_ c: String, _ j: String) -> String { "     |\(c)    \(j)" }
     return [
-        pad(#"                                                    |"#),  // row  0
-        pad(#"  \                                                /|"#),  // row  1
-        pad(#"   \                                              / |"#),  // row  2
-        pad(#"    \____________________________________________/  | "#), // row  3
-        pad(#"    |                                          |   | "#), // row  4
-        pad("    |\(fog)|   | "),                                        // row  5: fog
-        pad("    |\(fogC)|   | "),                                       // row  6: fog centre
-        pad("    |\(fog)|   | "),                                        // row  7: fog
-        pad(#"    |                                          |   | "#), // row  8
-        pad(#"    |__________________________________________|   | "#), // row  9
-        pad(#"   /                                          \  | "#),  // row 10
-        pad(#"  /                                            \ | "#),  // row 11
-        pad(#"                                                \| "#),  // row 12
-        pad(#"                                                    |"#), // row 13
-        pad(#"                                                      "#),// row 14
+        String(repeating: " ", count: 57) + "|",             // row  0: 57sp + | = 58
+        "  \\" + String(repeating: " ", count: 53) + "/|",   // row  1: 3+53+2=58
+        "   \\" + String(repeating: "_", count: 51) + " /|", // row  2: 4+51+3=58
+        r(fog44, " | /"),                                     // row  3: mirror "\ | "
+        r(fog44, " |/ "),                                     // row  4: mirror " \| "
+        r(fog44, " /  "),                                     // row  5: mirror "  \ "
+        r(fog44, "/|  "),                                     // row  6: mirror "  |\"
+        r(fog44, " \\  "),                                    // row  7: mirror "  / "
+        r(fog44, " |\\ "),                                    // row  8: mirror " /| "
+        "     |\(us48)_| \\",                                 // row  9: 6+48+4=58, mirror "/ |_"
+        "   /" + String(repeating: "_", count: 51) + " \\|", // row 10: 4+51+3=58
+        "  /" + String(repeating: " ", count: 53) + "\\|",   // row 11: 3+53+2=58
+        String(repeating: " ", count: 57) + "|",             // row 12: 57sp + | = 58
+        String(repeating: " ", count: 58),                   // row 13
+        String(repeating: " ", count: 58),                   // row 14
     ]
 }
 
 // nearRight: right wall open at player position, fog corridor ahead
+// Rows 3-9: left junction (3 chars) + fog44 (44) + "|     " (6) = 53 → padded to 58.
+// First 4 chars fall in the left bright zone.
 private func frame_d3_nearRight() -> [String] {
-    let fog   = "  " + String(repeating: "· ", count: 16) + "  "
-    let fogC  = "    " + String(repeating: "· ", count: 14) + "    "
+    let fog44 = "  " + String(repeating: "· ", count: 20) + "  "  // 44 chars
+    let us44  = String(repeating: "_", count: 44)
     return [
         pad(#"|                                                    "#),  // row  0
         pad(#"|\                                                /  "#),  // row  1
-        pad(#"| \                                              /   "#),  // row  2
-        pad(#"|  \____________________________________________/ /   "#), // row  3
-        pad(#"|   |                                          |     "#), // row  4
-        pad("|   |\(fog)|     "),                                        // row  5: fog
-        pad("|   |\(fogC)|     "),                                       // row  6: fog centre
-        pad("|   |\(fog)|     "),                                        // row  7: fog
-        pad(#"|   |                                          |     "#), // row  8
-        pad(#"|   |__________________________________________|     "#), // row  9
-        pad(#"|  /                                          \    "#),  // row 10
-        pad(#"| /                                            \   "#),  // row 11
-        pad(#"|/                                                   "#), // row 12
-        pad(#"|                                                    "#), // row 13
-        pad(#"                                                      "#),// row 14
+        pad(#"|\______________________________________________/ /   "#), // row  2: |\_... bright
+        pad("\\ |\(String(repeating: " ", count: 44))|     "),           // row  3: "\ | " bright
+        pad(" \\|\(fog44)|     "),                                        // row  4: " \| " bright
+        pad("  \\\(fog44)|     "),                                        // row  5: "  \ " bright
+        pad("  |\\\(fog44)|     "),                                       // row  6: "  |\" bright
+        pad("  /\(fog44)|     "),                                         // row  7: "  / " bright
+        pad(" /|\(fog44)|     "),                                         // row  8: " /| " bright
+        pad("/ |\(us44)|     "),                                          // row  9: "/ |_" bright
+        pad(#"| /                                            /     "#),  // row 10
+        pad(#"|/                                            /      "#),  // row 11
+        pad(#"|                                                    "#),  // row 12
+        String(repeating: " ", count: 58),                               // row 13
+        String(repeating: " ", count: 58),                               // row 14
     ]
 }
 
