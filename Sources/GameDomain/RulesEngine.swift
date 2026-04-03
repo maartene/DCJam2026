@@ -17,7 +17,21 @@ public enum RulesEngine {
         // Advance timers first on every tick.
         let next = advanceTimers(resolvedState, deltaTime: deltaTime)
 
-        switch command {
+        // On the upgrade prompt screen, keys 1/2/3 select an upgrade rather than triggering
+        // dash/brace/special. Remap before the main dispatch.
+        let resolvedCommand: GameCommand
+        if case .upgradePrompt(let choices) = next.screenMode {
+            switch command {
+            case .dash   where choices.count > 0: resolvedCommand = .selectUpgrade(choices[0])
+            case .brace  where choices.count > 1: resolvedCommand = .selectUpgrade(choices[1])
+            case .special where choices.count > 2: resolvedCommand = .selectUpgrade(choices[2])
+            default: resolvedCommand = command
+            }
+        } else {
+            resolvedCommand = command
+        }
+
+        switch resolvedCommand {
         case .none:
             return next
 

@@ -217,6 +217,27 @@ import Testing
         #expect(uniqueIDs.count == 3)
     }
 
+    @Test func `Keys 1, 2, 3 select upgrades on the upgrade prompt screen`() {
+        // Given — upgrade prompt showing three choices
+        let pool = UpgradePool(alreadySelected: [])
+        let choices = pool.drawChoices(count: 3)
+        var state = GameState.initial(config: GameConfig.default)
+        state = state.withScreenMode(.upgradePrompt(choices: choices))
+        // When — press key "1" (arrives as .dash), "2" (.brace), "3" (.special)
+        let result1 = RulesEngine.apply(command: .dash, to: state, deltaTime: 0.0)
+        let result2 = RulesEngine.apply(command: .brace, to: state, deltaTime: 0.0)
+        let result3 = RulesEngine.apply(command: .special, to: state, deltaTime: 0.0)
+        // Then — each selects the corresponding upgrade and returns to dungeon
+        for result in [result1, result2, result3] {
+            if case .dungeon = result.screenMode { } else {
+                Issue.record("Expected .dungeon after upgrade selection, got \(result.screenMode)")
+            }
+        }
+        #expect(result1.activeUpgrades.contains(where: { $0.id == choices[0].id }))
+        #expect(result2.activeUpgrades.contains(where: { $0.id == choices[1].id }))
+        #expect(result3.activeUpgrades.contains(where: { $0.id == choices[2].id }))
+    }
+
     // MARK: - Special charge meter transitions
 
     @Test func `The Special charge meter shows a ready state when charge reaches maximum`() {
