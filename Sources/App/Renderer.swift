@@ -217,11 +217,16 @@ final class Renderer {
         output.moveCursor(row: Self.mainViewFirstRow, col: 1)
         output.write("\u{1B}[40m")
         let sideColor = depthColor(for: 0)
-        let useRegionColoring = key.depth > 0 && !key.nearLeft && !key.nearRight
+        // Apply region coloring whenever depth > 0 and at least one side wall is present.
+        let hasLeftWall  = !key.nearLeft
+        let hasRightWall = !key.nearRight
+        let useRegionColoring = key.depth > 0 && (hasLeftWall || hasRightWall)
         for (i, line) in frameLines.enumerated() {
             output.moveCursor(row: i + Self.mainViewFirstRow, col: 2)
             if useRegionColoring {
-                output.write(regionColoredLine(line, sideColor: sideColor, centerColor: colorCode, row: i))
+                output.write(regionColoredLine(line, sideColor: sideColor, centerColor: colorCode,
+                                               row: i, hasLeftWall: hasLeftWall, hasRightWall: hasRightWall,
+                                               hasFarRight: key.farRight, hasFarLeft: key.farLeft))
             } else {
                 output.write(colorCode + line + ansiReset)
             }
@@ -647,19 +652,45 @@ final class Renderer {
     /// Splits a dungeon frame line into side-wall regions (bright, depth=0 color)
     /// and a center region (frame depth color). Side wall width varies by row to
     /// match the converging perspective structure of the ASCII frames.
-    private func regionColoredLine(_ line: String, sideColor: String, centerColor: String, row: Int) -> String {
+    /// hasLeftWall/hasRightWall let callers suppress brightening on the open side
+    /// (e.g. nearRight frames have no right outer wall).
+    private func regionColoredLine(_ line: String, sideColor: String, centerColor: String,
+                                    row: Int, hasLeftWall: Bool = true, hasRightWall: Bool = true,
+                                    hasFarRight: Bool = false, hasFarLeft: Bool = false) -> String {
         let width = sideWallWidth(for: row)
         guard width > 0 else {
             return centerColor + line + ansiReset
         }
         let chars = Array(line)
-        let total = chars.count
-        let left = String(chars[0..<min(width, total)])
-        let center = String(chars[min(width, total)..<max(total - width, width)])
-        let right = String(chars[max(total - width, width)..<total])
-        return sideColor + left + ansiReset
-             + centerColor + center + ansiReset
-             + sideColor + right + ansiReset
+        let n = chars.count
+        let leftW  = hasLeftWall  ? min(width, n) : 0
+        let rightW = hasRightWall ? min(width, n) : 0
+        let isFarRow = (3...8).contains(row)
+        let farColor = depthColor(for: 1)
+
+        // When far openings are active, cols 54-55 (right) / 2-3 (left)
+        // get D=1 tinting instead of D=0 side or center color.
+        func colorFor(_ col: Int) -> String {
+            if isFarRow && hasFarRight && col >= 53 && col < 56 { return farColor }
+            if isFarRow && hasFarLeft  && col >= 2  && col < 5  { return farColor }
+            if col < leftW { return sideColor }
+            if col >= n - rightW { return sideColor }
+            return centerColor
+        }
+
+        var result = ""
+        var runColor = colorFor(0)
+        var runStart = 0
+        for col in 1..<n {
+            let c = colorFor(col)
+            if c != runColor {
+                result += runColor + String(chars[runStart..<col]) + ansiReset
+                runStart = col
+                runColor = c
+            }
+        }
+        result += runColor + String(chars[runStart..<n]) + ansiReset
+        return result
     }
 
     /// Returns the number of characters from each side that belong to the
