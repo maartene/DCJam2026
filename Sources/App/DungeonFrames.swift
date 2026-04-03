@@ -61,7 +61,7 @@ private func frame_d0_none() -> [String] {
     let sp54  = String(repeating: " ", count: 54)
     let us52  = String(repeating: "_", count: 52)
     let us50  = String(repeating: "_", count: 50)
-    let stone = String(repeating: "▒", count: 50)
+    let stone = String(repeating: "▓▒", count: 25)
     return [
         "|\(sp56)|",                    // row  0
         "|\\\(sp54)/|",                 // row  1
