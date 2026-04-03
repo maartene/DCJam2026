@@ -216,9 +216,15 @@ final class Renderer {
         let colorCode = depthColor(for: key.depth)
         output.moveCursor(row: Self.mainViewFirstRow, col: 1)
         output.write("\u{1B}[40m")
+        let sideColor = depthColor(for: 0)
+        let useRegionColoring = key.depth > 0 && !key.nearLeft && !key.nearRight
         for (i, line) in frameLines.enumerated() {
             output.moveCursor(row: i + Self.mainViewFirstRow, col: 2)
-            output.write(colorCode + line + ansiReset)
+            if useRegionColoring {
+                output.write(regionColoredLine(line, sideColor: sideColor, centerColor: colorCode, row: i))
+            } else {
+                output.write(colorCode + line + ansiReset)
+            }
         }
         output.moveCursor(row: Self.mainViewLastRow + 1, col: 1)
         output.write(ansiReset)
@@ -635,6 +641,36 @@ final class Renderer {
             case 1:  return ansiWhite         // \e[37m — standard white
             default: return ansiDarkGray      // \e[90m — dark gray (depth 2+)
             }
+        }
+    }
+
+    /// Splits a dungeon frame line into side-wall regions (bright, depth=0 color)
+    /// and a center region (frame depth color). Side wall width varies by row to
+    /// match the converging perspective structure of the ASCII frames.
+    private func regionColoredLine(_ line: String, sideColor: String, centerColor: String, row: Int) -> String {
+        let width = sideWallWidth(for: row)
+        guard width > 0 else {
+            return centerColor + line + ansiReset
+        }
+        let chars = Array(line)
+        let total = chars.count
+        let left = String(chars[0..<min(width, total)])
+        let center = String(chars[min(width, total)..<max(total - width, width)])
+        let right = String(chars[max(total - width, width)..<total])
+        return sideColor + left + ansiReset
+             + centerColor + center + ansiReset
+             + sideColor + right + ansiReset
+    }
+
+    /// Returns the number of characters from each side that belong to the
+    /// outermost corridor walls (depth=0) for a given frame row index.
+    private func sideWallWidth(for row: Int) -> Int {
+        switch row {
+        case 0, 12: return 1
+        case 1, 11: return 2
+        case 2, 10: return 3
+        case 3...9:  return 4
+        default:     return 0
         }
     }
 

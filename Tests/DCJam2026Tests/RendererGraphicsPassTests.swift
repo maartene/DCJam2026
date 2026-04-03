@@ -377,3 +377,89 @@ struct ColorDepth256Tests {
         }
     }
 }
+
+// MARK: - Per-region coloring: side walls bright, center depth-colored
+
+@Suite("Renderer — Graphics Pass: per-region coloring for dungeon frames")
+struct PerRegionColoringTests {
+
+    // For depth>=1 standard frames (no nearLeft/nearRight), side wall characters
+    // should be colored at depth=0 brightness while center content uses frame depth.
+
+    // ACCEPTANCE TEST: depth=1 256-color frame lines contain BOTH depth=0 (252) and depth=1 (249) codes
+    @Test("depth=1 standard frame lines contain both side-wall and center color codes in 256-color mode")
+    func depth1StandardFrameHasBothColors256() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy, supports256Color: true)
+        let state = makeDepthState(depth: 1)
+        renderer.render(state)
+
+        let dungeonLineWrites = spy.entries.filter { (2...16).contains($0.row) && $0.col == 2 }
+        #expect(!dungeonLineWrites.isEmpty, "Expected dungeon frame line writes")
+
+        // At least some lines should contain the depth=0 side color AND the depth=1 center color
+        let linesWithBothColors = dungeonLineWrites.filter { entry in
+            entry.string.contains(ansi256Depth0) && entry.string.contains(ansi256Depth1)
+        }
+        #expect(!linesWithBothColors.isEmpty,
+                "Expected at least some depth=1 lines to have both depth=0 (\(ansi256Depth0)) side color and depth=1 (\(ansi256Depth1)) center color")
+    }
+
+    // ACCEPTANCE TEST: depth=2 256-color frame lines contain depth=0 side color
+    @Test("depth=2 standard frame lines contain depth=0 side-wall color in 256-color mode")
+    func depth2StandardFrameHasSideColor256() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy, supports256Color: true)
+        let state = makeDepthState(depth: 2)
+        renderer.render(state)
+
+        let dungeonLineWrites = spy.entries.filter { (2...16).contains($0.row) && $0.col == 2 }
+        #expect(!dungeonLineWrites.isEmpty, "Expected dungeon frame line writes")
+
+        let linesWithSideColor = dungeonLineWrites.filter { entry in
+            entry.string.contains(ansi256Depth0) && entry.string.contains(ansi256Depth2)
+        }
+        #expect(!linesWithSideColor.isEmpty,
+                "Expected at least some depth=2 lines to have depth=0 (\(ansi256Depth0)) side color and depth=2 (\(ansi256Depth2)) center color")
+    }
+
+    // UNIT TEST: depth=0 frames are NOT affected (uniform color, no splitting)
+    @Test("depth=0 frame lines do NOT contain multiple different color codes")
+    func depth0FrameStaysUniform() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy, supports256Color: true)
+        let state = makeDepthState(depth: 0)
+        renderer.render(state)
+
+        let dungeonLineWrites = spy.entries.filter { (2...16).contains($0.row) && $0.col == 2 }
+        #expect(!dungeonLineWrites.isEmpty)
+
+        // depth=0 lines should only contain the depth=0 color, never depth=1/2/3
+        for entry in dungeonLineWrites {
+            #expect(!entry.string.contains(ansi256Depth1),
+                    "depth=0 line at row \(entry.row) should not contain depth=1 color code")
+            #expect(!entry.string.contains(ansi256Depth2),
+                    "depth=0 line at row \(entry.row) should not contain depth=2 color code")
+            #expect(!entry.string.contains(ansi256Depth3),
+                    "depth=0 line at row \(entry.row) should not contain depth=3 color code")
+        }
+    }
+
+    // UNIT TEST: 16-color mode also gets per-region coloring
+    @Test("depth=1 16-color frame lines contain both bright-white side and standard-white center")
+    func depth116ColorHasBothColors() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy, supports256Color: false)
+        let state = makeDepthState(depth: 1)
+        renderer.render(state)
+
+        let dungeonLineWrites = spy.entries.filter { (2...16).contains($0.row) && $0.col == 2 }
+        #expect(!dungeonLineWrites.isEmpty)
+
+        let linesWithBothColors = dungeonLineWrites.filter { entry in
+            entry.string.contains(ansiBrightWhiteFg) && entry.string.contains(ansiStandardWhite)
+        }
+        #expect(!linesWithBothColors.isEmpty,
+                "Expected at least some depth=1 lines to have bright-white sides and standard-white center")
+    }
+}
