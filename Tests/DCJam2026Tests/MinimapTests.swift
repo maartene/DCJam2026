@@ -156,6 +156,102 @@ struct MinimapTests {
     }
 }
 
+// MARK: - Landmark symbols in minimap
+
+@Suite("Turning Mechanic — 2D Minimap Landmark Symbols")
+struct MinimapLandmarkTests {
+
+    // Test Budget: 7 distinct behaviors × 2 = 14 max tests; 7 used.
+    //   B1: entry 'E' at (7,0)
+    //   B2: guard 'G' at encounter cell on non-final floor
+    //   B3: boss 'B' at encounter cell on final floor
+    //   B4: egg '*' at egg room when not yet collected
+    //   B5: egg 'e' at egg room after collection
+    //   B6: staircase 'S' on non-final floor
+    //   B7: exit 'X' on final floor
+
+    // Minimap grid: y=6 renders at screen row 2; y=0 renders at screen row 8.
+    // Each row is written to col 61 as a 15-character string; character x is at string index x.
+    private func minimapCharAt(x: Int, y: Int, spy: TUIOutputSpy) -> Character? {
+        let targetRow = 2 + (6 - y)   // screenRow formula from Renderer.renderMinimap
+        guard let entry = spy.entries.first(where: { $0.row == targetRow && $0.col == 61 }) else {
+            return nil
+        }
+        guard x >= 0 && x < entry.string.count else { return nil }
+        return entry.string[entry.string.index(entry.string.startIndex, offsetBy: x)]
+    }
+
+    private func render(_ state: GameState) -> TUIOutputSpy {
+        let spy = TUIOutputSpy()
+        Renderer(output: spy).render(state)
+        return spy
+    }
+
+    @Test("Minimap shows E at the entry cell (7,0)")
+    func minimapShowsEntrySymbol() {
+        // Player is north of entry so entry cell is visible (not overridden by player marker)
+        let state = GameState.initial(config: .default).withPlayerPosition(Position(x: 7, y: 3))
+        let spy = render(state)
+        #expect(minimapCharAt(x: 7, y: 0, spy: spy) == "E", "Expected 'E' at entry (7,0)")
+    }
+
+    @Test("Minimap shows G at the guard encounter cell on a non-final floor")
+    func minimapShowsGuardSymbol() {
+        // Floor 1, player at entry; encounter is at (7,4) on non-final floor
+        let state = GameState.initial(config: .default).withPlayerPosition(Position(x: 7, y: 0))
+        let spy = render(state)
+        #expect(minimapCharAt(x: 7, y: 4, spy: spy) == "G", "Expected 'G' at encounter (7,4)")
+    }
+
+    @Test("Minimap shows B at the boss encounter cell on the final floor")
+    func minimapShowsBossSymbol() {
+        // Final floor, boss at (7,3); player at entry
+        let finalFloor = GameConfig.default.maxFloors
+        let state = GameState.initial(config: .default)
+            .withCurrentFloor(finalFloor)
+            .withPlayerPosition(Position(x: 7, y: 0))
+        let spy = render(state)
+        #expect(minimapCharAt(x: 7, y: 3, spy: spy) == "B", "Expected 'B' at boss encounter (7,3) on final floor")
+    }
+
+    @Test("Minimap shows * at the egg room cell before the egg is collected")
+    func minimapShowsEggSymbol() {
+        // Floor 2 has the egg room at (2,3); player at entry, egg not yet collected
+        let state = GameState.initial(config: .default)
+            .withCurrentFloor(2)
+            .withPlayerPosition(Position(x: 7, y: 0))
+        let spy = render(state)
+        #expect(minimapCharAt(x: 2, y: 3, spy: spy) == "*", "Expected '*' at uncollected egg room (2,3) on floor 2")
+    }
+
+    @Test("Minimap shows e at the egg room cell after the egg is collected")
+    func minimapShowsCollectedEggSymbol() {
+        let state = GameState.initial(config: .default)
+            .withCurrentFloor(2)
+            .withPlayerPosition(Position(x: 7, y: 0))
+            .withHasEgg(true)
+        let spy = render(state)
+        #expect(minimapCharAt(x: 2, y: 3, spy: spy) == "e", "Expected 'e' at egg room (2,3) after collection")
+    }
+
+    @Test("Minimap shows S at the staircase cell on a non-final floor")
+    func minimapShowsStaircaseSymbol() {
+        let state = GameState.initial(config: .default).withPlayerPosition(Position(x: 7, y: 0))
+        let spy = render(state)
+        #expect(minimapCharAt(x: 7, y: 6, spy: spy) == "S", "Expected 'S' at staircase (7,6) on non-final floor")
+    }
+
+    @Test("Minimap shows X at the exit cell on the final floor")
+    func minimapShowsExitSymbol() {
+        let finalFloor = GameConfig.default.maxFloors
+        let state = GameState.initial(config: .default)
+            .withCurrentFloor(finalFloor)
+            .withPlayerPosition(Position(x: 7, y: 0))
+        let spy = render(state)
+        #expect(minimapCharAt(x: 7, y: 6, spy: spy) == "X", "Expected 'X' at exit (7,6) on final floor")
+    }
+}
+
 // MARK: - ADR-006 Screen Layout — Vertical Split
 
 @Suite("Turning Mechanic — Vertical Split Layout (ADR-006)")
