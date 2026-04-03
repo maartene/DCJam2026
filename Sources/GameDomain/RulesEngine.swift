@@ -168,7 +168,15 @@ public enum RulesEngine {
         if !floor.hasExitSquare && isAtOrPastStaircase {
             let nextFloor = state.currentFloor + 1
             let nextFloorMap = FloorGenerator.generate(floorNumber: nextFloor, config: state.config)
-            return state.withCurrentFloor(nextFloor).withPlayerPosition(nextFloorMap.entryPosition)
+            let advanced = state.withCurrentFloor(nextFloor).withPlayerPosition(nextFloorMap.entryPosition)
+            // Non-final descent: show upgrade prompt with 3 distinct choices not already taken.
+            if nextFloor <= state.config.maxFloors {
+                let pool = UpgradePool(alreadySelected: state.activeUpgrades)
+                let choices = pool.drawChoices(count: state.config.upgradeChoiceCount)
+                return advanced.withScreenMode(.upgradePrompt(choices: choices))
+            }
+            // Defensive guard: beyond final floor — return to dungeon directly.
+            return advanced.withScreenMode(.dungeon)
         }
 
         // Wall collision — block movement into non-passable cells (walls or out-of-bounds).

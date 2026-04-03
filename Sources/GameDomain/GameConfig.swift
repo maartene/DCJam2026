@@ -13,6 +13,7 @@ public struct GameConfig: Sendable {
     public var braceWindowDuration: Double       // invulnerability window after Brace input
     public var braceCooldownSeconds: Double      // cooldown before Brace can be used again
     public var braceSpecialBonus: Double         // Special charge bonus on a successful parry
+    public var upgradeChoiceCount: Int           // Number of choices presented at each milestone
 
     public static let `default` = GameConfig(
         maxHP: 100,
@@ -24,7 +25,8 @@ public struct GameConfig: Sendable {
         enemyAttackInterval: 2.0,
         braceWindowDuration: 0.5,
         braceCooldownSeconds: 1.5,
-        braceSpecialBonus: 0.15
+        braceSpecialBonus: 0.15,
+        upgradeChoiceCount: 3
     )
 
     public static func withFloorCount(_ count: Int) -> GameConfig {

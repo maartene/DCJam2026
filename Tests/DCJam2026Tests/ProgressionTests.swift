@@ -86,17 +86,64 @@ import Testing
     // MARK: - Milestone upgrade prompt
 
     @Test func `The upgrade prompt shows exactly 3 options at a milestone floor transition`() {
-        // Given — Ember has cleared a milestone floor
+        // Given — Ember is on floor 1, standing adjacent to the staircase
         var state = GameState.initial(config: GameConfig.default)
-        state = state.withCurrentFloor(2) // assume Floor 2 cleared = milestone
-        // When — milestone triggers upgrade prompt
+        state = state.withCurrentFloor(1).withScreenMode(.dungeon)
+        let floor1 = FloorGenerator.generate(floorNumber: 1, config: GameConfig.default)
+        // Position one step before the staircase (staircase is at y=6, so stand at y=5 facing north = +y)
+        let beforeStaircase = Position(x: floor1.staircasePosition2D.x, y: floor1.staircasePosition2D.y - 1)
+        state = state.withPlayerPosition(beforeStaircase).withFacingDirection(.north)
+        // When — Ember steps onto the staircase
         let result = RulesEngine.apply(command: .move(.forward), to: state, deltaTime: 0.0)
-        // If an upgrade prompt fires:
+        // Then — upgrade prompt fires with exactly 3 distinct choices, floor has advanced
         if case .upgradePrompt(let choices) = result.screenMode {
             #expect(choices.count == 3)
+            let uniqueIDs = Set(choices.map { $0.id })
+            #expect(uniqueIDs.count == 3)
+        } else {
+            Issue.record("Expected .upgradePrompt but got \(result.screenMode)")
         }
-        // If the prompt does not fire here, the milestone trigger floor is a design detail —
-        // test passes vacuously and the crafter must wire the milestone to the correct floor.
+        #expect(result.currentFloor == 2)
+    }
+
+    @Test func `Descending from floor 4 to floor 5 also triggers the upgrade prompt`() {
+        // Given — Ember is on floor 4, adjacent to the staircase
+        var state = GameState.initial(config: GameConfig.default)
+        state = state.withCurrentFloor(4).withScreenMode(.dungeon)
+        let floor4 = FloorGenerator.generate(floorNumber: 4, config: GameConfig.default)
+        let beforeStaircase = Position(x: floor4.staircasePosition2D.x, y: floor4.staircasePosition2D.y - 1)
+        state = state.withPlayerPosition(beforeStaircase).withFacingDirection(.north)
+        // When
+        let result = RulesEngine.apply(command: .move(.forward), to: state, deltaTime: 0.0)
+        // Then — upgrade prompt still fires on the floor 4→5 boundary
+        if case .upgradePrompt = result.screenMode {
+            // expected
+        } else {
+            Issue.record("Expected .upgradePrompt on floor 4→5 transition, got \(result.screenMode)")
+        }
+        #expect(result.currentFloor == 5)
+    }
+
+    @Test func `No upgrade prompt fires when descending from the final floor`() {
+        // Given — a config with maxFloors=3 so floor 3 is final; Ember is on floor 2 (non-final)
+        // which means descending lands on floor 3 (final) — upgrade DOES fire.
+        // For "beyond final floor" defensive guard we need a custom config.
+        var config = GameConfig.default
+        config.maxFloors = 2
+        var state = GameState.initial(config: config)
+        state = state.withCurrentFloor(2).withScreenMode(.dungeon)
+        // Floor 2 is the final floor with maxFloors=2, so it has hasExitSquare=true
+        // and NO staircase trigger — movement returns dungeon directly.
+        let floor2 = FloorGenerator.generate(floorNumber: 2, config: config)
+        // Place Ember adjacent to what would be the staircase cell and step forward
+        let nearExit = Position(x: floor2.staircasePosition2D.x, y: floor2.staircasePosition2D.y - 1)
+        state = state.withPlayerPosition(nearExit).withFacingDirection(.north)
+        // When
+        let result = RulesEngine.apply(command: .move(.forward), to: state, deltaTime: 0.0)
+        // Then — NO upgrade prompt: final floor has exit square, not a staircase
+        if case .upgradePrompt = result.screenMode {
+            Issue.record("Upgrade prompt must not fire when on the final floor")
+        }
     }
 
     @Test func `Selecting an upgrade applies its effect immediately and resumes the dungeon`() {

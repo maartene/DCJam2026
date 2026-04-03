@@ -17,21 +17,10 @@ import Testing
     private func statusBarContent(hp: Int, maxHP: Int = 100) -> String {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
-        let config = GameConfig(
-            maxHP: maxHP,
-            dashCooldownSeconds: 25.0,
-            dashStartingCharges: 2,
-            dashChargeCap: 2,
-            specialChargeRatePerSecond: 0.008,
-            maxFloors: 5,
-            enemyAttackInterval: 2.0,
-            braceWindowDuration: 0.5,
-            braceCooldownSeconds: 1.5,
-            braceSpecialBonus: 0.15
-        )
+        var config = GameConfig.default
+        config.maxHP = maxHP
         var state = GameState.initial(config: config)
-        state = state.withHP(hp)
-        state.screenMode = .dungeon
+        state = state.withHP(hp).withScreenMode(.dungeon)
         renderer.render(state)
         return spy.entries
             .filter { $0.row == 18 }
