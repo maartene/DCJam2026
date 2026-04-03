@@ -140,7 +140,7 @@ struct DepthGradedColorTests {
     func depth0LinesContainBrightWhiteAndReset() {
         // Use a GameState whose position/facing yields depth=0 (player faces a wall directly)
         let spy = TUIOutputSpy()
-        let renderer = Renderer(output: spy)
+        let renderer = Renderer(output: spy, supports256Color: false)
         let state = makeDepthState(depth: 0)
         renderer.render(state)
 
@@ -158,7 +158,7 @@ struct DepthGradedColorTests {
     @Test("depth=1 frame lines contain standard-white foreground code")
     func depth1LinesContainStandardWhite() {
         let spy = TUIOutputSpy()
-        let renderer = Renderer(output: spy)
+        let renderer = Renderer(output: spy, supports256Color: false)
         let state = makeDepthState(depth: 1)
         renderer.render(state)
 
@@ -174,7 +174,7 @@ struct DepthGradedColorTests {
     @Test("depth=2 frame lines contain dark-gray foreground code")
     func depth2LinesContainDarkGray() {
         let spy = TUIOutputSpy()
-        let renderer = Renderer(output: spy)
+        let renderer = Renderer(output: spy, supports256Color: false)
         let state = makeDepthState(depth: 2)
         renderer.render(state)
 
@@ -190,7 +190,7 @@ struct DepthGradedColorTests {
     @Test("background \\e[40m still emitted before first dungeon frame line after depth color added")
     func backgroundStillEmittedAfterDepthColor() {
         let spy = TUIOutputSpy()
-        let renderer = Renderer(output: spy)
+        let renderer = Renderer(output: spy, supports256Color: false)
         let state = makeDepthState(depth: 0)
         renderer.render(state)
 
@@ -212,7 +212,7 @@ struct DepthGradedColorTests {
     @Test("minimap writes do not start with standalone depth-graded foreground codes")
     func minimapWritesDoNotStartWithDepthColor() {
         let spy = TUIOutputSpy()
-        let renderer = Renderer(output: spy)
+        let renderer = Renderer(output: spy, supports256Color: false)
         let state = makeDepthState(depth: 0)
         renderer.render(state)
 
@@ -246,7 +246,8 @@ private func makeDepthState(depth: Int) -> GameState {
     switch depth {
     case 0: state = state.withPlayerPosition(Position(x: 7, y: 6))
     case 1: state = state.withPlayerPosition(Position(x: 7, y: 5))
-    default: state = state.withPlayerPosition(Position(x: 7, y: 4))
+    case 2: state = state.withPlayerPosition(Position(x: 7, y: 4))
+    default: state = state.withPlayerPosition(Position(x: 7, y: 3))
     }
     return state
 }
@@ -327,5 +328,91 @@ struct DepthZeroWallDensityTests {
         #expect(d1[5].contains(brickB), "depth-1 row 5 should contain brickB pattern ░▓ repeated")
         #expect(d1[7].contains(brickB), "depth-1 row 7 should contain brickB pattern ░▓ repeated")
         #expect(d1[8].contains(brickA), "depth-1 row 8 should contain brickA pattern ▓░ repeated")
+    }
+}
+
+// MARK: - Step 01-04: 256-color grayscale depth ramp with 16-color fallback
+// Test Budget: 3 behaviors × 2 = 6 unit tests max
+//   Behavior 1: 256-color path emits correct grayscale codes per depth (4 depths, parametrized)
+//   Behavior 2: 16-color fallback path emits correct 16-color codes
+//   Behavior 3: ansi256Fg helper returns correct escape string
+
+private let ansi256Depth0 = "\u{1B}[38;5;252m"  // near-white
+private let ansi256Depth1 = "\u{1B}[38;5;245m"  // medium gray
+private let ansi256Depth2 = "\u{1B}[38;5;238m"  // dark gray
+private let ansi256Depth3 = "\u{1B}[38;5;234m"  // near-black
+private let ansi256Prefix  = "\u{1B}[38;5;"
+
+@Suite("Renderer — Graphics Pass 01-04: 256-color grayscale depth ramp")
+struct ColorDepth256Tests {
+
+    // ACCEPTANCE TEST (Behavior 1): 256-color path emits correct grayscale code for each depth
+    @Test("256-color terminal uses grayscale codes per depth",
+          arguments: [
+            (0, "\u{1B}[38;5;252m"),
+            (1, "\u{1B}[38;5;245m"),
+            (2, "\u{1B}[38;5;238m"),
+            (3, "\u{1B}[38;5;234m"),
+          ])
+    func uses256ColorGrayscaleCodeForDepth(depth: Int, expectedCode: String) {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy, supports256Color: true)
+        let state = makeDepthState(depth: depth)
+        renderer.render(state)
+
+        let dungeonLineWrites = spy.entries.filter { (2...16).contains($0.row) && $0.col == 2 }
+        #expect(!dungeonLineWrites.isEmpty, "Expected dungeon frame line writes at rows 2-16 col 2")
+        for entry in dungeonLineWrites {
+            #expect(entry.string.contains(expectedCode),
+                    "depth=\(depth) line at row \(entry.row) should contain \(expectedCode), got: \(entry.string)")
+        }
+    }
+
+    // ACCEPTANCE TEST (Behavior 2): 16-color fallback path emits correct 16-color codes
+    @Test("16-color fallback terminal uses 16-color codes and not 256-color codes",
+          arguments: [
+            (0, "\u{1B}[97m"),
+            (1, "\u{1B}[37m"),
+            (2, "\u{1B}[90m"),
+          ])
+    func uses16ColorFallbackForDepth(depth: Int, expectedCode: String) {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy, supports256Color: false)
+        let state = makeDepthState(depth: depth)
+        renderer.render(state)
+
+        let dungeonLineWrites = spy.entries.filter { (2...16).contains($0.row) && $0.col == 2 }
+        #expect(!dungeonLineWrites.isEmpty, "Expected dungeon frame line writes at rows 2-16 col 2")
+        for entry in dungeonLineWrites {
+            #expect(entry.string.contains(expectedCode),
+                    "depth=\(depth) fallback line at row \(entry.row) should contain \(expectedCode), got: \(entry.string)")
+            #expect(!entry.string.contains(ansi256Prefix),
+                    "depth=\(depth) fallback line at row \(entry.row) must not contain 256-color code, got: \(entry.string)")
+        }
+    }
+
+    // UNIT TEST (Behavior 3): ansi256Fg helper returns correct escape string
+    @Test("ansi256Fg returns correct ANSI 256-color foreground escape string",
+          arguments: [(252, "\u{1B}[38;5;252m"), (245, "\u{1B}[38;5;245m"),
+                      (238, "\u{1B}[38;5;238m"), (234, "\u{1B}[38;5;234m")])
+    func ansi256FgHelperReturnsCorrectEscapeString(index: Int, expected: String) {
+        #expect(ansi256Fg(index) == expected,
+                "ansi256Fg(\(index)) should return \(expected)")
+    }
+
+    // UNIT TEST: reset \e[0m still applied after each dungeon line in 256-color mode
+    @Test("256-color mode still applies reset after each dungeon frame line")
+    func reset256ColorModeStillAppliesResetAfterEachLine() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy, supports256Color: true)
+        let state = makeDepthState(depth: 0)
+        renderer.render(state)
+
+        let dungeonLineWrites = spy.entries.filter { (2...16).contains($0.row) && $0.col == 2 }
+        #expect(!dungeonLineWrites.isEmpty)
+        for entry in dungeonLineWrites {
+            #expect(entry.string.hasSuffix("\u{1B}[0m"),
+                    "256-color line at row \(entry.row) must end with \\e[0m, got: \(entry.string)")
+        }
     }
 }

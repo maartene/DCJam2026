@@ -21,6 +21,13 @@ let ansiDarkGray        = "\u{1B}[90m"
 let ansiWhite           = "\u{1B}[37m"
 let ansiBrightWhite     = "\u{1B}[97m"
 
+// MARK: - 256-color helper
+
+/// Returns an ANSI 256-color foreground escape sequence for the given color index (0–255).
+func ansi256Fg(_ n: Int) -> String {
+    "\u{1B}[38;5;\(n)m"
+}
+
 // MARK: - Helper
 
 /// Returns `text` wrapped with the given ANSI escape `code` and a trailing reset sequence.

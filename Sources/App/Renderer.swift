@@ -16,10 +16,19 @@ final class Renderer {
 
     private let output: TUIOutputPort
     private let frames: [DungeonFrameKey: [String]]
+    private let supports256Color: Bool
 
     init(output: TUIOutputPort) {
         self.output = output
         self.frames = buildFrameTable()
+        self.supports256Color = (ProcessInfo.processInfo.environment["TERM"] ?? "").contains("256color")
+    }
+
+    /// Internal initializer for tests — injects the 256-color capability directly.
+    init(output: TUIOutputPort, supports256Color: Bool) {
+        self.output = output
+        self.frames = buildFrameTable()
+        self.supports256Color = supports256Color
     }
 
     func render(_ state: GameState) {
@@ -635,12 +644,22 @@ final class Renderer {
 
     // MARK: - Helpers
 
-    /// Maps a dungeon frame depth level (0–3) to an ANSI 16-color foreground code.
+    /// Maps a dungeon frame depth level (0–3) to an ANSI foreground code.
+    /// Uses 256-color grayscale indices when the terminal supports them; falls back to 16-color.
     private func depthColor(for depth: Int) -> String {
-        switch depth {
-        case 0:  return ansiBrightWhite   // \e[97m — bright white (closest wall)
-        case 1:  return ansiWhite         // \e[37m — standard white
-        default: return ansiDarkGray      // \e[90m — dark gray (depth 2+)
+        if supports256Color {
+            switch depth {
+            case 0:  return ansi256Fg(252)  // near-white
+            case 1:  return ansi256Fg(245)  // medium gray
+            case 2:  return ansi256Fg(238)  // dark gray
+            default: return ansi256Fg(234)  // near-black (depth 3+)
+            }
+        } else {
+            switch depth {
+            case 0:  return ansiBrightWhite   // \e[97m — bright white (closest wall)
+            case 1:  return ansiWhite         // \e[37m — standard white
+            default: return ansiDarkGray      // \e[90m — dark gray (depth 2+)
+            }
         }
     }
 
