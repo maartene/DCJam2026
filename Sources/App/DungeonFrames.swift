@@ -35,15 +35,12 @@ func buildFrameTable() -> [DungeonFrameKey: [String]] {
 // MARK: - Fallback
 
 func fallbackFrame(for key: DungeonFrameKey) -> [String] {
-    // Promote far openings to near: a corridor visible 1 step ahead on the side
-    // is approximated by the near-open variant (slightly imprecise but far better than no opening).
-    let promotedLeft  = key.nearLeft  || key.farLeft
-    let promotedRight = key.nearRight || key.farRight
+    // Strip farLeft/farRight (no frames use them) then progressively simplify nearLeft/nearRight.
     let candidates: [DungeonFrameKey] = [
-        DungeonFrameKey(depth: key.depth, nearLeft: promotedLeft,  nearRight: promotedRight, farLeft: false, farRight: false),
-        DungeonFrameKey(depth: key.depth, nearLeft: promotedLeft,  nearRight: false,          farLeft: false, farRight: false),
-        DungeonFrameKey(depth: key.depth, nearLeft: false,          nearRight: promotedRight, farLeft: false, farRight: false),
-        DungeonFrameKey(depth: key.depth, nearLeft: false,          nearRight: false,          farLeft: false, farRight: false),
+        DungeonFrameKey(depth: key.depth, nearLeft: key.nearLeft, nearRight: key.nearRight, farLeft: false, farRight: false),
+        DungeonFrameKey(depth: key.depth, nearLeft: key.nearLeft, nearRight: false,          farLeft: false, farRight: false),
+        DungeonFrameKey(depth: key.depth, nearLeft: false,         nearRight: key.nearRight, farLeft: false, farRight: false),
+        DungeonFrameKey(depth: key.depth, nearLeft: false,         nearRight: false,          farLeft: false, farRight: false),
     ]
     let table = buildFrameTable()
     for candidate in candidates {

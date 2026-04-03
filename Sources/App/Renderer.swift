@@ -217,11 +217,15 @@ final class Renderer {
         output.moveCursor(row: Self.mainViewFirstRow, col: 1)
         output.write("\u{1B}[40m")
         let sideColor = depthColor(for: 0)
-        let useRegionColoring = key.depth > 0 && !key.nearLeft && !key.nearRight
+        // Apply region coloring whenever depth > 0 and at least one side wall is present.
+        let hasLeftWall  = !key.nearLeft
+        let hasRightWall = !key.nearRight
+        let useRegionColoring = key.depth > 0 && (hasLeftWall || hasRightWall)
         for (i, line) in frameLines.enumerated() {
             output.moveCursor(row: i + Self.mainViewFirstRow, col: 2)
             if useRegionColoring {
-                output.write(regionColoredLine(line, sideColor: sideColor, centerColor: colorCode, row: i))
+                output.write(regionColoredLine(line, sideColor: sideColor, centerColor: colorCode,
+                                               row: i, hasLeftWall: hasLeftWall, hasRightWall: hasRightWall))
             } else {
                 output.write(colorCode + line + ansiReset)
             }
@@ -647,19 +651,32 @@ final class Renderer {
     /// Splits a dungeon frame line into side-wall regions (bright, depth=0 color)
     /// and a center region (frame depth color). Side wall width varies by row to
     /// match the converging perspective structure of the ASCII frames.
-    private func regionColoredLine(_ line: String, sideColor: String, centerColor: String, row: Int) -> String {
+    /// hasLeftWall/hasRightWall let callers suppress brightening on the open side
+    /// (e.g. nearRight frames have no right outer wall).
+    private func regionColoredLine(_ line: String, sideColor: String, centerColor: String,
+                                    row: Int, hasLeftWall: Bool = true, hasRightWall: Bool = true) -> String {
         let width = sideWallWidth(for: row)
         guard width > 0 else {
             return centerColor + line + ansiReset
         }
         let chars = Array(line)
-        let total = chars.count
-        let left = String(chars[0..<min(width, total)])
-        let center = String(chars[min(width, total)..<max(total - width, width)])
-        let right = String(chars[max(total - width, width)..<total])
-        return sideColor + left + ansiReset
-             + centerColor + center + ansiReset
-             + sideColor + right + ansiReset
+        let total  = chars.count
+        let leftW  = hasLeftWall  ? min(width, total) : 0
+        let rightW = hasRightWall ? min(width, total) : 0
+        let centerStart = leftW
+        let centerEnd   = max(total - rightW, centerStart)
+
+        var result = ""
+        if leftW > 0 {
+            result += sideColor + String(chars[0..<leftW]) + ansiReset
+        }
+        if centerStart < centerEnd {
+            result += centerColor + String(chars[centerStart..<centerEnd]) + ansiReset
+        }
+        if rightW > 0 {
+            result += sideColor + String(chars[centerEnd..<total]) + ansiReset
+        }
+        return result
     }
 
     /// Returns the number of characters from each side that belong to the
