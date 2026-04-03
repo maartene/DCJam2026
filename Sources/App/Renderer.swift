@@ -216,7 +216,7 @@ final class Renderer {
                 "  " + colored("   |  ^  |   ", code: ansiYellow),
                 "  " + colored("    \\___/    ", code: ansiYellow),
                 "",
-                "  " + colored("Warm. Alive. Still here.", code: ansiBoldBrightWhite),
+                "  " + colored("Warm. Alive. Pulsing against your scales.", code: ansiBoldBrightWhite),
                 "",
                 "  " + colored("\"They almost had you. Almost.\"", code: ansiDarkGray),
             ])
