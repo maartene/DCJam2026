@@ -45,13 +45,5 @@ swift run
 swift test
 ```
 
-## CI Artifacts
-
-Every push to `main` produces two zipped release binaries via GitHub Actions:
-
-| Artifact | Platform |
-|---|---|
-| `DCJam2026-linux-x86_64` | Linux AMD64 |
-| `DCJam2026-linux-aarch64` | Linux ARM64 |
-
-Download them from the **Actions** tab of this repository.
+## Download prebuilt binaries
+Find them on [itch.io](https://maartene.itch.io/dcjam2026)
