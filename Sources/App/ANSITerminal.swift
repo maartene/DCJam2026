@@ -68,11 +68,7 @@ final class ANSITerminal: TUIOutputPort {
             var offset = 0
             let bytes = ptr.count
             while offset < bytes {
-                #if canImport(Darwin)
-                let n = Darwin.write(STDOUT_FILENO, base + offset, bytes - offset)
-                #elseif canImport(Glibc)
-                let n = Glibc.write(STDOUT_FILENO, base + offset, bytes - offset)
-                #endif
+                let n = platformWrite(STDOUT_FILENO, base + offset, bytes - offset)
                 if n > 0 {
                     offset += n
                 } else if errno == EINTR {
