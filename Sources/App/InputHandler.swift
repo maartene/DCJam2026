@@ -14,7 +14,7 @@ import GameDomain
 final class InputHandler {
 
     private let fd: Int32
-    /// Set to true when the user requests quit (q / Q / ESC).
+    /// Set to true when the user requests quit (ESC only).
     private(set) var shouldQuit: Bool = false
 
     init() {
@@ -67,9 +67,6 @@ final class InputHandler {
         case UInt8(ascii: "3"): return .special
         case 0x20, 0x0D: return .confirmOverlay  // space / enter
         case UInt8(ascii: "r"), UInt8(ascii: "R"): return .restart
-        case UInt8(ascii: "q"), UInt8(ascii: "Q"):
-            shouldQuit = true
-            return .none
         default:
             break
         }
