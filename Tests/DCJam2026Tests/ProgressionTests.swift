@@ -188,8 +188,9 @@ import Testing
         state = state.withScreenMode(.upgradePrompt(choices: [upgrade]))
         // When — selectUpgrade routes through applyUpgrade -> applyEffect, modifying config
         let upgraded = RulesEngine.apply(command: .selectUpgrade(upgrade), to: state, deltaTime: 0.0)
-        // Then
+        // Then — cap increased AND charges immediately granted
         #expect(upgraded.config.dashChargeCap > baseCap)
+        #expect(upgraded.dashCharges > state.dashCharges)
     }
 
     // MARK: - Error path: duplicate upgrades not re-offered

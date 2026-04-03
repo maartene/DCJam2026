@@ -296,9 +296,12 @@ public enum RulesEngine {
         var newConfig = state.config
         applyEffect(upgrade.effect, to: &newConfig)
         let newUpgrades = state.activeUpgrades + [upgrade]
+        let capGain = newConfig.dashChargeCap - state.config.dashChargeCap
+        let newDashCharges = min(state.dashCharges + capGain, newConfig.dashChargeCap)
         return state
             .withConfig(newConfig)
             .withActiveUpgrades(newUpgrades)
+            .withDashCharges(newDashCharges)
             .withScreenMode(.dungeon)
     }
 
