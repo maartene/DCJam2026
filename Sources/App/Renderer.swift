@@ -82,7 +82,8 @@ final class Renderer {
             word = "STRUCK!"
             colorCode = ansiBrightRed
         case .dash:
-            return // handled in step 04-02
+            word = "SWOOSH!"
+            colorCode = ansiBoldBrightWhite
         }
         let col = (60 - word.count) / 2 + 1
         output.moveCursor(row: 9, col: col)

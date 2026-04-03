@@ -2,14 +2,17 @@ import Testing
 @testable import DCJam2026
 @testable import GameDomain
 
-// TransientOverlay Renderer Tests — step 04-01 (US-P06)
-// Test budget: 5 distinct behaviors × 2 = 10 unit tests max
+// TransientOverlay Renderer Tests — step 04-01 (US-P06), step 04-02 (US-P07)
+// Test budget: 8 distinct behaviors × 2 = 16 unit tests max
 //
 // B1: braceSuccess renders "SHIELDED!" in dungeon/combat mode
 // B2: braceHit renders "STRUCK!" in dungeon/combat mode
 // B3: Overlay uses correct ANSI color + reset wrapping, positioned at row 9
 // B4: Non-dungeon/combat screen modes suppress overlay regardless of transientOverlay
 // B5: nil transientOverlay produces no overlay word
+// B6: dash renders "SWOOSH!" in dungeon/combat mode
+// B7: "SWOOSH!" is wrapped in bold white ANSI + reset
+// B8: "SWOOSH!" is positioned at row 9 centered in 60-wide main view
 
 @Suite struct `Renderer — Transient Overlay` {
 
@@ -119,5 +122,61 @@ import Testing
         let allText = spy.entries.map { $0.string }.joined()
         #expect(!allText.contains("SHIELDED!"))
         #expect(!allText.contains("STRUCK!"))
+    }
+
+    // MARK: - B6: dash renders "SWOOSH!"
+
+    @Test func `dash overlay in dungeon mode renders SWOOSH! word`() {
+        let spy = TUIOutputSpy()
+        let state = makeDungeonState(overlay: .dash(framesRemaining: 10))
+        Renderer(output: spy).render(state)
+
+        let allText = spy.entries.map { $0.string }.joined()
+        #expect(allText.contains("SWOOSH!"))
+    }
+
+    @Test func `dash overlay in combat mode renders SWOOSH! word`() {
+        let spy = TUIOutputSpy()
+        let encounter = EncounterModel.guard(isBossEncounter: false)
+        let state = GameState.initial(config: .default)
+            .withScreenMode(.combat(encounter: encounter))
+            .withTransientOverlay(.dash(framesRemaining: 10))
+        Renderer(output: spy).render(state)
+
+        let allText = spy.entries.map { $0.string }.joined()
+        #expect(allText.contains("SWOOSH!"))
+    }
+
+    // MARK: - B7: "SWOOSH!" wrapped in bold white ANSI + reset
+
+    @Test func `dash overlay wraps SWOOSH! in bold bright white with reset`() {
+        let spy = TUIOutputSpy()
+        let state = makeDungeonState(overlay: .dash(framesRemaining: 10))
+        Renderer(output: spy).render(state)
+
+        let allText = spy.entries.map { $0.string }.joined()
+        // ansiBoldBrightWhite = "\u{1B}[1m\u{1B}[97m", ansiReset = "\u{1B}[0m"
+        #expect(allText.contains("\u{1B}[1m\u{1B}[97mSWOOSH!\u{1B}[0m"))
+    }
+
+    // MARK: - B8: "SWOOSH!" positioned at row 9, centered in 60-wide main view
+
+    @Test func `dash overlay is rendered at row 9`() {
+        let spy = TUIOutputSpy()
+        let state = makeDungeonState(overlay: .dash(framesRemaining: 10))
+        Renderer(output: spy).render(state)
+
+        let overlayEntry = spy.entries.first { $0.string.contains("SWOOSH!") }
+        #expect(overlayEntry?.row == 9)
+    }
+
+    @Test func `dash overlay column is centered within 60-wide main view`() {
+        let spy = TUIOutputSpy()
+        let state = makeDungeonState(overlay: .dash(framesRemaining: 10))
+        Renderer(output: spy).render(state)
+
+        // "SWOOSH!" is 7 chars; col = (60 - 7) / 2 + 1 = 27
+        let overlayEntry = spy.entries.first { $0.string.contains("SWOOSH!") }
+        #expect(overlayEntry?.col == 27)
     }
 }
