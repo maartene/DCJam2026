@@ -11,7 +11,7 @@ public enum FloorGenerator {
 
     private static let entry2D         = Position(x: 7, y: 0)
     private static let staircase2D     = Position(x: 7, y: 6)
-    private static let encounter2D     = Position(x: 7, y: 3)
+    private static let encounter2D     = Position(x: 7, y: 4)
     private static let egg2D           = Position(x: 2, y: 3)
     private static let bossEncounter2D = Position(x: 7, y: 3)
 

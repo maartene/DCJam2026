@@ -460,16 +460,30 @@ final class Renderer {
             let screenRow = 2 + (floor.grid.height - 1 - y)
             var rowChars = [Character]()
             for x in 0..<floor.grid.width {
-                if x == state.playerPosition.x && y == state.playerPosition.y {
+                let pos = Position(x: x, y: y)
+                if pos == state.playerPosition {
                     rowChars.append(facingChar)
                 } else {
-                    let cell = floor.grid.cell(x: x, y: y)
-                    rowChars.append(cell.isPassable ? "." : "#")
+                    rowChars.append(minimapChar(at: pos, floor: floor, state: state))
                 }
             }
             output.moveCursor(row: screenRow, col: 61)
             output.write(String(rowChars))
         }
+    }
+
+    private func minimapChar(at pos: Position, floor: FloorMap, state: GameState) -> Character {
+        if pos == floor.entryPosition2D { return "E" }
+        if let enc = floor.encounterPosition2D, pos == enc {
+            return floor.hasBossEncounter ? "B" : "G"
+        }
+        if let egg = floor.eggRoomPosition2D, pos == egg {
+            return state.hasEgg ? "e" : "*"
+        }
+        if floor.hasExitSquare && pos == floor.exitPosition2D { return "X" }
+        if pos == floor.staircasePosition2D { return "S" }
+        let cell = floor.grid.cell(x: pos.x, y: pos.y)
+        return cell.isPassable ? "." : "#"
     }
 
     // MARK: - Helpers

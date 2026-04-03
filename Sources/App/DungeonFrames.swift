@@ -53,18 +53,8 @@ private func pad(_ s: String, to width: Int = 58) -> String {
     return s + String(repeating: " ", count: width - count)
 }
 
-// MARK: - depth=0: wall right in front (staircase)
+// MARK: - depth=0: wall right in front (close wall)
 // 58-col layout: | + 56 interior + |
-// Row 0: |<56sp>|
-// Row 1: |\<54sp>/|
-// Row 2: | \<52_>/ |
-// Row 3: |  |<50_>|  |
-// Rows 4-8: |  |<stone 50>|  |
-// Row 6: |  |<label 50>|  |
-// Row 9: |  |<50_>|  |
-// Row 10: | /<52_>\ |
-// Row 11: |/<54sp>\|
-// Row 12: |<56sp>|
 
 private func frame_d0_none() -> [String] {
     let sp56  = String(repeating: " ", count: 56)
@@ -72,8 +62,6 @@ private func frame_d0_none() -> [String] {
     let us52  = String(repeating: "_", count: 52)
     let us50  = String(repeating: "_", count: 50)
     let stone = String(repeating: "▒", count: 50)
-    // "[ STAIRCASE ]" = 13 chars; (50-13)/2 = 18 left, 19 right
-    let label = String(repeating: " ", count: 18) + "[ STAIRCASE ]" + String(repeating: " ", count: 19)
     return [
         "|\(sp56)|",                    // row  0
         "|\\\(sp54)/|",                 // row  1
@@ -81,7 +69,7 @@ private func frame_d0_none() -> [String] {
         "|  |\(us50)|  |",              // row  3: top of wall face
         "|  |\(stone)|  |",             // row  4
         "|  |\(stone)|  |",             // row  5
-        "|  |\(label)|  |",             // row  6: label
+        "|  |\(stone)|  |",             // row  6
         "|  |\(stone)|  |",             // row  7
         "|  |\(stone)|  |",             // row  8
         "|  |\(us50)|  |",              // row  9: bottom of wall face
