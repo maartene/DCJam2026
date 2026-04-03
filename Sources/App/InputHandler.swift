@@ -1,7 +1,11 @@
 // InputHandler — non-blocking keyboard input via a separate /dev/tty fd.
 // CRITICAL: STDOUT_FILENO is never set O_NONBLOCK. Only this fd is non-blocking.
 
+#if canImport(Darwin)
 import Darwin
+#elseif canImport(Glibc)
+import Glibc
+#endif
 import GameDomain
 
 final class InputHandler {
@@ -11,17 +15,17 @@ final class InputHandler {
     private(set) var shouldQuit: Bool = false
 
     init() {
-        fd = Darwin.open("/dev/tty", O_RDONLY | O_NONBLOCK)
+        fd = open("/dev/tty", O_RDONLY | O_NONBLOCK)
     }
 
     deinit {
-        if fd >= 0 { Darwin.close(fd) }
+        if fd >= 0 { close(fd) }
     }
 
     /// Poll for a single keypress. Returns .none if no input is available.
     func poll() -> GameCommand {
         var buf = [UInt8](repeating: 0, count: 8)
-        let n = Darwin.read(fd, &buf, buf.count)
+        let n = read(fd, &buf, buf.count)
         guard n > 0 else { return .none }
         return mapKey(buf, count: Int(n))
     }
