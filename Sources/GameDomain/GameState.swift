@@ -20,6 +20,8 @@ public struct GameState: Sendable {
     public var recentDash: Bool
     /// The cardinal direction Ember is currently facing.
     public var facingDirection: CardinalDirection
+    /// Short-lived HUD overlay driven by a frame countdown; nil when inactive.
+    public var transientOverlay: TransientOverlay?
 
     public var specialIsReady: Bool { specialCharge >= 1.0 }
     public var braceWindowActive: Bool { braceWindowTimer > 0 }
@@ -33,14 +35,15 @@ public struct GameState: Sendable {
             hasEgg: false,
             currentFloor: 1,
             playerPosition: Position(x: 7, y: 0),
-            screenMode: .dungeon,
+            screenMode: .startScreen,
             timerModel: .empty,
             activeUpgrades: [],
             config: config,
             braceWindowTimer: 0.0,
             braceCooldownTimer: 0.0,
             recentDash: false,
-            facingDirection: .north
+            facingDirection: .north,
+            transientOverlay: nil
         )
     }
 
@@ -100,5 +103,9 @@ public struct GameState: Sendable {
 
     public func withFacingDirection(_ direction: CardinalDirection) -> GameState {
         var copy = self; copy.facingDirection = direction; return copy
+    }
+
+    public func withTransientOverlay(_ overlay: TransientOverlay?) -> GameState {
+        var copy = self; copy.transientOverlay = overlay; return copy
     }
 }

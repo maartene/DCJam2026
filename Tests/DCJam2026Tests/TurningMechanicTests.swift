@@ -55,8 +55,8 @@ import Testing
         #expect(result.hasEgg == original.hasEgg)
         #expect(result.currentFloor == original.currentFloor)
         #expect(result.playerPosition == original.playerPosition)
-        // screenMode: verify still .dungeon (initial value) — ScreenMode has associated values so no ==
-        if case .dungeon = result.screenMode { } else { Issue.record("screenMode changed") }
+        // screenMode: verify still .startScreen (initial value) — ScreenMode has associated values so no ==
+        if case .startScreen = result.screenMode { } else { Issue.record("screenMode changed") }
         #expect(result.timerModel.cooldownSlots == original.timerModel.cooldownSlots)
         #expect(result.activeUpgrades == original.activeUpgrades)
         #expect(result.braceWindowTimer == original.braceWindowTimer)
