@@ -116,6 +116,141 @@ private let ansiResetCode = "\u{1B}[0m"
     }
 }
 
+// MARK: - Step 01-02: Depth-graded ANSI 16-color foreground on dungeon frames
+// Test Budget: 3 behaviors × 2 = 6 unit tests max
+//   Behavior 1: depth=0 dungeon lines contain \e[97m and end with \e[0m
+//   Behavior 2: depth=1 dungeon lines contain \e[37m
+//   Behavior 3: depth=2/3 dungeon lines contain \e[90m
+
+private let ansiBrightWhiteFg = "\u{1B}[97m"
+private let ansiStandardWhite  = "\u{1B}[37m"
+private let ansiDarkGrayFg     = "\u{1B}[90m"
+private let ansiBlackBgCode    = "\u{1B}[40m"
+
+/// Helpers to build a minimal GameState for a given depth key
+/// Depth = 0: player is standing right in front of a wall (adjacentWall in dungeon key)
+/// The DungeonFrameKey.depth is derived in dungeonFrameKey(). We test by directly
+/// checking what renderDungeon() writes for the states that exercise each depth key.
+
+@Suite("Renderer — Graphics Pass: depth-graded foreground color on dungeon frames")
+struct DepthGradedColorTests {
+
+    // ACCEPTANCE TEST (Behavior 1): depth=0 frame lines contain \e[97m and end with \e[0m
+    @Test("depth=0 frame lines contain bright-white foreground code and reset")
+    func depth0LinesContainBrightWhiteAndReset() {
+        // Use a GameState whose position/facing yields depth=0 (player faces a wall directly)
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy)
+        let state = makeDepthState(depth: 0)
+        renderer.render(state)
+
+        let dungeonLineWrites = spy.entries.filter { (2...16).contains($0.row) && $0.col == 2 }
+        #expect(!dungeonLineWrites.isEmpty, "Expected dungeon frame line writes at rows 2-16 col 2")
+        for entry in dungeonLineWrites {
+            #expect(entry.string.contains(ansiBrightWhiteFg),
+                    "depth=0 line at row \(entry.row) should contain \(ansiBrightWhiteFg), got: \(entry.string)")
+            #expect(entry.string.hasSuffix(ansiResetCode),
+                    "depth=0 line at row \(entry.row) should end with \(ansiResetCode), got: \(entry.string)")
+        }
+    }
+
+    // ACCEPTANCE TEST (Behavior 2): depth=1 frame lines contain \e[37m
+    @Test("depth=1 frame lines contain standard-white foreground code")
+    func depth1LinesContainStandardWhite() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy)
+        let state = makeDepthState(depth: 1)
+        renderer.render(state)
+
+        let dungeonLineWrites = spy.entries.filter { (2...16).contains($0.row) && $0.col == 2 }
+        #expect(!dungeonLineWrites.isEmpty, "Expected dungeon frame line writes at rows 2-16 col 2")
+        for entry in dungeonLineWrites {
+            #expect(entry.string.contains(ansiStandardWhite),
+                    "depth=1 line at row \(entry.row) should contain \(ansiStandardWhite), got: \(entry.string)")
+        }
+    }
+
+    // ACCEPTANCE TEST (Behavior 3): depth=2 frame lines contain \e[90m
+    @Test("depth=2 frame lines contain dark-gray foreground code")
+    func depth2LinesContainDarkGray() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy)
+        let state = makeDepthState(depth: 2)
+        renderer.render(state)
+
+        let dungeonLineWrites = spy.entries.filter { (2...16).contains($0.row) && $0.col == 2 }
+        #expect(!dungeonLineWrites.isEmpty, "Expected dungeon frame line writes at rows 2-16 col 2")
+        for entry in dungeonLineWrites {
+            #expect(entry.string.contains(ansiDarkGrayFg),
+                    "depth=2 line at row \(entry.row) should contain \(ansiDarkGrayFg), got: \(entry.string)")
+        }
+    }
+
+    // UNIT TEST: background \e[40m is still emitted before first dungeon line (01-01 regression)
+    @Test("background \\e[40m still emitted before first dungeon frame line after depth color added")
+    func backgroundStillEmittedAfterDepthColor() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy)
+        let state = makeDepthState(depth: 0)
+        renderer.render(state)
+
+        let allWrites = spy.entries
+        guard let bgIndex = allWrites.firstIndex(where: { $0.string.contains(ansiBlackBgCode) }) else {
+            Issue.record("Expected \(ansiBlackBgCode) but not found")
+            return
+        }
+        guard let firstFrameIndex = allWrites.firstIndex(where: { (2...16).contains($0.row) && $0.col == 2 }) else {
+            Issue.record("Expected dungeon frame line writes at rows 2-16 col 2")
+            return
+        }
+        #expect(bgIndex < firstFrameIndex,
+                "\(ansiBlackBgCode) must precede first dungeon frame line")
+    }
+
+    // UNIT TEST: minimap writes do not start with the standalone depth foreground codes
+    // (depth colors are \e[97m, \e[37m; minimap uses \e[1m\e[97m for player — distinct prefix)
+    @Test("minimap writes do not start with standalone depth-graded foreground codes")
+    func minimapWritesDoNotStartWithDepthColor() {
+        let spy = TUIOutputSpy()
+        let renderer = Renderer(output: spy)
+        let state = makeDepthState(depth: 0)
+        renderer.render(state)
+
+        let minimapWrites = spy.entries.filter { $0.col >= 61 }
+        // Depth colors are always the first prefix of a dungeon line write.
+        // Check that no minimap write starts with \e[97m or \e[37m.
+        let startingWithDepthColor = minimapWrites.filter {
+            $0.string.hasPrefix(ansiBrightWhiteFg) || $0.string.hasPrefix(ansiStandardWhite)
+        }
+        #expect(startingWithDepthColor.isEmpty,
+                "Minimap writes must not start with depth foreground codes \(ansiBrightWhiteFg) or \(ansiStandardWhite), found: \(startingWithDepthColor.map { "col \($0.col): \($0.string)" })")
+    }
+}
+
+/// Returns a GameState whose dungeon frame depth equals the requested depth.
+/// depth=0: player at y=1 (one step into corridor, wall directly in front)
+/// depth=1: player at y=2
+/// depth=2: player at y=3
+private func makeDepthState(depth: Int) -> GameState {
+    // The default floor has the staircase far away; player starts at (7,0) facing north.
+    // Moving 'y' forward increases corridor depth in dungeonFrameKey.
+    // depth is determined by how many open cells are ahead of the player.
+    // depth=0: wall directly ahead (y close to staircase or wall)
+    // We use initial GameState but override playerPosition to engineer the depth.
+    var state = GameState.initial(config: .default).withScreenMode(.dungeon)
+    // depth=0 → player at position that creates depth-0 key.
+    // From FloorGenerator, staircase is at y=6; walls are beyond that.
+    // Player at y=6 facing north = wall 1 step ahead = depth 0.
+    // Player at y=5 facing north = 1 open cell ahead = depth 1.
+    // Player at y=4 facing north = 2 open cells ahead = depth 2/3.
+    switch depth {
+    case 0: state = state.withPlayerPosition(Position(x: 7, y: 6))
+    case 1: state = state.withPlayerPosition(Position(x: 7, y: 5))
+    default: state = state.withPlayerPosition(Position(x: 7, y: 4))
+    }
+    return state
+}
+
 // MARK: - Step 01-03: Depth-0 wall face character density
 // Test Budget: 2 behaviors × 2 = 4 unit tests
 //   Behavior 1: depth-0 rows 4–8 contain the dense alternating wall pattern

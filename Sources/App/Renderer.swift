@@ -204,11 +204,12 @@ final class Renderer {
         let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
         let key = dungeonFrameKey(grid: floor.grid, position: state.playerPosition, facing: state.facingDirection)
         let frameLines = frames[key] ?? fallbackFrame(for: key)
+        let colorCode = depthColor(for: key.depth)
         output.moveCursor(row: Self.mainViewFirstRow, col: 1)
         output.write("\u{1B}[40m")
         for (i, line) in frameLines.enumerated() {
             output.moveCursor(row: i + Self.mainViewFirstRow, col: 2)
-            output.write(line)
+            output.write(colorCode + line + ansiReset)
         }
         output.moveCursor(row: Self.mainViewLastRow + 1, col: 1)
         output.write(ansiReset)
@@ -633,6 +634,15 @@ final class Renderer {
     }
 
     // MARK: - Helpers
+
+    /// Maps a dungeon frame depth level (0–3) to an ANSI 16-color foreground code.
+    private func depthColor(for depth: Int) -> String {
+        switch depth {
+        case 0:  return ansiBrightWhite   // \e[97m — bright white (closest wall)
+        case 1:  return ansiWhite         // \e[37m — standard white
+        default: return ansiDarkGray      // \e[90m — dark gray (depth 2+)
+        }
+    }
 
     /// Blanks the main view area before drawing a full-screen overlay.
     private func clearMainView() {

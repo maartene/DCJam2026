@@ -18,6 +18,8 @@ let ansiBrightYellow    = "\u{1B}[93m"
 let ansiBrightCyan      = "\u{1B}[96m"
 let ansiBoldBrightWhite = "\u{1B}[1m\u{1B}[97m"
 let ansiDarkGray        = "\u{1B}[90m"
+let ansiWhite           = "\u{1B}[37m"
+let ansiBrightWhite     = "\u{1B}[97m"
 
 // MARK: - Helper
 
