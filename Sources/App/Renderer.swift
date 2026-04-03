@@ -625,9 +625,9 @@ final class Renderer {
         if supports256Color {
             switch depth {
             case 0:  return ansi256Fg(252)  // near-white
-            case 1:  return ansi256Fg(245)  // medium gray
-            case 2:  return ansi256Fg(238)  // dark gray
-            default: return ansi256Fg(234)  // near-black (depth 3+)
+            case 1:  return ansi256Fg(249)  // light gray
+            case 2:  return ansi256Fg(244)  // medium gray
+            default: return ansi256Fg(240)  // dark-but-readable gray (depth 3+)
             }
         } else {
             switch depth {

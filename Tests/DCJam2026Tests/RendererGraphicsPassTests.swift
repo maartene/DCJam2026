@@ -299,9 +299,9 @@ struct DepthZeroWallDensityTests {
 //   Behavior 3: ansi256Fg helper returns correct escape string
 
 private let ansi256Depth0 = "\u{1B}[38;5;252m"  // near-white
-private let ansi256Depth1 = "\u{1B}[38;5;245m"  // medium gray
-private let ansi256Depth2 = "\u{1B}[38;5;238m"  // dark gray
-private let ansi256Depth3 = "\u{1B}[38;5;234m"  // near-black
+private let ansi256Depth1 = "\u{1B}[38;5;249m"  // light gray
+private let ansi256Depth2 = "\u{1B}[38;5;244m"  // medium gray
+private let ansi256Depth3 = "\u{1B}[38;5;240m"  // dark-but-readable gray
 private let ansi256Prefix  = "\u{1B}[38;5;"
 
 @Suite("Renderer — Graphics Pass 01-04: 256-color grayscale depth ramp")
@@ -311,9 +311,9 @@ struct ColorDepth256Tests {
     @Test("256-color terminal uses grayscale codes per depth",
           arguments: [
             (0, "\u{1B}[38;5;252m"),
-            (1, "\u{1B}[38;5;245m"),
-            (2, "\u{1B}[38;5;238m"),
-            (3, "\u{1B}[38;5;234m"),
+            (1, "\u{1B}[38;5;249m"),
+            (2, "\u{1B}[38;5;244m"),
+            (3, "\u{1B}[38;5;240m"),
           ])
     func uses256ColorGrayscaleCodeForDepth(depth: Int, expectedCode: String) {
         let spy = TUIOutputSpy()
@@ -354,8 +354,8 @@ struct ColorDepth256Tests {
 
     // UNIT TEST (Behavior 3): ansi256Fg helper returns correct escape string
     @Test("ansi256Fg returns correct ANSI 256-color foreground escape string",
-          arguments: [(252, "\u{1B}[38;5;252m"), (245, "\u{1B}[38;5;245m"),
-                      (238, "\u{1B}[38;5;238m"), (234, "\u{1B}[38;5;234m")])
+          arguments: [(252, "\u{1B}[38;5;252m"), (249, "\u{1B}[38;5;249m"),
+                      (244, "\u{1B}[38;5;244m"), (240, "\u{1B}[38;5;240m")])
     func ansi256FgHelperReturnsCorrectEscapeString(index: Int, expected: String) {
         #expect(ansi256Fg(index) == expected,
                 "ansi256Fg(\(index)) should return \(expected)")
