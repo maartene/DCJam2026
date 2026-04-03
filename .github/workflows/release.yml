@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  build:
+    name: Build (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Swift
+        uses: SwiftyLab/setup-swift@latest
+
+      - name: Build release binary
+        run: swift build -c release --product DCJam2026
+
+      - name: Package binary into zip
+        run: |
+          mkdir -p dist
+          cp .build/release/DCJam2026 dist/
+          cd dist && zip DCJam2026-linux-${{ matrix.arch }}.zip DCJam2026
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DCJam2026-linux-${{ matrix.arch }}
+          path: dist/DCJam2026-linux-${{ matrix.arch }}.zip
+          if-no-files-found: error
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: dist/
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip
+          generate_release_notes: true
