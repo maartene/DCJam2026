@@ -9,8 +9,15 @@ on:
 jobs:
   # ── Build & test on Linux ────────────────────────────────────────────────────
   linux:
-    name: Build & Test (Linux)
-    runs-on: ubuntu-latest
+    name: Build & Test (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
 
@@ -26,10 +33,16 @@ jobs:
       - name: Build release binary
         run: swift build -c release --product DCJam2026
 
-      - name: Upload Linux binary
+      - name: Package binary into zip
+        run: |
+          mkdir -p dist
+          cp .build/release/DCJam2026 dist/
+          cd dist && zip DCJam2026-linux-${{ matrix.arch }}.zip DCJam2026
+
+      - name: Upload Linux zip
         uses: actions/upload-artifact@v4
         with:
-          name: DCJam2026-linux-x86_64
-          path: .build/release/DCJam2026
+          name: DCJam2026-linux-${{ matrix.arch }}
+          path: dist/DCJam2026-linux-${{ matrix.arch }}.zip
           if-no-files-found: error
 
