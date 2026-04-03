@@ -1,4 +1,4 @@
-# Test Scenarios — Dragon Escape (dcjam2026-core)
+# Test Scenarios — Ember's Escape (dcjam2026-core)
 **Feature**: dcjam2026-core
 **Date**: 2026-04-02
 **Author**: Quinn (Acceptance Test Designer — DISTILL wave)

@@ -1,4 +1,4 @@
-# Component Boundaries — Dragon Escape (dcjam2026-core)
+# Component Boundaries — Ember's Escape (dcjam2026-core)
 **Feature**: dcjam2026-core
 **Date**: 2026-04-02
 **Author**: Morgan (Solution Architect — DESIGN wave)

@@ -1,4 +1,4 @@
-# Walking Skeleton — Dragon Escape (dcjam2026-core)
+# Walking Skeleton — Ember's Escape (dcjam2026-core)
 **Feature**: dcjam2026-core
 **Date**: 2026-04-02
 **Author**: Quinn (Acceptance Test Designer — DISTILL wave)
@@ -11,7 +11,7 @@ The walking skeleton is the thinnest end-to-end slice of the game loop that deli
 
 **Litmus test**: Can a player accomplish their goal and see the result?
 
-For Dragon Escape: Can a player spawn, encounter a guard, Dash through, reach stairs, descend, and die if HP hits 0?
+For Ember's Escape: Can a player spawn, encounter a guard, Dash through, reach stairs, descend, and die if HP hits 0?
 
 ---
 

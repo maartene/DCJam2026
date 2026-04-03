@@ -1,4 +1,4 @@
-# CLAUDE.md — Dragon Escape (dcjam2026-core)
+# CLAUDE.md — Ember's Escape (dcjam2026-core)
 **Status**: FINAL — paradigm confirmed by developer 2026-04-02
 **Date**: 2026-04-02
 
@@ -8,7 +8,7 @@ This file captures architectural constraints and decisions that all waves (craft
 
 ## Project Identity
 
-- **Game**: Dragon Escape — you are Ember, a young dragon reclaiming your stolen egg from a dungeon.
+- **Game**: Ember's Escape — you are Ember, a young dragon reclaiming your stolen egg from a dungeon.
 - **Jam**: DCJam 2026
 - **Scope**: Jam-only. Every feature must pass the question: "Is this necessary for a submittable entry?"
 - **Language**: Swift 6.3 (developer preference; not a jam requirement)

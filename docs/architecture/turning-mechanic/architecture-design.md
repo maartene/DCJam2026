@@ -9,14 +9,14 @@
 
 ## 1. System Context
 
-Dragon Escape is a standalone terminal dungeon crawler running on macOS/Linux. No external services or network integration. The system boundary is the 80×25 ANSI terminal.
+Ember's Escape is a standalone terminal dungeon crawler running on macOS/Linux. No external services or network integration. The system boundary is the 80×25 ANSI terminal.
 
 ```mermaid
 C4Context
-  title System Context — Dragon Escape (Turning Mechanic)
+  title System Context — Ember's Escape (Turning Mechanic)
 
   Person(player, "Ember / Player", "Controls dragon via keyboard in 80×25 terminal")
-  System(game, "Dragon Escape", "Terminal dungeon crawler. Step movement on 2D grid. 90-degree turns. First-person ASCII view + 2D minimap.")
+  System(game, "Ember's Escape", "Terminal dungeon crawler. Step movement on 2D grid. 90-degree turns. First-person ASCII view + 2D minimap.")
   System_Ext(terminal, "ANSI Terminal", "80×25 fixed. macOS/Linux. Renders ANSI escape sequences.")
 
   Rel(player, game, "Sends keystrokes to")
@@ -32,7 +32,7 @@ The SwiftPM target structure is the container boundary. Turning mechanic changes
 
 ```mermaid
 C4Container
-  title Container Diagram — Dragon Escape Module Structure
+  title Container Diagram — Ember's Escape Module Structure
 
   Person(player, "Player")
 

@@ -1,12 +1,12 @@
 ---
-# Journey Schema: Dragon Escape
+# Journey Schema: Ember's Escape
 # Feature: dcjam2026-core
 # Date: 2026-04-02
 # Author: Luna (Product Owner — DISCUSS wave)
 
 journey:
   id: dragon-escape
-  title: "Dragon Escape — reclaim the egg, reach the exit"
+  title: "Ember's Escape — reclaim the egg, reach the exit"
   persona:
     name: Ember
     role: young dragon

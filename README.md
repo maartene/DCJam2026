@@ -1,8 +1,8 @@
-# Dragon Escape — DCJam 2026
+# Ember's Escape — DCJam 2026
 
 A first-person dungeon exploration and combat game for DCJam 2026. You are Ember, a young dragon reclaiming a stolen egg and their freedom from a 5-floor dungeon.
 
-Runs in any ANSI-capable terminal on macOS and Linux.
+Runs in any ANSI-capable terminal (min 80x25 characters) on macOS and Linux.
 
 ## Controls
 

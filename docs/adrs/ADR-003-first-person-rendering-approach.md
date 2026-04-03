@@ -9,7 +9,7 @@
 
 ## Context
 
-Dragon Escape requires a first-person 3D dungeon view rendered in ASCII/character art in a terminal. The player moves on a square grid with step movement and 90-degree turns. The view must show walls ahead, corridor openings to the left and right, and a sense of depth as the corridor extends forward.
+Ember's Escape requires a first-person 3D dungeon view rendered in ASCII/character art in a terminal. The player moves on a square grid with step movement and 90-degree turns. The view must show walls ahead, corridor openings to the left and right, and a sense of depth as the corridor extends forward.
 
 Three rendering approaches were evaluated. The feasibility spike from the DISCOVER wave (DEC-06, spike 1) asks whether the grid can support Dash pass-through — this is a domain/rules question, not a rendering question. The rendering approach is independent of how Dash works on the grid.
 

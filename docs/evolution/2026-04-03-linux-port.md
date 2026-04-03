@@ -8,7 +8,7 @@
 
 ## Summary
 
-Enabled cross-platform compilation of the `DCJam2026` TUI dungeon crawler (Dragon Escape) for both macOS and Linux. The driver was Dungeon Crawler Jam 2026: judges need to run the game, and Linux is the dominant judge platform. The delivery strategy is pre-built ARM64/AMD64 Linux binaries for judges, with Linux source builds verified continuously in CI.
+Enabled cross-platform compilation of the `DCJam2026` TUI dungeon crawler (Ember's Escape) for both macOS and Linux. The driver was Dungeon Crawler Jam 2026: judges need to run the game, and Linux is the dominant judge platform. The delivery strategy is pre-built ARM64/AMD64 Linux binaries for judges, with Linux source builds verified continuously in CI.
 
 ---
 

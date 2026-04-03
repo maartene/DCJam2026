@@ -9,7 +9,7 @@
 
 ## Context
 
-Dragon Escape requires a TUI (Terminal User Interface) layer capable of:
+Ember's Escape requires a TUI (Terminal User Interface) layer capable of:
 1. Full-screen control (clear, cursor positioning)
 2. Color output and Unicode box-drawing characters (U+2500 block)
 3. Non-blocking keyboard input (required for real-time combat)

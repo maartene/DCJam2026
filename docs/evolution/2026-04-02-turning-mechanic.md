@@ -8,7 +8,7 @@
 
 ## Feature Summary
 
-The turning-mechanic feature adds 90-degree first-person turns to Dragon Escape. Turning is a mandatory DCJam 2026 jam rule — all entries must support step movement on a square grid with cardinal direction turns.
+The turning-mechanic feature adds 90-degree first-person turns to Ember's Escape. Turning is a mandatory DCJam 2026 jam rule — all entries must support step movement on a square grid with cardinal direction turns.
 
 ### What Was Delivered
 

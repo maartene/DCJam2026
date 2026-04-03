@@ -1,4 +1,4 @@
-# Architecture Design — Dragon Escape (dcjam2026-core)
+# Architecture Design — Ember's Escape (dcjam2026-core)
 **Feature**: dcjam2026-core
 **Date**: 2026-04-02
 **Author**: Morgan (Solution Architect — DESIGN wave)
@@ -8,13 +8,13 @@
 
 ## 1. System Context
 
-Dragon Escape is a single-player terminal game running as a native macOS/Linux command-line executable. There are no external services, no network calls, and no persistent storage beyond a single in-process run. The system boundary is the process itself.
+Ember's Escape is a single-player terminal game running as a native macOS/Linux command-line executable. There are no external services, no network calls, and no persistent storage beyond a single in-process run. The system boundary is the process itself.
 
 ```mermaid
 C4Context
-  title System Context — Dragon Escape
+  title System Context — Ember's Escape
   Person(player, "Player", "Controls Ember the dragon via keyboard")
-  System(game, "Dragon Escape", "Swift 6.3 terminal executable. First-person dungeon escape with Dash as primary locomotion verb.")
+  System(game, "Ember's Escape", "Swift 6.3 terminal executable. First-person dungeon escape with Dash as primary locomotion verb.")
   System_Ext(terminal, "Terminal Emulator", "Renders ANSI output. Provides raw keyboard input. macOS Terminal, iTerm2, or Linux equivalents.")
 
   Rel(player, game, "Plays via keyboard input through")
@@ -28,11 +28,11 @@ C4Context
 
 ## 2. Container Diagram
 
-Dragon Escape is a single process. The "containers" are logical execution units within that process.
+Ember's Escape is a single process. The "containers" are logical execution units within that process.
 
 ```mermaid
 C4Container
-  title Container Diagram — Dragon Escape
+  title Container Diagram — Ember's Escape
   Person(player, "Player")
   System_Ext(terminal, "Terminal Emulator", "ANSI I/O")
 

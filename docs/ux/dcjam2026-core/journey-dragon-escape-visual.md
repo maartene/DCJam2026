@@ -1,4 +1,4 @@
-# Journey Visual: Dragon Escape
+# Journey Visual: Ember's Escape
 **Feature**: dcjam2026-core
 **Date**: 2026-04-02
 **Author**: Luna (Product Owner — DISCUSS wave)
@@ -34,7 +34,7 @@ Key emotional waypoints:
 
 ---
 
-## Full Journey Map: Dragon Escape (5-Floor Target)
+## Full Journey Map: Ember's Escape (5-Floor Target)
 
 ```
 +------------------------------------------------------------------+
