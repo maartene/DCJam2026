@@ -475,8 +475,8 @@ final class Renderer {
     // MARK: - 2D Minimap (rows 2-8, cols 61-75, panel cols 61-79)
 
     /// Renders the 15×7 floor grid into the right panel (cols 61-79, rows 2-8).
-    /// Wall cells render as '#', passable corridor cells as '.'.
-    /// The player's position renders as a facing indicator: ^ > v <
+    /// Each cell is written individually: moveCursor then write(color + char + reset).
+    /// Wall '#' → dark gray; passable '.' → no color; landmarks and player use their color mappings.
     func renderMinimap(floor: FloorMap, state: GameState) {
         let facingChar: Character
         switch state.facingDirection {
@@ -487,17 +487,35 @@ final class Renderer {
         }
         for y in stride(from: floor.grid.height - 1, through: 0, by: -1) {
             let screenRow = 2 + (floor.grid.height - 1 - y)
-            var rowChars = [Character]()
             for x in 0..<floor.grid.width {
                 let pos = Position(x: x, y: y)
-                if pos == state.playerPosition {
-                    rowChars.append(facingChar)
+                let ch: Character = pos == state.playerPosition
+                    ? facingChar
+                    : minimapChar(at: pos, floor: floor, state: state)
+                let colorCode = minimapColor(for: ch)
+                output.moveCursor(row: screenRow, col: 61 + x)
+                if colorCode.isEmpty {
+                    output.write(String(ch))
                 } else {
-                    rowChars.append(minimapChar(at: pos, floor: floor, state: state))
+                    output.write(colorCode + String(ch) + ansiReset)
                 }
             }
-            output.moveCursor(row: screenRow, col: 61)
-            output.write(String(rowChars))
+        }
+    }
+
+    /// Returns the ANSI color prefix for a minimap character, or "" for no color.
+    private func minimapColor(for ch: Character) -> String {
+        switch ch {
+        case "^", ">", "v", "<": return ansiBoldBrightWhite
+        case "G":                return ansiBrightRed
+        case "B":                return ansiBoldBrightRed
+        case "*":                return ansiBrightYellow
+        case "e":                return ansiYellow
+        case "S":                return ansiBrightCyan
+        case "X":                return ansiBoldBrightCyan
+        case "E":                return ansiDimCyan
+        case "#":                return ansiDarkGray
+        default:                 return ""
         }
     }
 
