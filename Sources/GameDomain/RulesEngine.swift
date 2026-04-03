@@ -298,10 +298,13 @@ public enum RulesEngine {
         let newUpgrades = state.activeUpgrades + [upgrade]
         let capGain = newConfig.dashChargeCap - state.config.dashChargeCap
         let newDashCharges = min(state.dashCharges + capGain, newConfig.dashChargeCap)
+        let hpGain = newConfig.maxHP - state.config.maxHP
+        let newHP = min(state.hp + hpGain, newConfig.maxHP)
         return state
             .withConfig(newConfig)
             .withActiveUpgrades(newUpgrades)
             .withDashCharges(newDashCharges)
+            .withHP(newHP)
             .withScreenMode(.dungeon)
     }
 

@@ -193,6 +193,22 @@ import Testing
         #expect(upgraded.dashCharges > state.dashCharges)
     }
 
+    @Test func `A max HP upgrade immediately restores the gained health`() {
+        // Given — Ember is at full health, then takes some damage
+        let config = GameConfig.default
+        var state = GameState.initial(config: config).withScreenMode(.dungeon)
+        state = state.withHP(state.hp - 10)  // simulate combat damage
+        let hpBefore = state.hp
+        let upgrade = Upgrade(id: "hp-boost", name: "Dragonhide", effect: .increaseMaxHP(by: 25))
+        state = state.withScreenMode(.upgradePrompt(choices: [upgrade]))
+        // When
+        let upgraded = RulesEngine.apply(command: .selectUpgrade(upgrade), to: state, deltaTime: 0.0)
+        // Then — max HP raised AND current HP raised by the same amount
+        #expect(upgraded.config.maxHP == config.maxHP + 25)
+        #expect(upgraded.hp == hpBefore + 25)
+        #expect(upgraded.hp <= upgraded.config.maxHP)
+    }
+
     // MARK: - Error path: duplicate upgrades not re-offered
 
     @Test func `An already-selected upgrade does not appear in a subsequent milestone prompt`() {
