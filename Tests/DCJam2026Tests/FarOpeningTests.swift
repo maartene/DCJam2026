@@ -23,14 +23,14 @@ struct FarOpeningAcceptanceTests {
         }
         let rows = frame.map { Array($0) }
 
-        // Gap zone: D=1 right wall removed at col 54 row 5
-        #expect(rows[5][54] == " ", "col 54 row 5 should be space (D=1 right wall in gap zone)")
+        // Gap zone: doorjamb visible at col 53 row 5 (Slice B draws corridor geometry)
+        #expect(rows[5][53] == "|", "col 53 row 5 should be | (doorjamb visible through far opening)")
 
-        // Lintel above opening intact: row 3 col 54 is |
-        #expect(rows[3][54] == "|", "col 54 row 3 should be | (lintel above opening)")
+        // Ceiling stub: row 3 col 54 is _ (Slice B overwrites lintel with stub underscore)
+        #expect(rows[3][54] == "_", "col 54 row 3 should be _ (ceiling stub from far corridor)")
 
-        // Lintel below opening intact: row 9 col 54 is |
-        #expect(rows[9][54] == "|", "col 54 row 9 should be | (lintel below opening)")
+        // Row 9: back wall extends below opening at col 55, col 54 is space
+        #expect(rows[9][55] == "|", "col 55 row 9 should be | (back wall below opening)")
 
         // D=0 outer wall untouched: col 57 row 5 is |
         #expect(rows[5][57] == "|", "col 57 row 5 should be | (D=0 outer wall intact)")
@@ -125,7 +125,7 @@ struct FarOpeningTableTests {
             return
         }
         let rows = frame.map { Array($0) }
-        #expect(rows[5][3] == " ", "col 3 row 5 should be space (far-left opening)")
+        #expect(rows[5][4] == "|", "col 4 row 5 should be | (doorjamb visible through far-left opening)")
     }
 
     @Test("fallbackFrame no longer strips farLeft/farRight: exact match returned first")

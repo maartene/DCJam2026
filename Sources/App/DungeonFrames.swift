@@ -51,6 +51,64 @@ func applyFarOpening(_ grid: inout [[Character]], side: Side) {
     }
 }
 
+/// Extends ceiling and floor underscores to the frame edge for a near opening (Slice B).
+/// Near-right: rows 2 and 10, cols 55-57 → `_`
+/// Near-left:  rows 2 and 10, cols 0-2  → `_`
+func applyNearCorridor(_ grid: inout [[Character]], side: Side) {
+    switch side {
+    case .right:
+        for col in 55...57 { grid[2][col] = "_" }
+        for col in 55...57 { grid[10][col] = "_" }
+    case .left:
+        for col in 0...2 { grid[2][col] = "_" }
+        for col in 0...2 { grid[10][col] = "_" }
+    }
+}
+
+/// Draws the visible side corridor geometry for a far opening (Slice B).
+/// Far-right: ceiling stub `_` at row 3 col 53, back wall `|` at col 55 rows 4-8, floor stub `_` at row 8 col 53.
+/// Far-left:  ceiling stub `_` at row 3 col 4,  back wall `|` at col 2  rows 4-8, floor stub `_` at row 8 col 4.
+func applyFarCorridor(_ grid: inout [[Character]], side: Side) {
+    switch side {
+    case .right:
+        // Ceiling stub: underscores at cols 53-54, back wall top at col 55
+        grid[3][53] = "_"
+        grid[3][54] = "_"
+        grid[3][55] = "|"
+        // Restore D=2 ceiling/floor diagonals (cleared by Slice A)
+        grid[4][52] = "/"
+        grid[8][52] = "\\"
+        // Doorjamb (col 53) and back wall (col 55) through opening
+        for row in 4...8 {
+            grid[row][53] = "|"
+            grid[row][55] = "|"
+        }
+        // Floor stub: underscore at col 54 (between doorjamb and back wall)
+        grid[8][54] = "_"
+        // Row 9: back wall extends below opening, D=1 lintel shifts to col 55
+        grid[9][54] = " "
+        grid[9][55] = "|"
+    case .left:
+        // Ceiling stub: underscores at cols 3-4, back wall top at col 2
+        grid[3][4] = "_"
+        grid[3][3] = "_"
+        grid[3][2] = "|"
+        // Restore D=2 ceiling/floor diagonals (cleared by Slice A)
+        grid[4][5] = "\\"
+        grid[8][5] = "/"
+        // Doorjamb (col 4) and back wall (col 2) through opening
+        for row in 4...8 {
+            grid[row][4] = "|"
+            grid[row][2] = "|"
+        }
+        // Floor stub: underscore at col 3 (between back wall and doorjamb)
+        grid[8][3] = "_"
+        // Row 9: back wall extends below opening, D=1 lintel shifts to col 2
+        grid[9][3] = " "
+        grid[9][2] = "|"
+    }
+}
+
 // MARK: - Base corridor grid builder
 
 /// Returns a mutable [[Character]] grid (58 cols × 15 rows) with both walls intact
@@ -78,6 +136,8 @@ func buildFrameTable() -> [DungeonFrameKey: [String]] {
             var g = baseCorridorGrid(depth: 0)
             if nearLeft  { applyNearOpening(&g, side: .left) }
             if nearRight { applyNearOpening(&g, side: .right) }
+            if nearLeft  { applyNearCorridor(&g, side: .left) }
+            if nearRight { applyNearCorridor(&g, side: .right) }
             table[DungeonFrameKey(depth: 0, nearLeft: nearLeft, nearRight: nearRight, farLeft: false, farRight: false)] =
                 g.map { String($0) }
         }
@@ -94,6 +154,10 @@ func buildFrameTable() -> [DungeonFrameKey: [String]] {
                         if nearRight { applyNearOpening(&g, side: .right) }
                         if farLeft   { applyFarOpening(&g, side: .left) }
                         if farRight  { applyFarOpening(&g, side: .right) }
+                        if nearLeft  { applyNearCorridor(&g, side: .left) }
+                        if nearRight { applyNearCorridor(&g, side: .right) }
+                        if farLeft   { applyFarCorridor(&g, side: .left) }
+                        if farRight  { applyFarCorridor(&g, side: .right) }
                         table[DungeonFrameKey(depth: depth, nearLeft: nearLeft, nearRight: nearRight, farLeft: farLeft, farRight: farRight)] =
                             g.map { String($0) }
                     }
