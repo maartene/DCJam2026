@@ -74,6 +74,8 @@ public enum RulesEngine {
             newOverlay = .braceHit(framesRemaining: f - 1)
         case .dash(let f) where f > 1:
             newOverlay = .dash(framesRemaining: f - 1)
+        case .special(let f) where f > 1:
+            newOverlay = .special(framesRemaining: f - 1)
         default:
             // framesRemaining == 1 (expires this tick) or nil
             newOverlay = nil
@@ -242,7 +244,9 @@ public enum RulesEngine {
 
         encounter.enemyHP -= specialAttackDamage
 
-        let next = state.withSpecialCharge(0.0)
+        let next = state
+            .withSpecialCharge(0.0)
+            .withTransientOverlay(.special(framesRemaining: TransientOverlay.defaultDuration))
         if encounter.enemyHP <= 0 {
             return next.withScreenMode(.dungeon)
         }

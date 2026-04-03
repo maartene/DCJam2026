@@ -42,4 +42,13 @@ import Testing
         #expect(s != h)
         #expect(h != d)
     }
+
+    // special case: constructible, Sendable, and distinct from other cases
+    @Test func `special case is constructible and Sendable`() {
+        func requireSendable<T: Sendable>(_ value: T) -> T { value }
+        let sp = requireSendable(TransientOverlay.special(framesRemaining: 23))
+        let d = TransientOverlay.dash(framesRemaining: 23)
+        #expect(sp != d)
+        #expect(sp == TransientOverlay.special(framesRemaining: 23))
+    }
 }

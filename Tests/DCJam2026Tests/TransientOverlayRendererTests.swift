@@ -179,4 +179,40 @@ import Testing
         let overlayEntry = spy.entries.first { $0.string.contains("SWOOSH!") }
         #expect(overlayEntry?.col == 27)
     }
+
+    // MARK: - B9: special renders "SEARING!" in bold bright red
+
+    @Test func `special overlay in dungeon mode renders SEARING! word`() {
+        let spy = TUIOutputSpy()
+        let state = makeDungeonState(overlay: .special(framesRemaining: 10))
+        Renderer(output: spy).render(state)
+
+        let allText = spy.entries.map { $0.string }.joined()
+        #expect(allText.contains("SEARING!"))
+    }
+
+    @Test func `special overlay wraps SEARING! in bold bright red with reset`() {
+        let spy = TUIOutputSpy()
+        let state = makeDungeonState(overlay: .special(framesRemaining: 10))
+        Renderer(output: spy).render(state)
+
+        let allText = spy.entries.map { $0.string }.joined()
+        // ansiBoldBrightRed = "\u{1B}[1m\u{1B}[91m", ansiReset = "\u{1B}[0m"
+        #expect(allText.contains("\u{1B}[1m\u{1B}[91mSEARING!\u{1B}[0m"))
+    }
+
+    // MARK: - B10: combat thought fires when special overlay is active
+
+    @Test func `special overlay in combat mode produces fire-breath thought`() {
+        let spy = TUIOutputSpy()
+        let encounter = EncounterModel.guard(isBossEncounter: false)
+        let state = GameState.initial(config: .default)
+            .withScreenMode(.combat(encounter: encounter))
+            .withTransientOverlay(.special(framesRemaining: 10))
+            .withHP(100)
+        Renderer(output: spy).render(state)
+
+        let allText = spy.entries.map { $0.string }.joined()
+        #expect(allText.contains("I breathe deep"))
+    }
 }

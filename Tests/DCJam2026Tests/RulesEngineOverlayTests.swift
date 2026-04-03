@@ -132,6 +132,21 @@ import Testing
         #expect(result.transientOverlay == .dash(framesRemaining: 23))
     }
 
+    // MARK: - AC9: firing special sets .special(framesRemaining: 23)
+
+    @Test func `firing special sets transientOverlay to special with default duration`() {
+        // Given — combat encounter with special ready
+        let config = GameConfig.default
+        var state = GameState.initial(config: config)
+        let encounter = EncounterModel.guard(isBossEncounter: false)
+        state = state.withScreenMode(.combat(encounter: encounter))
+        state = state.withSpecialCharge(1.0)
+        // When
+        let result = RulesEngine.apply(command: .special, to: state, deltaTime: 0.0)
+        // Then
+        #expect(result.transientOverlay == .special(framesRemaining: 23))
+    }
+
     // MARK: - AC8: startScreen pauses timer advancement
 
     @Test func `timers are not advanced when screenMode is startScreen`() {

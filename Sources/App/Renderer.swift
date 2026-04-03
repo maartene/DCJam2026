@@ -82,6 +82,9 @@ final class Renderer {
         case .dash:
             word = "SWOOSH!"
             colorCode = ansiBoldBrightWhite
+        case .special:
+            word = "SEARING!"
+            colorCode = ansiBoldBrightRed
         }
         let col = (60 - word.count) / 2 + 1
         output.moveCursor(row: 9, col: col)
@@ -543,7 +546,9 @@ final class Renderer {
     }
 
     private func combatThoughts(_ state: GameState, encounter: EncounterModel) -> [String] {
-        if encounter.isBossEncounter {
+        if case .special = state.transientOverlay {
+            return ["I breathe deep and let the fire pour out. The air itself ignites."]
+        } else if encounter.isBossEncounter {
             return ["The Dragon Warden. Ancient. Enormous. My fire stirs — I'll need every trick I have."]
         } else if state.hp <= 30 {
             return ["I'm wounded and it knows it. I have to time this — brace the next strike, then move."]
