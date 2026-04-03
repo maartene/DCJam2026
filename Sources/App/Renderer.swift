@@ -208,11 +208,17 @@ final class Renderer {
         case .eggDiscovery:
             return ("THE EGG", [
                 "",
-                "  There — nestled in ash and shadow — the egg glows with quiet warmth.",
-                "  Your scales bristle. This is what you came for.",
+                "  " + colored("~ My egg. ~", code: ansiBrightYellow),
                 "",
-                "  You gather it gently in your claws. It pulses once, as if in recognition.",
-                "  Now get out.",
+                "  " + colored("     .-.     ", code: ansiYellow),
+                "  " + colored("    /   \\    ", code: ansiYellow),
+                "  " + colored("   | o o |   ", code: ansiYellow),
+                "  " + colored("   |  ^  |   ", code: ansiYellow),
+                "  " + colored("    \\___/    ", code: ansiYellow),
+                "",
+                "  " + colored("Warm. Alive. Still here.", code: ansiBoldBrightWhite),
+                "",
+                "  " + colored("\"They almost had you. Almost.\"", code: ansiDarkGray),
             ])
         case .exitPatio:
             return ("THE PATIO", [
@@ -316,7 +322,19 @@ final class Renderer {
     private func drawStatusBar(_ state: GameState) {
         let hpFilled = Int(Double(state.hp) / Double(state.config.maxHP) * Double(Self.hpBarWidth))
         let hpClamped = max(0, min(hpFilled, Self.hpBarWidth))
-        let hpBar = String(repeating: "█", count: hpClamped) + String(repeating: "░", count: Self.hpBarWidth - hpClamped)
+        let hpBarRaw = String(repeating: "█", count: hpClamped) + String(repeating: "░", count: Self.hpBarWidth - hpClamped)
+
+        let hpRatio = Double(state.hp) / Double(state.config.maxHP)
+        let hpColorCode: String
+        if hpRatio >= 0.40 {
+            hpColorCode = ansiGreen
+        } else if hpRatio >= 0.20 {
+            hpColorCode = ansiYellow
+        } else {
+            hpColorCode = ansiRed
+        }
+        let hpBar = colored(hpBarRaw, code: hpColorCode)
+
         let eggSymbol = state.hasEgg ? "*" : " "
 
         let cooldown = state.timerModel.activeCooldownDuration
