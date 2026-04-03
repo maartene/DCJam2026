@@ -7,4 +7,5 @@ public enum ScreenMode: Sendable {
     case upgradePrompt(choices: [Upgrade])
     case deathState
     case winState
+    case startScreen
 }

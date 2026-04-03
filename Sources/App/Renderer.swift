@@ -48,6 +48,8 @@ final class Renderer {
             renderDeathScreen(state)
         case .winState:
             renderWinScreen(state)
+        case .startScreen:
+            break // placeholder — full renderStartScreen() added in step 03-02
         }
         output.flush()
     }
