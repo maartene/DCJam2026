@@ -434,21 +434,18 @@ final class Renderer {
         let eggSymbol = state.hasEgg ? "*" : " "
 
         let cooldown = state.timerModel.activeCooldownDuration
-        let dashCooldownStr = cooldown > 0 ? String(format: " (cd=%.0fs)", cooldown) : ""
-        let braceCooldownStr = state.braceOnCooldown ? String(format: " (cd=%.1fs)", state.braceCooldownTimer) : ""
+        let coloredDashCooldownStr = cooldown > 0
+            ? " " + colored(String(format: "cd=%.0fs", cooldown), code: ansiYellow)
+            : ""
+        let coloredBraceCooldownStr = state.braceOnCooldown
+            ? " " + colored(String(format: "cd=%.1fs", state.braceCooldownTimer), code: ansiYellow)
+            : ""
 
         let specFilled = Int(state.specialCharge * Double(Self.specialMeterWidth))
         let specClamped = max(0, min(specFilled, Self.specialMeterWidth))
         let specBarRaw = String(repeating: "█", count: specClamped) + String(repeating: "░", count: Self.specialMeterWidth - specClamped)
         let specColorCode = state.specialIsReady ? ansiBoldBrightCyan : ansiDimCyan
         let specBar = colored(specBarRaw, code: specColorCode)
-
-        let coloredDashCooldownStr = dashCooldownStr.isEmpty
-            ? ""
-            : " " + colored(String(dashCooldownStr.dropFirst()), code: ansiYellow)
-        let coloredBraceCooldownStr = braceCooldownStr.isEmpty
-            ? ""
-            : " " + colored(String(braceCooldownStr.dropFirst()), code: ansiYellow)
 
         var bar = " HP [\(hpBar)]"
         bar += " EGG [\(eggSymbol)]"
@@ -507,7 +504,7 @@ final class Renderer {
     // MARK: - Thought content
 
     private func dungeonThoughts(_ state: GameState) -> [String] {
-        let map = buildMinimap(state)
+        let minimapLine = buildMinimap(state)
         let flavor: String
         if state.recentDash {
             flavor = "I tear through! Wings snap, scales scrape stone — the guard never had a chance."
@@ -520,7 +517,7 @@ final class Renderer {
         } else {
             flavor = "Deeper now. The air is thicker, heavier. My claws find the floor and I press on."
         }
-        return [map, flavor]
+        return [minimapLine, flavor]
     }
 
     /// Builds a minimap string: [E...G..○..S] showing entry, guard, player, staircase/exit.
@@ -593,7 +590,7 @@ final class Renderer {
                 if colorCode.isEmpty {
                     output.write(String(ch))
                 } else {
-                    output.write(colorCode + String(ch) + ansiReset)
+                    output.write(colored(String(ch), code: colorCode))
                 }
             }
         }

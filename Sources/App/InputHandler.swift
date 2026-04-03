@@ -42,10 +42,10 @@ final class InputHandler {
         // Escape sequence: ESC [ A/B/C/D
         if count >= 3 && buf[0] == 0x1B && buf[1] == 0x5B {
             switch buf[2] {
-            case 0x41: return .move(.forward)  // Arrow Up
+            case 0x41: return .move(.forward)   // Arrow Up
             case 0x42: return .move(.backward)  // Arrow Down
-            case 0x43: return .turn(.right)  // Arrow Right
-            case 0x44: return .turn(.left)  // Arrow Left
+            case 0x43: return .turn(.right)     // Arrow Right
+            case 0x44: return .turn(.left)      // Arrow Left
             default: break
             }
         }

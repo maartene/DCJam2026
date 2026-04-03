@@ -47,18 +47,6 @@ public enum RulesEngine {
         }
     }
 
-    // MARK: - Start screen
-
-    private static func applyStartScreen(command: GameCommand, state: GameState) -> GameState {
-        // Any non-quit command transitions to dungeon. Quit is handled by the game loop, not RulesEngine.
-        switch command {
-        case .none:
-            return state
-        default:
-            return state.withScreenMode(.dungeon)
-        }
-    }
-
     // MARK: - Timer advancement
 
     private static func advanceTimers(_ state: GameState, deltaTime: Double) -> GameState {
