@@ -125,7 +125,7 @@ private let ansiResetCode = "\u{1B}[0m"
 private let ansiBrightWhiteFg = "\u{1B}[97m"
 private let ansiStandardWhite  = "\u{1B}[37m"
 private let ansiDarkGrayFg     = "\u{1B}[90m"
-private let ansiBlackBgCode    = "\u{1B}[40m"
+private let ansiBlackBgCode    = ansiBlackBg
 
 /// Helpers to build a minimal GameState for a given depth key
 /// Depth = 0: player is standing right in front of a wall (adjacentWall in dungeon key)

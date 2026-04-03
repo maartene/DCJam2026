@@ -534,31 +534,6 @@ final class Renderer {
         return [flavor]
     }
 
-    /// Builds a minimap string: [E...G..○..S] showing entry, guard, player, staircase/exit.
-    /// The minimap shows the y-axis of the main corridor (x=7), from y=0 (south/entry) upward.
-    private func buildMinimap(_ state: GameState) -> String {
-        let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
-        let endY = floor.hasExitSquare ? floor.exitPosition2D.y : min(floor.staircasePosition2D.y, 6)
-        var cells = [Character](repeating: ".", count: endY + 1)
-
-        // Landmarks (use y-coordinate of 2D position)
-        cells[0] = "E"
-        cells[endY] = floor.hasExitSquare ? "X" : "S"
-        if let eggPos = floor.eggRoomPosition2D, eggPos.y <= endY {
-            cells[eggPos.y] = state.hasEgg ? "e" : "*"
-        }
-        if let enc = floor.encounterPosition2D, enc.y <= endY {
-            cells[enc.y] = floor.hasBossEncounter ? "B" : "G"
-        }
-        // Player (overrides landmark if on same square; use y for corridor position)
-        let posY = min(state.playerPosition.y, endY)
-        let clampedPosY = max(0, posY)
-        cells[clampedPosY] = "○"
-
-        let bar = "[" + String(cells) + "]"
-        return "Floor \(state.currentFloor):  \(bar)   E=entry  G=guard  *=egg  S=stairs  X=exit"
-    }
-
     private func combatThoughts(_ state: GameState, encounter: EncounterModel) -> [String] {
         if case .special = state.transientOverlay {
             return ["I breathe deep and let the fire pour out. The air itself ignites."]

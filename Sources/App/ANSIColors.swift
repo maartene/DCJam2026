@@ -24,8 +24,8 @@ let ansiBrightWhite     = "\u{1B}[97m"
 // MARK: - 256-color helper
 
 /// Returns an ANSI 256-color foreground escape sequence for the given color index (0–255).
-func ansi256Fg(_ n: Int) -> String {
-    "\u{1B}[38;5;\(n)m"
+func ansi256Fg(_ colorIndex: Int) -> String {
+    "\u{1B}[38;5;\(colorIndex)m"
 }
 
 // MARK: - Helper
