@@ -343,12 +343,21 @@ final class Renderer {
 
         let specFilled = Int(state.specialCharge * Double(Self.specialMeterWidth))
         let specClamped = max(0, min(specFilled, Self.specialMeterWidth))
-        let specBar = String(repeating: "█", count: specClamped) + String(repeating: "░", count: Self.specialMeterWidth - specClamped)
+        let specBarRaw = String(repeating: "█", count: specClamped) + String(repeating: "░", count: Self.specialMeterWidth - specClamped)
+        let specColorCode = state.specialIsReady ? ansiBoldBrightCyan : ansiDimCyan
+        let specBar = colored(specBarRaw, code: specColorCode)
+
+        let coloredDashCooldownStr = dashCooldownStr.isEmpty
+            ? ""
+            : " " + colored(String(dashCooldownStr.dropFirst()), code: ansiYellow)
+        let coloredBraceCooldownStr = braceCooldownStr.isEmpty
+            ? ""
+            : " " + colored(String(braceCooldownStr.dropFirst()), code: ansiYellow)
 
         var bar = " HP [\(hpBar)]"
         bar += " EGG [\(eggSymbol)]"
-        bar += "  (1)DASH[\(state.dashCharges)]\(dashCooldownStr)"
-        bar += "  (2)BRACE\(braceCooldownStr)"
+        bar += "  (1)DASH[\(state.dashCharges)]\(coloredDashCooldownStr)"
+        bar += "  (2)BRACE\(coloredBraceCooldownStr)"
         bar += "  (3)SPEC[\(specBar)]"
 
         output.moveCursor(row: 18, col: 2)
