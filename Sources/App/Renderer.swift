@@ -55,7 +55,38 @@ final class Renderer {
         case .startScreen:
             break // unreachable — handled above
         }
+        renderTransientOverlay(state)
         output.flush()
+    }
+
+    // MARK: - Transient overlay (row 9, centered in cols 1-60)
+
+    private func renderTransientOverlay(_ state: GameState) {
+        guard let overlay = state.transientOverlay else { return }
+        switch state.screenMode {
+        case .dungeon, .combat:
+            renderOverlayWord(overlay)
+        default:
+            return
+        }
+    }
+
+    private func renderOverlayWord(_ overlay: TransientOverlay) {
+        let word: String
+        let colorCode: String
+        switch overlay {
+        case .braceSuccess:
+            word = "SHIELDED!"
+            colorCode = ansiBrightCyan
+        case .braceHit:
+            word = "STRUCK!"
+            colorCode = ansiBrightRed
+        case .dash:
+            return // handled in step 04-02
+        }
+        let col = (60 - word.count) / 2 + 1
+        output.moveCursor(row: 9, col: col)
+        output.write(colored(word, code: colorCode))
     }
 
     // MARK: - Start screen (full-screen takeover, 80×25)
