@@ -23,6 +23,10 @@ final class Renderer {
     }
 
     func render(_ state: GameState) {
+        if case .startScreen = state.screenMode {
+            renderStartScreen()
+            return
+        }
         output.clearScreen()
         drawChrome()
         switch state.screenMode {
@@ -49,8 +53,68 @@ final class Renderer {
         case .winState:
             renderWinScreen(state)
         case .startScreen:
-            break // placeholder — full renderStartScreen() added in step 03-02
+            break // unreachable — handled above
         }
+        output.flush()
+    }
+
+    // MARK: - Start screen (full-screen takeover, 80×25)
+
+    private func renderStartScreen() {
+        output.clearScreen()
+
+        // Row 6: title
+        let title = colored("EMBER'S ESCAPE", code: ansiBoldBrightWhite)
+        let titlePad = (80 - "EMBER'S ESCAPE".count) / 2
+        output.moveCursor(row: 6, col: titlePad)
+        output.write(title)
+
+        // Row 8: subtitle
+        let subtitle = "DCJam 2026"
+        let subtitlePad = (80 - subtitle.count) / 2
+        output.moveCursor(row: 8, col: subtitlePad)
+        output.write(colored(subtitle, code: ansiDimCyan))
+
+        // Row 10: narrative hook
+        let hook = "A young dragon. A stolen egg. One chance to escape."
+        let hookPad = (80 - hook.count) / 2
+        output.moveCursor(row: 10, col: hookPad)
+        output.write(colored(hook, code: ansiYellow))
+
+        // Rows 12-16: controls table (two columns to fit without hitting status bar row 18)
+        let controlsTitle = "Controls"
+        let controlsTitlePad = (80 - controlsTitle.count) / 2
+        output.moveCursor(row: 12, col: controlsTitlePad)
+        output.write(colored(controlsTitle, code: ansiBoldBrightWhite))
+
+        // Left column: movement keys (col 15); right column: action keys (col 45)
+        let leftControls: [(String, String)] = [
+            ("W", "Move forward"),
+            ("S", "Move backward"),
+            ("A", "Turn left"),
+            ("D", "Turn right"),
+        ]
+        let rightControls: [(String, String)] = [
+            ("1", "Dash through enemy"),
+            ("2", "Brace for impact"),
+            ("3", "Special attack"),
+            ("ESC", "Exit game"),
+        ]
+        for (i, (key, desc)) in leftControls.enumerated() {
+            output.moveCursor(row: 14 + i, col: 15)
+            output.write(colored(key, code: ansiBoldBrightWhite) + "  —  " + desc)
+        }
+        for (i, (key, desc)) in rightControls.enumerated() {
+            output.moveCursor(row: 14 + i, col: 45)
+            output.write(colored(key, code: ansiBoldBrightWhite) + "  —  " + desc)
+        }
+
+        // Row 23: prompt
+        let prompt = "[ Press any key to begin ]"
+        let promptPad = (80 - prompt.count) / 2
+        output.moveCursor(row: 23, col: promptPad)
+        output.write(colored(prompt, code: ansiBrightCyan))
+
         output.flush()
     }
 
