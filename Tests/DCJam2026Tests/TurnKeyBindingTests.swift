@@ -25,20 +25,17 @@ import Testing
 //   CM-B: Test names describe the key Ember presses and the command it produces.
 //   CM-C: Tests validate the observable command that flows into RulesEngine.
 
-@Suite("Turning Mechanic — Turn Key Bindings")
-struct TurnKeyBindingTests {
+@Suite struct `Turning Mechanic — Turn Key Bindings` {
 
     // MARK: - US-TM-05: A / a key produces turn-left command
 
-    @Test("Pressing lowercase 'a' produces a turn-left command")
-    func lowercaseAProducesTurnLeft() {
+    @Test func `Pressing lowercase 'a' produces a turn-left command`() {
         let handler = InputHandler()
         let result = handler.mapKey(bytes: [0x61])
         #expect(result == .turn(.left))
     }
 
-    @Test("Pressing uppercase 'A' produces a turn-left command")
-    func uppercaseAProducesTurnLeft() {
+    @Test func `Pressing uppercase 'A' produces a turn-left command`() {
         let handler = InputHandler()
         let result = handler.mapKey(bytes: [0x41])
         #expect(result == .turn(.left))
@@ -46,15 +43,13 @@ struct TurnKeyBindingTests {
 
     // MARK: - US-TM-05: D / d key produces turn-right command
 
-    @Test("Pressing lowercase 'd' produces a turn-right command")
-    func lowercaseDProducesTurnRight() {
+    @Test func `Pressing lowercase 'd' produces a turn-right command`() {
         let handler = InputHandler()
         let result = handler.mapKey(bytes: [0x64])
         #expect(result == .turn(.right))
     }
 
-    @Test("Pressing uppercase 'D' produces a turn-right command")
-    func uppercaseDProducesTurnRight() {
+    @Test func `Pressing uppercase 'D' produces a turn-right command`() {
         let handler = InputHandler()
         let result = handler.mapKey(bytes: [0x44])
         #expect(result == .turn(.right))
@@ -62,15 +57,13 @@ struct TurnKeyBindingTests {
 
     // MARK: - US-TM-05: Arrow Left / Right escape sequences
 
-    @Test("Arrow Left escape sequence [ESC [ D] produces a turn-left command")
-    func arrowLeftProducesTurnLeft() {
+    @Test func `Arrow Left escape sequence [ESC [ D] produces a turn-left command`() {
         let handler = InputHandler()
         let result = handler.mapKey(bytes: [0x1B, 0x5B, 0x44])
         #expect(result == .turn(.left))
     }
 
-    @Test("Arrow Right escape sequence [ESC [ C] produces a turn-right command")
-    func arrowRightProducesTurnRight() {
+    @Test func `Arrow Right escape sequence [ESC [ C] produces a turn-right command`() {
         let handler = InputHandler()
         let result = handler.mapKey(bytes: [0x1B, 0x5B, 0x43])
         #expect(result == .turn(.right))
@@ -78,29 +71,25 @@ struct TurnKeyBindingTests {
 
     // MARK: - US-TM-05: Regression — existing W/S and Arrow Up/Down bindings unchanged
 
-    @Test("Pressing 'w' still produces a move-forward command (regression guard)")
-    func wKeyStillProducesMoveForward() {
+    @Test func `Pressing 'w' still produces a move-forward command (regression guard)`() {
         let handler = InputHandler()
         let result = handler.mapKey(bytes: [0x77])
         #expect(result == .move(.forward))
     }
 
-    @Test("Pressing 's' still produces a move-backward command (regression guard)")
-    func sKeyStillProducesMoveBackward() {
+    @Test func `Pressing 's' still produces a move-backward command (regression guard)`() {
         let handler = InputHandler()
         let result = handler.mapKey(bytes: [0x73])
         #expect(result == .move(.backward))
     }
 
-    @Test("Arrow Up escape sequence [ESC [ A] still produces move-forward (regression guard)")
-    func arrowUpStillProducesMoveForward() {
+    @Test func `Arrow Up escape sequence [ESC [ A] still produces move-forward (regression guard)`() {
         let handler = InputHandler()
         let result = handler.mapKey(bytes: [0x1B, 0x5B, 0x41])
         #expect(result == .move(.forward))
     }
 
-    @Test("Arrow Down escape sequence [ESC [ B] still produces move-backward (regression guard)")
-    func arrowDownStillProducesMoveBackward() {
+    @Test func `Arrow Down escape sequence [ESC [ B] still produces move-backward (regression guard)`() {
         let handler = InputHandler()
         let result = handler.mapKey(bytes: [0x1B, 0x5B, 0x42])
         #expect(result == .move(.backward))
@@ -108,8 +97,7 @@ struct TurnKeyBindingTests {
 
     // MARK: - US-TM-05: Rapid turn round-trip
 
-    @Test("Pressing 'd' then 'a' rapidly returns Ember to her original facing")
-    func rapidRightThenLeftReturnsToOriginalFacing() {
+    @Test func `Pressing 'd' then 'a' rapidly returns Ember to her original facing`() {
         let handler = InputHandler()
         let initial = GameState.initial(config: .default)
 

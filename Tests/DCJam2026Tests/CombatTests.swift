@@ -16,13 +16,11 @@ import Testing
 // Special at game start is unavailable (INT-02), boss survives until defeated.
 // Error path ratio in this file: 4 of 13 = 31%
 
-@Suite("Combat — Brace and Special")
-struct CombatTests {
+@Suite struct `Combat — Brace and Special` {
 
     // MARK: - Enemy attack timer
 
-    @Test("Unbraced combat tick past attack interval reduces Ember HP")
-    func enemyAttackTimerDealsUnbracedDamage() {
+    @Test func `Unbraced combat tick past attack interval reduces Ember HP`() {
         // Given — Ember in regular encounter, no Brace active
         let config = GameConfig.default
         let state = gameStateInRegularEncounter()
@@ -35,8 +33,7 @@ struct CombatTests {
 
     // MARK: - Brace: reduces damage
 
-    @Test("Ember takes zero damage during a successful Brace parry vs full damage when unbraced")
-    func braceTakesDamage() {
+    @Test func `Ember takes zero damage during a successful Brace parry vs full damage when unbraced`() {
         // Given — identical encounter at the moment an enemy attack lands
         let config = GameConfig.default
         let baseState = gameStateInRegularEncounter()
@@ -51,8 +48,7 @@ struct CombatTests {
         #expect(bracedDamage < unbracedDamage)
     }
 
-    @Test("Brace keeps Ember in the encounter — it does not end combat")
-    func braceKeepsEncounterActive() {
+    @Test func `Brace keeps Ember in the encounter — it does not end combat`() {
         // Given
         let state = gameStateInRegularEncounter()
         // When
@@ -65,8 +61,7 @@ struct CombatTests {
         }
     }
 
-    @Test("Brace is selectable even when both Dash charges are depleted")
-    func braceSelectableWithZeroDashCharges() {
+    @Test func `Brace is selectable even when both Dash charges are depleted`() {
         // Given — Dash at 0, Special below full
         var state = gameStateInRegularEncounter()
         state = state.withDashCharges(0)
@@ -82,8 +77,7 @@ struct CombatTests {
 
     // MARK: - Brace: successful parry charges Special
 
-    @Test("A successful Brace parry adds the configured Special charge bonus")
-    func braceParryGrantsSpecialBonus() {
+    @Test func `A successful Brace parry adds the configured Special charge bonus`() {
         // Given — Ember braces at the moment an enemy attack is incoming
         let config = GameConfig.default
         let baseState = gameStateInRegularEncounter()
@@ -97,8 +91,7 @@ struct CombatTests {
 
     // MARK: - Brace error path: fatal unbraced hit triggers death
 
-    @Test("The death condition fires when an unbraced enemy attack drops HP to 0")
-    func fatalUnbracedHitTriggersDeathCondition() {
+    @Test func `The death condition fires when an unbraced enemy attack drops HP to 0`() {
         // Given — Ember at 1 HP in encounter, no Brace active
         let config = GameConfig.default
         var state = gameStateInRegularEncounter()
@@ -118,8 +111,7 @@ struct CombatTests {
 
     // MARK: - Special: requires full charge
 
-    @Test("Special is not selectable when the charge meter is below full")
-    func specialNotSelectableBelowFull() {
+    @Test func `Special is not selectable when the charge meter is below full`() {
         // Given — Special at 80% (not full)
         var state = gameStateInRegularEncounter()
         state = state.withSpecialCharge(0.8)
@@ -136,8 +128,7 @@ struct CombatTests {
         }
     }
 
-    @Test("Special cannot be used at game start because the charge begins at 0")
-    func specialUnavailableAtGameStart() {
+    @Test func `Special cannot be used at game start because the charge begins at 0`() {
         // Given
         let config = GameConfig.default
         let baseState = GameState.initial(config: config)
@@ -150,8 +141,7 @@ struct CombatTests {
 
     // MARK: - Special: full charge fires and resets
 
-    @Test("Ember's Special charge resets to 0 after the Special attack fires")
-    func specialChargeResetsAfterUse() {
+    @Test func `Ember's Special charge resets to 0 after the Special attack fires`() {
         // Given — charge at full
         var state = gameStateInRegularEncounter()
         state = state.withSpecialCharge(1.0)
@@ -161,8 +151,7 @@ struct CombatTests {
         #expect(result.specialCharge == 0.0)
     }
 
-    @Test("The enemy takes significant damage when Ember fires Special")
-    func specialDamagesEnemy() {
+    @Test func `The enemy takes significant damage when Ember fires Special`() {
         // Given
         var state = gameStateInRegularEncounter()
         state = state.withSpecialCharge(1.0)
@@ -185,8 +174,7 @@ struct CombatTests {
         #expect(enemyHPAfter < enemyHPBefore || encounterEnded)
     }
 
-    @Test("After firing Special, the screen mode transitions away from the narrative overlay")
-    func specialOverlayTransitionsBackAfterConfirmation() {
+    @Test func `After firing Special, the screen mode transitions away from the narrative overlay`() {
         // Given — Special fired, narrative overlay is showing
         var state = GameState.initial(config: GameConfig.default)
         state = state.withScreenMode(.narrativeOverlay(event: .specialAttack))
@@ -200,8 +188,7 @@ struct CombatTests {
 
     // MARK: - Boss: defeatable with Brace and Special
 
-    @Test("The boss is defeatable and the path to the exit opens after defeat")
-    func bossDefeatedUnblocksExit() {
+    @Test func `The boss is defeatable and the path to the exit opens after defeat`() {
         // Given — boss encounter, Ember has full Special and can brace
         var state = GameState.initial(config: GameConfig.default)
         state = state.withCurrentFloor(5)
@@ -219,8 +206,7 @@ struct CombatTests {
 
     // MARK: - Special charge accumulates over time
 
-    @Test("Special charge increases when time passes during dungeon navigation")
-    func specialChargeAccumulatesOverTime() {
+    @Test func `Special charge increases when time passes during dungeon navigation`() {
         // Given
         let config = GameConfig.default
         let state = GameState.initial(config: config)
@@ -233,8 +219,7 @@ struct CombatTests {
 
     // MARK: - Property: Special cannot be full at first encounter (INT-02)
 
-    @Test("Special charge cannot reach full in the time available before the first encounter")
-    func specialChargeCannotBeFullAtFirstEncounter() {
+    @Test func `Special charge cannot reach full in the time available before the first encounter`() {
         // Given — typical Floor 1 walk time: at most 20 seconds
         let config = GameConfig.default
         let state = GameState.initial(config: config)
@@ -247,7 +232,7 @@ struct CombatTests {
 
 // MARK: - Test Setup Helpers
 
-private extension CombatTests {
+private extension `Combat — Brace and Special` {
 
     func gameStateInRegularEncounter() -> GameState {
         let state = GameState.initial(config: GameConfig.default)

@@ -17,13 +17,11 @@ import Testing
 //   CM-B: Test names use navigation/combat domain terms — no framework or API jargon.
 //   CM-C: Each test validates an observable state outcome (facingDirection, screenMode, HP).
 
-@Suite("Turning Mechanic — Facing Persistence and Combat Turn Blocking")
-struct TurningEdgeCaseTests {
+@Suite struct `Turning Mechanic — Facing Persistence and Combat Turn Blocking` {
 
     // MARK: - US-TM-06: Facing persists through floor transitions
 
-    @Test("Ember's facing direction is unchanged after descending to the next floor")
-    func facingPersistsThroughFloorTransition() {
+    @Test func `Ember's facing direction is unchanged after descending to the next floor`() {
         let state = GameState.initial(config: .default)
             .withFacingDirection(.east)
             .withCurrentFloor(2)
@@ -31,8 +29,7 @@ struct TurningEdgeCaseTests {
         #expect(state.facingDirection == .east)
     }
 
-    @Test("Ember's facing direction is unchanged after descending from floor 2 to floor 3")
-    func facingPersistsThroughMultipleFloorTransitions() {
+    @Test func `Ember's facing direction is unchanged after descending from floor 2 to floor 3`() {
         let state = GameState.initial(config: .default)
             .withFacingDirection(.south)
             .withCurrentFloor(2)
@@ -41,8 +38,7 @@ struct TurningEdgeCaseTests {
         #expect(state.facingDirection == .south)
     }
 
-    @Test("withCurrentFloor does not reset facing direction to North")
-    func withCurrentFloorDoesNotResetFacing() {
+    @Test func `withCurrentFloor does not reset facing direction to North`() {
         let state = GameState.initial(config: .default)
             .withFacingDirection(.west)
             .withCurrentFloor(2)
@@ -52,8 +48,7 @@ struct TurningEdgeCaseTests {
 
     // MARK: - US-TM-06: Turn command blocked in combat
 
-    @Test("Turn command is ignored during an active combat encounter — facing does not change")
-    func turnCommandIgnoredInCombat() {
+    @Test func `Turn command is ignored during an active combat encounter — facing does not change`() {
         let encounter = EncounterModel.guard(isBossEncounter: false)
         let state = GameState.initial(config: .default)
             .withFacingDirection(.east)
@@ -64,8 +59,7 @@ struct TurningEdgeCaseTests {
         #expect(result.facingDirection == .east)
     }
 
-    @Test("screenMode remains .combat after a blocked turn command")
-    func screenModeRemainsInCombatAfterBlockedTurn() {
+    @Test func `screenMode remains .combat after a blocked turn command`() {
         let encounter = EncounterModel.guard(isBossEncounter: false)
         let state = GameState.initial(config: .default)
             .withScreenMode(.combat(encounter: encounter))
@@ -79,8 +73,7 @@ struct TurningEdgeCaseTests {
         }
     }
 
-    @Test("Enemy HP is unchanged when a turn command is blocked during combat")
-    func enemyHPUnchangedAfterBlockedTurnInCombat() {
+    @Test func `Enemy HP is unchanged when a turn command is blocked during combat`() {
         let encounter = EncounterModel(isBossEncounter: false, enemyHP: 40, enemyAttackTimer: 5.0)
         let state = GameState.initial(config: .default)
             .withScreenMode(.combat(encounter: encounter))
@@ -94,8 +87,7 @@ struct TurningEdgeCaseTests {
         }
     }
 
-    @Test("Turn-left command in combat does not change facing regardless of current direction")
-    func allTurnDirectionsBlockedInCombat() {
+    @Test func `Turn-left command in combat does not change facing regardless of current direction`() {
         let encounter = EncounterModel.guard(isBossEncounter: false)
         let facings: [CardinalDirection] = [.north, .east, .south, .west]
         let directions: [TurnDirection] = [.left, .right]
@@ -116,8 +108,7 @@ struct TurningEdgeCaseTests {
 
     // MARK: - US-TM-06: Movement lock in combat is unaffected by facing
 
-    @Test("Normal movement is still locked in combat even after Ember has turned")
-    func movementLockedInCombatRegardlessOfFacing() {
+    @Test func `Normal movement is still locked in combat even after Ember has turned`() {
         let encounter = EncounterModel.guard(isBossEncounter: false)
         let facings: [CardinalDirection] = [.north, .east, .south, .west]
 
@@ -134,8 +125,7 @@ struct TurningEdgeCaseTests {
         }
     }
 
-    @Test("Ember's HP is unchanged when move is blocked in combat (no position change, no damage from move)")
-    func hpUnchangedWhenMoveBlockedInCombat() {
+    @Test func `Ember's HP is unchanged when move is blocked in combat (no position change, no damage from move)`() {
         let encounter = EncounterModel(isBossEncounter: false, enemyHP: 40, enemyAttackTimer: 5.0)
         let state = GameState.initial(config: .default)
             .withScreenMode(.combat(encounter: encounter))

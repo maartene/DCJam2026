@@ -12,13 +12,11 @@ import Testing
 //   CM-B: Test names and comments use game domain terms only (Ember, Dash, Floor, egg).
 //   CM-C: Each test validates an observable player outcome, not an internal side effect.
 
-@Suite("Walking Skeleton — Core Loop")
-struct WalkingSkeletonTests {
+@Suite struct `Walking Skeleton — Core Loop` {
 
     // MARK: - Ember spawns on Floor 1 with full readiness
 
-    @Test("Ember's HP is full when a new run begins")
-    func emberStartsWithFullHP() {
+    @Test func `Ember's HP is full when a new run begins`() {
         // Given
         let config = GameConfig.default
         // When
@@ -27,8 +25,7 @@ struct WalkingSkeletonTests {
         #expect(state.hp == config.maxHP)
     }
 
-    @Test("Ember has exactly 2 Dash charges when a new run begins")
-    func emberStartsWithTwoDashCharges() {
+    @Test func `Ember has exactly 2 Dash charges when a new run begins`() {
         // Given
         let config = GameConfig.default
         // When
@@ -37,8 +34,7 @@ struct WalkingSkeletonTests {
         #expect(state.dashCharges == 2)
     }
 
-    @Test("Ember's Special charge is 0 when a new run begins")
-    func emberStartsWithEmptySpecialCharge() {
+    @Test func `Ember's Special charge is 0 when a new run begins`() {
         // Given
         let config = GameConfig.default
         // When
@@ -47,8 +43,7 @@ struct WalkingSkeletonTests {
         #expect(state.specialCharge == 0.0)
     }
 
-    @Test("Ember does not carry the egg when a new run begins")
-    func emberStartsWithoutEgg() {
+    @Test func `Ember does not carry the egg when a new run begins`() {
         // Given
         let config = GameConfig.default
         // When
@@ -57,8 +52,7 @@ struct WalkingSkeletonTests {
         #expect(state.hasEgg == false)
     }
 
-    @Test("Ember begins on Floor 1 when a new run begins")
-    func emberStartsOnFloorOne() {
+    @Test func `Ember begins on Floor 1 when a new run begins`() {
         // Given
         let config = GameConfig.default
         // When
@@ -69,8 +63,7 @@ struct WalkingSkeletonTests {
 
     // MARK: - Ember passes through a guard using Dash
 
-    @Test("Ember's position advances 3 squares after a successful Dash through a guard")
-    func dashAdvancesEmberThreeSquares() {
+    @Test func `Ember's position advances 3 squares after a successful Dash through a guard`() {
         // Given — Ember on Floor 1, 1 Dash charge, in encounter with regular enemy
         let config = GameConfig.default
         var state = GameState.initial(config: config)
@@ -82,8 +75,7 @@ struct WalkingSkeletonTests {
         #expect(result.playerPosition == startPosition + 3)
     }
 
-    @Test("Ember's Dash charge count decrements by 1 after a successful Dash")
-    func dashDecrementsChargeByOne() {
+    @Test func `Ember's Dash charge count decrements by 1 after a successful Dash`() {
         // Given
         let config = GameConfig.default
         var state = GameState.initial(config: config)
@@ -95,8 +87,7 @@ struct WalkingSkeletonTests {
         #expect(result.dashCharges == chargesBefore - 1)
     }
 
-    @Test("The encounter ends after Ember uses Dash")
-    func dashEndsEncounter() {
+    @Test func `The encounter ends after Ember uses Dash`() {
         // Given
         let config = GameConfig.default
         var state = GameState.initial(config: config)
@@ -111,8 +102,7 @@ struct WalkingSkeletonTests {
         }
     }
 
-    @Test("Normal movement is unavailable when Ember is in an active encounter")
-    func normalMovementLockedInEncounter() {
+    @Test func `Normal movement is unavailable when Ember is in an active encounter`() {
         // Given
         let config = GameConfig.default
         var state = GameState.initial(config: config)
@@ -130,8 +120,7 @@ struct WalkingSkeletonTests {
 
     // MARK: - Ember descends stairs to the next floor
 
-    @Test("The floor counter increments when Ember steps onto the stairs")
-    func descendingStairsIncrementsFloor() {
+    @Test func `The floor counter increments when Ember steps onto the stairs`() {
         // Given — Ember on Floor 1, at the staircase position
         let config = GameConfig.default
         var state = GameState.initial(config: config)
@@ -143,8 +132,7 @@ struct WalkingSkeletonTests {
         #expect(result.currentFloor == floorBefore + 1)
     }
 
-    @Test("Ember's position resets to the Floor 2 entry point after descending")
-    func descendingPlacesEmberAtNextFloorEntry() {
+    @Test func `Ember's position resets to the Floor 2 entry point after descending`() {
         // Given
         let config = GameConfig.default
         var state = GameState.initial(config: config)
@@ -158,8 +146,7 @@ struct WalkingSkeletonTests {
 
     // MARK: - Ember dies when HP reaches 0
 
-    @Test("The death screen appears when Ember's HP drops to 0")
-    func deathFiresWhenHPReachesZero() {
+    @Test func `The death screen appears when Ember's HP drops to 0`() {
         // Given — Ember at 1 HP in encounter
         let config = GameConfig.default
         var state = GameState.initial(config: config)
@@ -175,8 +162,7 @@ struct WalkingSkeletonTests {
         }
     }
 
-    @Test("HP display does not show a negative value when damage exceeds remaining HP")
-    func hpNeverDisplaysNegative() {
+    @Test func `HP display does not show a negative value when damage exceeds remaining HP`() {
         // Given — Ember at 1 HP, fatal blow incoming (unbraced)
         let config = GameConfig.default
         var state = GameState.initial(config: config)
@@ -191,7 +177,7 @@ struct WalkingSkeletonTests {
 
 // MARK: - Test Setup Helpers (business intent, not wiring)
 
-private extension WalkingSkeletonTests {
+private extension `Walking Skeleton — Core Loop` {
 
     func stateWithActiveEncounter(_ state: GameState, isBoss: Bool) -> GameState {
         let encounter = EncounterModel.guard(isBossEncounter: isBoss)

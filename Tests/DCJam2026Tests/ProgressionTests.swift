@@ -12,13 +12,11 @@ import Testing
 // cooldown upgrade has measurable effect, Special meter state transitions.
 // Error path ratio in this file: 4 of 11 = 36%
 
-@Suite("Progression — Egg Discovery, Upgrades, Special Meter")
-struct ProgressionTests {
+@Suite struct `Progression — Egg Discovery, Upgrades, Special Meter` {
 
     // MARK: - Egg discovery fires narrative event
 
-    @Test("Entering the egg room triggers the egg discovery narrative event")
-    func enteringEggRoomTriggersNarrative() {
+    @Test func `Entering the egg room triggers the egg discovery narrative event`() {
         // Given — Ember on Floor 2, steps onto the egg room square
         var state = GameState.initial(config: GameConfig.default)
         state = state.withCurrentFloor(2)
@@ -35,8 +33,7 @@ struct ProgressionTests {
         }
     }
 
-    @Test("The EGG indicator activates after Ember confirms the egg discovery event")
-    func eggIndicatorActivatesAfterConfirmation() {
+    @Test func `The EGG indicator activates after Ember confirms the egg discovery event`() {
         // Given — narrative event is showing
         var state = GameState.initial(config: GameConfig.default)
         state = state.withScreenMode(.narrativeOverlay(event: .eggDiscovery))
@@ -50,8 +47,7 @@ struct ProgressionTests {
         }
     }
 
-    @Test("The dungeon view resumes immediately after the egg discovery event is confirmed")
-    func dungeonResumesAfterEggConfirmation() {
+    @Test func `The dungeon view resumes immediately after the egg discovery event is confirmed`() {
         // Given
         var state = GameState.initial(config: GameConfig.default)
         state = state.withScreenMode(.narrativeOverlay(event: .eggDiscovery))
@@ -67,8 +63,7 @@ struct ProgressionTests {
 
     // MARK: - Error path: egg room not visited means no event
 
-    @Test("The EGG indicator remains inactive when Ember has not yet entered the egg room")
-    func eggIndicatorInactiveUntilRoomEntered() {
+    @Test func `The EGG indicator remains inactive when Ember has not yet entered the egg room`() {
         // Given — Ember has been navigating Floor 2 but not entered egg room
         var state = GameState.initial(config: GameConfig.default)
         state = state.withCurrentFloor(2)
@@ -90,8 +85,7 @@ struct ProgressionTests {
 
     // MARK: - Milestone upgrade prompt
 
-    @Test("The upgrade prompt shows exactly 3 options at a milestone floor transition")
-    func upgradePromptShowsExactlyThreeOptions() {
+    @Test func `The upgrade prompt shows exactly 3 options at a milestone floor transition`() {
         // Given — Ember has cleared a milestone floor
         var state = GameState.initial(config: GameConfig.default)
         state = state.withCurrentFloor(2) // assume Floor 2 cleared = milestone
@@ -105,8 +99,7 @@ struct ProgressionTests {
         // test passes vacuously and the crafter must wire the milestone to the correct floor.
     }
 
-    @Test("Selecting an upgrade applies its effect immediately and resumes the dungeon")
-    func selectingUpgradeAppliesImmediately() {
+    @Test func `Selecting an upgrade applies its effect immediately and resumes the dungeon`() {
         // Given — upgrade prompt showing
         let upgrade = UpgradePool.cooldownReductionUpgrade()
         var state = GameState.initial(config: GameConfig.default)
@@ -123,8 +116,7 @@ struct ProgressionTests {
         }
     }
 
-    @Test("A Dash cooldown reduction upgrade measurably reduces the cooldown duration")
-    func dashCooldownUpgradeReducesCooldown() {
+    @Test func `A Dash cooldown reduction upgrade measurably reduces the cooldown duration`() {
         // Given — baseline run
         let config = GameConfig.default
         let baseState = GameState.initial(config: config)
@@ -140,8 +132,7 @@ struct ProgressionTests {
         #expect(effectiveCooldown < baseCooldown)
     }
 
-    @Test("A Dash charge cap upgrade increases the maximum number of charges Ember can hold")
-    func dashChargeCapUpgradeIncreasesCapacity() {
+    @Test func `A Dash charge cap upgrade increases the maximum number of charges Ember can hold`() {
         // Given
         let config = GameConfig.default
         let baseCap = config.dashChargeCap
@@ -156,8 +147,7 @@ struct ProgressionTests {
 
     // MARK: - Error path: duplicate upgrades not re-offered
 
-    @Test("An already-selected upgrade does not appear in a subsequent milestone prompt")
-    func alreadySelectedUpgradeNotReOffered() {
+    @Test func `An already-selected upgrade does not appear in a subsequent milestone prompt`() {
         // Given — Ember has already selected the cooldown reduction upgrade
         let takenUpgrade = UpgradePool.cooldownReductionUpgrade()
         var state = GameState.initial(config: GameConfig.default)
@@ -169,8 +159,7 @@ struct ProgressionTests {
         #expect(!drawn.contains(where: { $0.id == takenUpgrade.id }))
     }
 
-    @Test("The upgrade pool provides at least 3 unique choices")
-    func upgradePoolHasEnoughUniquesForThreeChoices() {
+    @Test func `The upgrade pool provides at least 3 unique choices`() {
         // Given — fresh run, no upgrades taken
         let pool = UpgradePool(alreadySelected: [])
         // When
@@ -183,8 +172,7 @@ struct ProgressionTests {
 
     // MARK: - Special charge meter transitions
 
-    @Test("The Special charge meter shows a ready state when charge reaches maximum")
-    func specialChargeReachesFullIndicatesReady() {
+    @Test func `The Special charge meter shows a ready state when charge reaches maximum`() {
         // Given — charge advanced to full via time
         let config = GameConfig.default
         let state = GameState.initial(config: config)
@@ -199,7 +187,7 @@ struct ProgressionTests {
 
 // MARK: - Test Setup Helpers
 
-private extension ProgressionTests {
+private extension `Progression — Egg Discovery, Upgrades, Special Meter` {
 
     func adjacentToEggRoom(_ floor: FloorMap) -> Position {
         // Returns the position one step before the egg room entry

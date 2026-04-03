@@ -17,8 +17,7 @@ import Testing
 //   CM-B: Test names use game domain terms only (Ember, facing, cardinal, turn).
 //   CM-C: Each test validates an observable player outcome (facingDirection, HP, position).
 
-@Suite("Turning Mechanic — CardinalDirection and Turn Command")
-struct TurningMechanicTests {
+@Suite struct `Turning Mechanic — CardinalDirection and Turn Command` {
 
     // MARK: - Walking Skeleton (first to enable during DELIVER)
     //
@@ -26,8 +25,7 @@ struct TurningMechanicTests {
     // Implements the walking skeleton described in story-map.md and the task brief.
     // NEW TYPES REQUIRED: CardinalDirection, TurnDirection, GameCommand.turn, GameState.facingDirection
 
-    @Test("Ember faces West after turning left from North, and East after turning right from North")
-    func emberTurnsLeftAndRight() {
+    @Test func `Ember faces West after turning left from North, and East after turning right from North`() {
         let config = GameConfig.default
         let initial = GameState.initial(config: config)
 
@@ -40,14 +38,12 @@ struct TurningMechanicTests {
 
     // MARK: - US-TM-01: CardinalDirection domain type
 
-    @Test("Ember faces North when a new run begins")
-    func newRunInitialisesToNorthFacing() {
+    @Test func `Ember faces North when a new run begins`() {
         let state = GameState.initial(config: .default)
         #expect(state.facingDirection == .north)
     }
 
-    @Test("withFacingDirection produces a new state with the updated facing direction")
-    func withFacingDirectionReturnsCopiedState() {
+    @Test func `withFacingDirection produces a new state with the updated facing direction`() {
         let original = GameState.initial(config: .default)
         let result = original.withFacingDirection(.east)
 
@@ -68,8 +64,7 @@ struct TurningMechanicTests {
         #expect(result.recentDash == original.recentDash)
     }
 
-    @Test("All four cardinal directions are representable as CardinalDirection values")
-    func allFourCardinalDirectionsExist() {
+    @Test func `All four cardinal directions are representable as CardinalDirection values`() {
         #expect(CardinalDirection.allCases.count == 4)
         #expect(CardinalDirection.allCases.contains(.north))
         #expect(CardinalDirection.allCases.contains(.east))
@@ -79,8 +74,7 @@ struct TurningMechanicTests {
 
     // MARK: - US-TM-02: Rotation table
 
-    @Test("Complete turn rotation table is correct for all 8 combinations")
-    func fullRotationTableIsCorrect() {
+    @Test func `Complete turn rotation table is correct for all 8 combinations`() {
         let config = GameConfig.default
         let base = GameState.initial(config: config)
 
@@ -102,8 +96,7 @@ struct TurningMechanicTests {
         }
     }
 
-    @Test("Turning does not change Ember's HP, Dash charges, Special charge, or position")
-    func turningHasNoSideEffectsOnVitalStats() {
+    @Test func `Turning does not change Ember's HP, Dash charges, Special charge, or position`() {
         let config = GameConfig.default
         let state = GameState.initial(config: config)
             .withHP(7)
@@ -119,8 +112,7 @@ struct TurningMechanicTests {
         #expect(result.playerPosition == 3)
     }
 
-    @Test("Four consecutive turns left return Ember to her original facing")
-    func fourConsecutiveLeftTurnsReturnToStart() {
+    @Test func `Four consecutive turns left return Ember to her original facing`() {
         let config = GameConfig.default
         let initial = GameState.initial(config: config)
 
@@ -131,8 +123,7 @@ struct TurningMechanicTests {
         #expect(result.facingDirection == initial.facingDirection)
     }
 
-    @Test("Four consecutive turns right return Ember to her original facing")
-    func fourConsecutiveRightTurnsReturnToStart() {
+    @Test func `Four consecutive turns right return Ember to her original facing`() {
         let config = GameConfig.default
         let initial = GameState.initial(config: config)
 

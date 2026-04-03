@@ -18,13 +18,11 @@ import Testing
 //   CM-B: Test names use spatial/navigational terms — no SQL, HTTP, or framework jargon.
 //   CM-C: Each test validates an observable positional outcome for Ember.
 
-@Suite("Turning Mechanic — 2D Floor and Facing-Relative Movement")
-struct TwoDFloorTests {
+@Suite struct `Turning Mechanic — 2D Floor and Facing-Relative Movement` {
 
     // MARK: - US-TM-03: playerPosition is a 2D coordinate
 
-    @Test("playerPosition has x and y integer fields (Position struct)")
-    func playerPositionIsTwoDimensional() {
+    @Test func `playerPosition has x and y integer fields (Position struct)`() {
         let state = GameState.initial(config: .default)
         let pos = state.playerPosition
         // Position must be a named struct with x and y fields (not a tuple or plain Int)
@@ -32,8 +30,7 @@ struct TwoDFloorTests {
         let _: Int = pos.y
     }
 
-    @Test("Ember starts a new run at the floor entry cell (7, 0)")
-    func newRunStartsAtEntryCell() {
+    @Test func `Ember starts a new run at the floor entry cell (7, 0)`() {
         let state = GameState.initial(config: .default)
         #expect(state.playerPosition.x == 7)
         #expect(state.playerPosition.y == 0)
@@ -41,8 +38,7 @@ struct TwoDFloorTests {
 
     // MARK: - US-TM-03: Facing-relative movement deltas
 
-    @Test("Moving forward while facing North advances Ember by (dx:0, dy:+1)")
-    func forwardNorthAppliesCorrectDelta() {
+    @Test func `Moving forward while facing North advances Ember by (dx:0, dy:+1)`() {
         let start = GameState.initial(config: .default)
             .withPlayerPosition(Position(x: 7, y: 4))
             .withFacingDirection(.north)
@@ -50,8 +46,7 @@ struct TwoDFloorTests {
         #expect(result.playerPosition == Position(x: 7, y: 5))
     }
 
-    @Test("Moving forward while facing East advances Ember by (dx:+1, dy:0)")
-    func forwardEastAppliesCorrectDelta() {
+    @Test func `Moving forward while facing East advances Ember by (dx:+1, dy:0)`() {
         // Use branch corridor (y=3, x=4..5 are passable) to verify East delta.
         let start = GameState.initial(config: .default)
             .withPlayerPosition(Position(x: 4, y: 3))
@@ -60,8 +55,7 @@ struct TwoDFloorTests {
         #expect(result.playerPosition == Position(x: 5, y: 3))
     }
 
-    @Test("Moving forward while facing South retreats Ember by (dx:0, dy:-1)")
-    func forwardSouthAppliesCorrectDelta() {
+    @Test func `Moving forward while facing South retreats Ember by (dx:0, dy:-1)`() {
         let start = GameState.initial(config: .default)
             .withPlayerPosition(Position(x: 7, y: 5))
             .withFacingDirection(.south)
@@ -69,8 +63,7 @@ struct TwoDFloorTests {
         #expect(result.playerPosition == Position(x: 7, y: 4))
     }
 
-    @Test("Moving forward while facing West retreats Ember by (dx:-1, dy:0)")
-    func forwardWestAppliesCorrectDelta() {
+    @Test func `Moving forward while facing West retreats Ember by (dx:-1, dy:0)`() {
         // Use branch corridor (y=3, x=5..4 are passable) to verify West delta.
         let start = GameState.initial(config: .default)
             .withPlayerPosition(Position(x: 5, y: 3))
@@ -79,8 +72,7 @@ struct TwoDFloorTests {
         #expect(result.playerPosition == Position(x: 4, y: 3))
     }
 
-    @Test("Moving backward produces the inverse delta for all four facings")
-    func backwardIsInverseOfForward() {
+    @Test func `Moving backward produces the inverse delta for all four facings`() {
         // Each case uses a start position where the backward target is a passable corridor cell.
         // backward north (dy:-1): (7,4)→(7,3) — main corridor
         // backward east  (dx:-1): (5,3)→(4,3) — branch corridor
@@ -103,8 +95,7 @@ struct TwoDFloorTests {
 
     // MARK: - US-TM-03: Wall collision
 
-    @Test("Ember cannot step into a wall cell — position is unchanged")
-    func movementIntoWallIsBlocked() {
+    @Test func `Ember cannot step into a wall cell — position is unchanged`() {
         // Player at (7,4) facing East. Cell (8,4) is a wall (off the main corridor).
         let start = GameState.initial(config: .default)
             .withPlayerPosition(Position(x: 7, y: 4))
@@ -115,8 +106,7 @@ struct TwoDFloorTests {
 
     // MARK: - US-TM-03: Bounds clamping
 
-    @Test("Ember's position is clamped at the south boundary — cannot step below y=0")
-    func movementClampedAtSouthBoundary() {
+    @Test func `Ember's position is clamped at the south boundary — cannot step below y=0`() {
         // Player at (7,0) facing South. Candidate (7,-1) is out-of-bounds → treated as wall.
         let start = GameState.initial(config: .default)
             .withPlayerPosition(Position(x: 7, y: 0))
@@ -125,8 +115,7 @@ struct TwoDFloorTests {
         #expect(result.playerPosition == Position(x: 7, y: 0), "Stepping south off the grid should leave position unchanged")
     }
 
-    @Test("Ember's position is clamped at the west boundary — cannot step past x=0")
-    func movementClampedAtWestBoundary() {
+    @Test func `Ember's position is clamped at the west boundary — cannot step past x=0`() {
         // Player at (2,3) facing West. Cell (1,3) is a wall (branch corridor starts at x=2).
         let start = GameState.initial(config: .default)
             .withPlayerPosition(Position(x: 2, y: 3))
@@ -137,8 +126,7 @@ struct TwoDFloorTests {
 
     // MARK: - US-TM-03: Game rule preservation after movement
 
-    @Test("Encounter proximity check still fires when Ember steps onto the encounter cell")
-    func encounterProximityCheckAppliedAfterMove() {
+    @Test func `Encounter proximity check still fires when Ember steps onto the encounter cell`() {
         // Ember is one step south of the encounter cell (7,2), facing North.
         let start = GameState.initial(config: .default)
             .withPlayerPosition(Position(x: 7, y: 1))
@@ -151,8 +139,7 @@ struct TwoDFloorTests {
         }
     }
 
-    @Test("Win condition is checked when Ember reaches the exit cell with the egg")
-    func winConditionCheckedAfterMoveToExit() {
+    @Test func `Win condition is checked when Ember reaches the exit cell with the egg`() {
         // Ember is one step south of the exit cell (7,6) on the final floor, facing North, carrying the egg.
         // The final floor (maxFloors=5) has hasExitSquare=true, which activates the win condition check.
         let finalFloor = GameConfig.default.maxFloors
@@ -171,15 +158,13 @@ struct TwoDFloorTests {
 
     // MARK: - US-TM-03: 2D floor grid structure
 
-    @Test("Generated floor has the correct 15-wide by 7-tall grid dimensions")
-    func floorGridHasCorrectDimensions() {
+    @Test func `Generated floor has the correct 15-wide by 7-tall grid dimensions`() {
         let floor = FloorGenerator.generate(floorNumber: 1, config: .default)
         #expect(floor.grid.width == 15)
         #expect(floor.grid.height == 7)
     }
 
-    @Test("Main corridor cells at x=7 are passable and off-corridor cells at y=0 are walls")
-    func mainCorridorCellsArePassable() {
+    @Test func `Main corridor cells at x=7 are passable and off-corridor cells at y=0 are walls`() {
         let floor = FloorGenerator.generate(floorNumber: 1, config: .default)
         // All cells at x=7 (main corridor) are passable
         for y in 0..<7 {
@@ -191,8 +176,7 @@ struct TwoDFloorTests {
         }
     }
 
-    @Test("Branch corridor cells at y=3 from x=2 to x=7 are passable")
-    func branchCorridorCellsArePassable() {
+    @Test func `Branch corridor cells at y=3 from x=2 to x=7 are passable`() {
         let floor = FloorGenerator.generate(floorNumber: 1, config: .default)
         for x in 2...7 {
             #expect(floor.grid.cell(x: x, y: 3).isPassable, "cell (\(x),3) should be passable")
@@ -203,8 +187,7 @@ struct TwoDFloorTests {
         }
     }
 
-    @Test("Landmark positions match the L-shaped corridor topology")
-    func landmarkPositionsAreCorrect() {
+    @Test func `Landmark positions match the L-shaped corridor topology`() {
         let floor = FloorGenerator.generate(floorNumber: 1, config: .default)
         #expect(floor.entryPosition2D == Position(x: 7, y: 0))
         #expect(floor.staircasePosition2D == Position(x: 7, y: 6))

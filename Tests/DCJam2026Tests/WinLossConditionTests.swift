@@ -12,13 +12,11 @@ import Testing
 // HP below 0 clamped, death on Floor 1 before first Dash.
 // Error path ratio in this file: 5 of 9 = 56%
 
-@Suite("Win and Loss Conditions")
-struct WinLossConditionTests {
+@Suite struct `Win and Loss Conditions` {
 
     // MARK: - Win condition: BOTH hasEgg AND exitSquare required (INT-01)
 
-    @Test("Stepping onto the exit square with the egg fires the exit patio narrative event")
-    func exitWithEggFiresNarrativeEvent() {
+    @Test func `Stepping onto the exit square with the egg fires the exit patio narrative event`() {
         // Given — Floor 5, Ember carries egg, at exit square
         let state = stateAtExitSquareWithEgg(true)
         // When
@@ -31,8 +29,7 @@ struct WinLossConditionTests {
         }
     }
 
-    @Test("The win state is declared after Ember confirms the exit patio narrative")
-    func winStateDeclaredAfterExitConfirmation() {
+    @Test func `The win state is declared after Ember confirms the exit patio narrative`() {
         // Given — exit patio overlay showing
         var state = GameState.initial(config: GameConfig.default)
         state = state.withHasEgg(true)
@@ -49,8 +46,7 @@ struct WinLossConditionTests {
 
     // MARK: - Error path: exit without egg is blocked
 
-    @Test("The win state is not declared when Ember reaches the exit without the egg")
-    func exitWithoutEggDoesNotTriggerWin() {
+    @Test func `The win state is not declared when Ember reaches the exit without the egg`() {
         // Given — Floor 5, no egg, at exit square
         let state = stateAtExitSquareWithEgg(false)
         // When
@@ -66,8 +62,7 @@ struct WinLossConditionTests {
 
     // MARK: - Property: both conditions required simultaneously (INT-01)
 
-    @Test("Win state is not declared when hasEgg is true but Ember is not at the exit square")
-    func winStateRequiresExitPosition() {
+    @Test func `Win state is not declared when hasEgg is true but Ember is not at the exit square`() {
         // Given — hasEgg = true, but player is mid-corridor on Floor 5
         var state = GameState.initial(config: GameConfig.default)
         state = state.withCurrentFloor(5)
@@ -83,8 +78,7 @@ struct WinLossConditionTests {
 
     // MARK: - Death condition
 
-    @Test("The death screen appears when Ember's HP drops to exactly 0")
-    func deathScreenFiresAtZeroHP() {
+    @Test func `The death screen appears when Ember's HP drops to exactly 0`() {
         // Given — Ember at 1 HP in encounter
         var state = GameState.initial(config: GameConfig.default)
         state = state.withHP(1)
@@ -104,8 +98,7 @@ struct WinLossConditionTests {
 
     // MARK: - Error path: HP never goes negative
 
-    @Test("HP is displayed as 0, not a negative number, when a fatal blow is received")
-    func hpClampedAtZeroOnFatalBlow() {
+    @Test func `HP is displayed as 0, not a negative number, when a fatal blow is received`() {
         // Given — overkill scenario: 5 HP, enemy deals 50 damage (if brace doesn't fully absorb)
         var state = GameState.initial(config: GameConfig.default)
         state = state.withHP(5)
@@ -119,8 +112,7 @@ struct WinLossConditionTests {
 
     // MARK: - Restart resets ALL state (INT-04)
 
-    @Test("Restart from the death screen resets HP, Dash, Special, egg, floor, and upgrades")
-    func restartResetsAllStateVariables() {
+    @Test func `Restart from the death screen resets HP, Dash, Special, egg, floor, and upgrades`() {
         // Given — Ember died mid-run with partial state
         var state = GameState.initial(config: GameConfig.default)
         state = state.withHP(0)
@@ -142,8 +134,7 @@ struct WinLossConditionTests {
         #expect(result.activeUpgrades.isEmpty)
     }
 
-    @Test("The Dash cooldown timers are cleared when Ember restarts")
-    func restartClearsDashCooldownTimers() {
+    @Test func `The Dash cooldown timers are cleared when Ember restarts`() {
         // Given — Ember had both charges on cooldown when she died
         var state = GameState.initial(config: GameConfig.default)
         state = state.withDashCharges(0)
@@ -156,8 +147,7 @@ struct WinLossConditionTests {
 
     // MARK: - Error path: death on Floor 1 before using Dash
 
-    @Test("Death fires correctly when Ember braces repeatedly and HP reaches 0 on Floor 1")
-    func deathFiresOnFloorOneBeforeDash() {
+    @Test func `Death fires correctly when Ember braces repeatedly and HP reaches 0 on Floor 1`() {
         // Given — Ember on Floor 1, has never Dashed, low HP from bracing
         var state = GameState.initial(config: GameConfig.default)
         state = state.withHP(1)
@@ -180,7 +170,7 @@ struct WinLossConditionTests {
 
 // MARK: - Test Setup Helpers
 
-private extension WinLossConditionTests {
+private extension `Win and Loss Conditions` {
 
     func stateAtExitSquareWithEgg(_ hasEgg: Bool) -> GameState {
         let config = GameConfig.default

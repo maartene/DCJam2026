@@ -13,13 +13,11 @@ import Testing
 // egg room not on Floor 1, not on Floor 5.
 // Error path ratio in this file: 4 of 9 = 44%
 
-@Suite("Floor Navigation and Structure")
-struct FloorNavigationTests {
+@Suite struct `Floor Navigation and Structure` {
 
     // MARK: - Floor generation constraints
 
-    @Test("A new run generates between 3 and 5 floors")
-    func runGeneratesBetweenThreeAndFiveFloors() {
+    @Test func `A new run generates between 3 and 5 floors`() {
         // Given
         let config = GameConfig.default
         // When
@@ -29,8 +27,7 @@ struct FloorNavigationTests {
         #expect(run.floors.count <= 5)
     }
 
-    @Test("Floor 1 contains no egg room")
-    func floorOneHasNoEggRoom() {
+    @Test func `Floor 1 contains no egg room`() {
         // Given
         let config = GameConfig.default
         // When
@@ -39,8 +36,7 @@ struct FloorNavigationTests {
         #expect(floor1.hasEggRoom == false)
     }
 
-    @Test("Exactly one floor in the range 2 through 4 contains an egg room")
-    func exactlyOneEggRoomOnMidFloors() {
+    @Test func `Exactly one floor in the range 2 through 4 contains an egg room`() {
         // Given
         let config = GameConfig.default
         let run = FloorGenerator.generateRun(config: config, seed: 42)
@@ -50,8 +46,7 @@ struct FloorNavigationTests {
         #expect(eggFloors.count == 1)
     }
 
-    @Test("Floor 5 contains the boss encounter and the exit square")
-    func floorFiveHasBossAndExit() {
+    @Test func `Floor 5 contains the boss encounter and the exit square`() {
         // Given — 5-floor run
         let config = GameConfig.withFloorCount(5)
         let run = FloorGenerator.generateRun(config: config, seed: 42)
@@ -62,8 +57,7 @@ struct FloorNavigationTests {
         #expect(floor5.hasExitSquare == true)
     }
 
-    @Test("Floor 5 contains no egg room")
-    func floorFiveHasNoEggRoom() {
+    @Test func `Floor 5 contains no egg room`() {
         // Given
         let config = GameConfig.withFloorCount(5)
         let run = FloorGenerator.generateRun(config: config, seed: 42)
@@ -73,8 +67,7 @@ struct FloorNavigationTests {
         #expect(floor5.hasEggRoom == false)
     }
 
-    @Test("Each floor has a reachable path from entry to staircase with no inescapable dead ends")
-    func everyFloorIsNavigable() {
+    @Test func `Each floor has a reachable path from entry to staircase with no inescapable dead ends`() {
         // Given — generate multiple runs with different seeds
         let config = GameConfig.default
         for seed in [1, 2, 3, 42, 99] {
@@ -89,8 +82,7 @@ struct FloorNavigationTests {
 
     // MARK: - 3-floor minimum run constraints (edge path)
 
-    @Test("In a 3-floor run, the final floor contains the boss encounter and exit")
-    func threeFloorRunFinalFloorHasBossAndExit() {
+    @Test func `In a 3-floor run, the final floor contains the boss encounter and exit`() {
         // Given
         let config = GameConfig.withFloorCount(3)
         let run = FloorGenerator.generateRun(config: config, seed: 42)
@@ -101,8 +93,7 @@ struct FloorNavigationTests {
         #expect(finalFloor.hasExitSquare == true)
     }
 
-    @Test("In a 3-floor run, the egg room is on Floor 2 because Floor 3 is the final floor")
-    func threeFloorRunEggRoomIsOnFloorTwo() {
+    @Test func `In a 3-floor run, the egg room is on Floor 2 because Floor 3 is the final floor`() {
         // Given — 3 floors: Floor 1 = starter, Floor 2 = only regular floor, Floor 3 = boss+exit
         let config = GameConfig.withFloorCount(3)
         let run = FloorGenerator.generateRun(config: config, seed: 42)
@@ -115,8 +106,7 @@ struct FloorNavigationTests {
 
     // MARK: - Floor descent places Ember at next floor entry (integration)
 
-    @Test("Ember is placed at the entry point of the new floor after descending")
-    func descentPlacesEmberAtFloorEntry() {
+    @Test func `Ember is placed at the entry point of the new floor after descending`() {
         // Given
         let config = GameConfig.default
         var state = GameState.initial(config: config)

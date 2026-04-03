@@ -15,13 +15,11 @@ import Testing
 //   B1: All frame art lines are ≤ 58 characters wide (fits in 58-col dungeon view panel)
 // Total tests used: 1 (within budget)
 
-@Suite("DungeonFrameWidth — all frame art fits within 58-column dungeon view")
-struct DungeonFrameWidthTests {
+@Suite struct `DungeonFrameWidth — all frame art fits within 58-column dungeon view` {
 
     private static let maxWidth = 58
 
-    @Test("all frame art lines are at most 58 characters wide")
-    func allFrameLinesAreAtMost58CharsWide() {
+    @Test func `all frame art lines are at most 58 characters wide`() {
         let table = buildFrameTable()
         var violations: [(key: String, lineIndex: Int, width: Int, content: String)] = []
 

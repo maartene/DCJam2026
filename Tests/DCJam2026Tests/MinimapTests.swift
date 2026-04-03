@@ -21,13 +21,11 @@ import Testing
 //   CM-B: Test names describe what Ember sees on the minimap — no ANSI or cursor terms.
 //   CM-C: Tests validate the observable minimap display, not internal rendering state.
 
-@Suite("Turning Mechanic — 2D Minimap Facing Indicator")
-struct MinimapTests {
+@Suite struct `Turning Mechanic — 2D Minimap Facing Indicator` {
 
     // MARK: - US-TM-04: Player facing symbol in minimap panel
 
-    @Test("Minimap shows ^ when Ember faces North")
-    func minimapShowsCaretNorthWhenFacingNorth() {
+    @Test func `Minimap shows ^ when Ember faces North`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
         let state = GameState.initial(config: .default).withFacingDirection(.north)
@@ -38,8 +36,7 @@ struct MinimapTests {
         #expect(allText.contains("^"), "Expected '^' at player cell when facing north, got: \(allText)")
     }
 
-    @Test("Minimap shows > when Ember faces East")
-    func minimapShowsCaretEastWhenFacingEast() {
+    @Test func `Minimap shows > when Ember faces East`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
         let state = GameState.initial(config: .default).withFacingDirection(.east)
@@ -49,8 +46,7 @@ struct MinimapTests {
         #expect(allText.contains(">"), "Expected '>' at player cell when facing east, got: \(allText)")
     }
 
-    @Test("Minimap shows v when Ember faces South")
-    func minimapShowsCaretSouthWhenFacingSouth() {
+    @Test func `Minimap shows v when Ember faces South`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
         let state = GameState.initial(config: .default).withFacingDirection(.south)
@@ -60,8 +56,7 @@ struct MinimapTests {
         #expect(allText.contains("v"), "Expected 'v' at player cell when facing south, got: \(allText)")
     }
 
-    @Test("Minimap shows < when Ember faces West")
-    func minimapShowsCaretWestWhenFacingWest() {
+    @Test func `Minimap shows < when Ember faces West`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
         let state = GameState.initial(config: .default).withFacingDirection(.west)
@@ -73,8 +68,7 @@ struct MinimapTests {
 
     // MARK: - US-TM-04: Player marker overrides landmarks
 
-    @Test("Player marker overrides the encounter landmark when Ember is at the encounter cell")
-    func playerMarkerOverridesEncounterLandmarkOnSameCell() {
+    @Test func `Player marker overrides the encounter landmark when Ember is at the encounter cell`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
         // Encounter is at (7,3); place player there facing north
@@ -88,8 +82,7 @@ struct MinimapTests {
         #expect(allText.contains("^"), "Expected '^' at encounter cell when player is there facing north, got: \(allText)")
     }
 
-    @Test("Player marker overrides the entry landmark when Ember is at the entry cell")
-    func playerMarkerOverridesEntryLandmarkAtStart() {
+    @Test func `Player marker overrides the entry landmark when Ember is at the entry cell`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
         // Entry is at (7,0); player starts there by default
@@ -103,8 +96,7 @@ struct MinimapTests {
 
     // MARK: - US-TM-04: Same-frame update
 
-    @Test("Minimap reflects the new facing on the same rendered frame as a turn command")
-    func minimapUpdatesSameFrameAsTurnCommand() {
+    @Test func `Minimap reflects the new facing on the same rendered frame as a turn command`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
         // Apply turn left (north -> west) and render the resulting state
@@ -119,8 +111,7 @@ struct MinimapTests {
 
     // MARK: - US-TM-04: Panel width constraint
 
-    @Test("Each minimap panel row fits within the 19-column minimap panel width")
-    func minimapRowsFitWithinPanelWidth() {
+    @Test func `Each minimap panel row fits within the 19-column minimap panel width`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
         let state = GameState.initial(config: .default)
@@ -137,8 +128,7 @@ struct MinimapTests {
 
     // MARK: - US-TM-04: Wall/corridor distinction
 
-    @Test("Minimap renders wall cells as # and corridor cells as a non-wall character")
-    func minimapRendersWallAndCorridorDistinctly() {
+    @Test func `Minimap renders wall cells as # and corridor cells as a non-wall character`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
         let state = GameState.initial(config: .default)
@@ -158,8 +148,7 @@ struct MinimapTests {
 
 // MARK: - Landmark symbols in minimap
 
-@Suite("Turning Mechanic — 2D Minimap Landmark Symbols")
-struct MinimapLandmarkTests {
+@Suite struct `Turning Mechanic — 2D Minimap Landmark Symbols` {
 
     // Test Budget: 7 distinct behaviors × 2 = 14 max tests; 7 used.
     //   B1: entry 'E' at (7,0)
@@ -187,24 +176,21 @@ struct MinimapLandmarkTests {
         return spy
     }
 
-    @Test("Minimap shows E at the entry cell (7,0)")
-    func minimapShowsEntrySymbol() {
+    @Test func `Minimap shows E at the entry cell (7,0)`() {
         // Player is north of entry so entry cell is visible (not overridden by player marker)
         let state = GameState.initial(config: .default).withPlayerPosition(Position(x: 7, y: 3))
         let spy = render(state)
         #expect(minimapCharAt(x: 7, y: 0, spy: spy) == "E", "Expected 'E' at entry (7,0)")
     }
 
-    @Test("Minimap shows G at the guard encounter cell on a non-final floor")
-    func minimapShowsGuardSymbol() {
+    @Test func `Minimap shows G at the guard encounter cell on a non-final floor`() {
         // Floor 1, player at entry; encounter is at (7,2) on non-final floor
         let state = GameState.initial(config: .default).withPlayerPosition(Position(x: 7, y: 0))
         let spy = render(state)
         #expect(minimapCharAt(x: 7, y: 2, spy: spy) == "G", "Expected 'G' at encounter (7,2)")
     }
 
-    @Test("Minimap shows B at the boss encounter cell on the final floor")
-    func minimapShowsBossSymbol() {
+    @Test func `Minimap shows B at the boss encounter cell on the final floor`() {
         // Final floor, boss at (7,3); player at entry
         let finalFloor = GameConfig.default.maxFloors
         let state = GameState.initial(config: .default)
@@ -214,8 +200,7 @@ struct MinimapLandmarkTests {
         #expect(minimapCharAt(x: 7, y: 3, spy: spy) == "B", "Expected 'B' at boss encounter (7,3) on final floor")
     }
 
-    @Test("Minimap shows * at the egg room cell before the egg is collected")
-    func minimapShowsEggSymbol() {
+    @Test func `Minimap shows * at the egg room cell before the egg is collected`() {
         // Floor 2 has the egg room at (2,3); player at entry, egg not yet collected
         let state = GameState.initial(config: .default)
             .withCurrentFloor(2)
@@ -224,8 +209,7 @@ struct MinimapLandmarkTests {
         #expect(minimapCharAt(x: 2, y: 3, spy: spy) == "*", "Expected '*' at uncollected egg room (2,3) on floor 2")
     }
 
-    @Test("Minimap shows e at the egg room cell after the egg is collected")
-    func minimapShowsCollectedEggSymbol() {
+    @Test func `Minimap shows e at the egg room cell after the egg is collected`() {
         let state = GameState.initial(config: .default)
             .withCurrentFloor(2)
             .withPlayerPosition(Position(x: 7, y: 0))
@@ -234,15 +218,13 @@ struct MinimapLandmarkTests {
         #expect(minimapCharAt(x: 2, y: 3, spy: spy) == "e", "Expected 'e' at egg room (2,3) after collection")
     }
 
-    @Test("Minimap shows S at the staircase cell on a non-final floor")
-    func minimapShowsStaircaseSymbol() {
+    @Test func `Minimap shows S at the staircase cell on a non-final floor`() {
         let state = GameState.initial(config: .default).withPlayerPosition(Position(x: 7, y: 0))
         let spy = render(state)
         #expect(minimapCharAt(x: 7, y: 6, spy: spy) == "S", "Expected 'S' at staircase (7,6) on non-final floor")
     }
 
-    @Test("Minimap shows X at the exit cell on the final floor")
-    func minimapShowsExitSymbol() {
+    @Test func `Minimap shows X at the exit cell on the final floor`() {
         let finalFloor = GameConfig.default.maxFloors
         let state = GameState.initial(config: .default)
             .withCurrentFloor(finalFloor)
@@ -254,8 +236,7 @@ struct MinimapLandmarkTests {
 
 // MARK: - ADR-006 Screen Layout — Vertical Split
 
-@Suite("Turning Mechanic — Vertical Split Layout (ADR-006)")
-struct VerticalSplitLayoutTests {
+@Suite struct `Turning Mechanic — Vertical Split Layout (ADR-006)` {
 
     // Test Budget: 3 distinct behaviors × 2 = 6 max tests
     //   B1: vertical divider '│' at col 60 for rows 2-16
@@ -280,8 +261,7 @@ struct VerticalSplitLayoutTests {
         return nil
     }
 
-    @Test("Top border has split connector '┬' at column 60")
-    func topBorderHasSplitConnectorAtCol60() {
+    @Test func `Top border has split connector '┬' at column 60`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
         let state = GameState.initial(config: .default)
@@ -290,8 +270,7 @@ struct VerticalSplitLayoutTests {
         #expect(ch == "┬", "Expected '┬' at row 1 col 60 for vertical split, got: \(ch.map(String.init) ?? "nil")")
     }
 
-    @Test("Vertical divider '│' is present at column 60 for all dungeon view rows (2-16)")
-    func verticalDividerPresentInAllDungeonViewRows() {
+    @Test func `Vertical divider '│' is present at column 60 for all dungeon view rows (2-16)`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
         let state = GameState.initial(config: .default)
@@ -302,8 +281,7 @@ struct VerticalSplitLayoutTests {
         }
     }
 
-    @Test("Row 17 separator has bottom T-junction '┴' at column 60")
-    func row17SeparatorHasBottomTJunctionAtCol60() {
+    @Test func `Row 17 separator has bottom T-junction '┴' at column 60`() {
         let spy = TUIOutputSpy()
         let renderer = Renderer(output: spy)
         let state = GameState.initial(config: .default)
