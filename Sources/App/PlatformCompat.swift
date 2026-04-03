@@ -44,6 +44,8 @@ func platformWrite(_ fd: Int32, _ ptr: UnsafeRawPointer, _ count: Int) -> Int {
         return Darwin.write(fd, ptr, count)
     #elseif canImport(Glibc)
         return Glibc.write(fd, ptr, count)
+    #elseif canImport(Musl)
+        return Musl.write(fd, ptr, count)
     #else
         return Foundation.write(fd, ptr, count)
     #endif
