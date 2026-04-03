@@ -1,7 +1,11 @@
 // GameLoop — synchronous 30Hz game loop. No async/await, no DispatchQueue.
 // Pure blocking while loop on the main thread.
 
+#if canImport(Darwin)
 import Darwin
+#elseif canImport(Glibc)
+import Glibc
+#endif
 import GameDomain
 
 final class GameLoop {
@@ -29,10 +33,10 @@ final class GameLoop {
         }
 
         let targetFrameNs: UInt64 = 1_000_000_000 / 30  // ~33.3ms per frame
-        var lastTime = clock_gettime_nsec_np(CLOCK_MONOTONIC)
+        var lastTime = monoTimeNanoseconds()
 
         while true {
-            let now = clock_gettime_nsec_np(CLOCK_MONOTONIC)
+            let now = monoTimeNanoseconds()
             let deltaTime = Double(now - lastTime) / 1_000_000_000.0
             lastTime = now
 
@@ -46,7 +50,7 @@ final class GameLoop {
             renderer.render(state)
 
             // Cap to 30Hz
-            let elapsed = clock_gettime_nsec_np(CLOCK_MONOTONIC) - now
+            let elapsed = monoTimeNanoseconds() - now
             if elapsed < targetFrameNs {
                 usleep(UInt32((targetFrameNs - elapsed) / 1000))
             }
