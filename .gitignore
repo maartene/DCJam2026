@@ -10,3 +10,4 @@ DerivedData/
 .vscode
 .nwave
 dist/
+node_modules/
