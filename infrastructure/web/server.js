@@ -64,6 +64,10 @@ wss.on('connection', (ws) => {
     }
   })
 
+  ws.on('message', (data) => {
+    pty.write(data)
+  })
+
   ws.on('close', () => {
     const session = sessions.get(ws)
     if (session) {
