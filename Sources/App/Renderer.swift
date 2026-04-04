@@ -264,20 +264,20 @@ final class Renderer {
         let clamped = max(0, min(enemyFillCount, Self.enemyHPBarWidth))
         let enemyBar = String(repeating: "█", count: clamped) + String(repeating: "░", count: Self.enemyHPBarWidth - clamped)
         let attackIn = String(format: "%.1f", max(0.0, encounter.enemyAttackTimer))
-        let enemyName = encounter.isBossEncounter ? "DRAGON WARDEN" : "DUNGEON GUARD"
+        let enemyName = encounter.isBossEncounter ? "HEAD WARDEN" : "DUNGEON GUARD"
         let enemyHP = encounter.enemyHP
 
         let art: [String]
         if encounter.isBossEncounter {
             art = [
-                #"              /\___/\"#,
-                #"             /  o o  \"#,
-                #"            / ==^==  \"#,
-                #"           /  \_V_/  \"#,
-                #"   /\     /___/ \___\"#,
-                #"  /  \   /   WARDEN  \"#,
-                #" /    \_/             \"#,
-                #"/______________________\"#,
+                #"            _______"#,
+                #"           /       \"#,
+                #"          | >   <  |"#,
+                #"          |   -    |"#,
+                #"           \_______/"#,
+                #"          /|       |\"#,
+                #"         / |  ###  | \"#,
+                #"        /__|_______|__\"#,
             ]
         } else {
             art = [
@@ -549,7 +549,7 @@ final class Renderer {
         if case .special = state.transientOverlay {
             return ["I breathe deep and let the fire pour out. The air itself ignites."]
         } else if encounter.isBossEncounter {
-            return ["The Dragon Warden. Ancient. Enormous. My fire stirs — I'll need every trick I have."]
+            return ["The Head Warden. The one who ordered my egg stolen. This ends now."]
         } else if state.hp <= 30 {
             return ["I'm wounded and it knows it. I have to time this — brace the next strike, then move."]
         } else if state.dashCharges == 0 {
