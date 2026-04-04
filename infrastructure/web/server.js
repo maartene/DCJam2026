@@ -40,13 +40,23 @@ const sessions = new Map()
 
 const wss = new WebSocketServer({ server, path: '/game' })
 
-wss.on('connection', (ws) => {
+wss.on('connection', (ws, req) => {
+  const { searchParams } = new URL(req.url, 'http://localhost')
+  const cols = parseInt(searchParams.get('cols') ?? '80', 10)
+  const rows = parseInt(searchParams.get('rows') ?? '25', 10)
+
+  if (cols < 80 || rows < 25) {
+    ws.send('Terminal too small. Please resize to at least 80x25.')
+    ws.close()
+    return
+  }
+
   let pty
   try {
     pty = spawn(GAME_BINARY, [], {
       name: 'xterm-256color',
-      cols: 80,
-      rows: 25,
+      cols,
+      rows,
       cwd: process.cwd(),
       env: process.env,
     })
