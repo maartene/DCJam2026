@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ember's Escape</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    #terminal { border: 1px solid #333; }
+  </style>
+</head>
+<body>
+  <div id="terminal"></div>
+  <script>
+    const term = new Terminal({ cursorBlink: true, fontFamily: 'monospace', fontSize: 16 })
+    term.open(document.getElementById('terminal'))
+
+    const ws = new WebSocket(`ws://${location.host}/game`)
+    ws.binaryType = 'arraybuffer'
+
+    ws.addEventListener('open', () => {
+      const dims = { cols: term.cols, rows: term.rows }
+      ws.send(JSON.stringify(dims))
+    })
+
+    ws.addEventListener('message', event => {
+      const data = event.data instanceof ArrayBuffer
+        ? new Uint8Array(event.data)
+        : event.data
+      term.write(data)
+    })
+
+    term.onData(data => {
+      if (ws.readyState === WebSocket.OPEN) ws.send(data)
+    })
+
+    ws.addEventListener('close', () => term.write('\r\n[Connection closed]\r\n'))
+    ws.addEventListener('error', () => term.write('\r\n[WebSocket error]\r\n'))
+  </script>
+</body>
+</html>
