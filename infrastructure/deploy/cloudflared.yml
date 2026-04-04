@@ -1,0 +1,21 @@
+# cloudflared.yml — Cloudflare Tunnel configuration template
+# Persistent tunnel for Ember's Escape judging window
+#
+# Setup:
+#   1. cloudflared tunnel login
+#   2. cloudflared tunnel create embers-escape
+#   3. Replace <tunnel-id> below with the ID from step 2
+#   4. Replace embers-escape.yourdomain.com with your actual hostname
+#   5. Run: cloudflared tunnel run embers-escape
+#      Or configure as a systemd service for persistence during judging.
+#
+# Quick-start (no account needed, 24h URL):
+#   cloudflared tunnel --url http://localhost:3000
+
+tunnel: <tunnel-id>
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  - hostname: embers-escape.yourdomain.com
+    service: http://localhost:3000
+  - service: http_status:404
