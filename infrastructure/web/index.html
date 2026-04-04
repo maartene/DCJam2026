@@ -18,7 +18,8 @@
     const term = new Terminal({ cursorBlink: true, fontFamily: 'monospace', fontSize: 16 })
     term.open(document.getElementById('terminal'))
 
-    const ws = new WebSocket(`ws://${location.host}/game`)
+    const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:'
+    const ws = new WebSocket(`${wsProtocol}//${location.host}/game`)
     ws.binaryType = 'arraybuffer'
 
     ws.addEventListener('open', () => {
