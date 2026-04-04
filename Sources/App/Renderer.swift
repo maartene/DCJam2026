@@ -617,6 +617,7 @@ final class Renderer {
     private func minimapChar(at pos: Position, floor: FloorMap, state: GameState) -> Character {
         if pos == floor.entryPosition2D { return "E" }
         if let enc = floor.encounterPosition2D, pos == enc {
+            if state.clearedEncounterPositions.contains(enc) { return "." }
             return floor.hasBossEncounter ? "B" : "G"
         }
         if let egg = floor.eggRoomPosition2D, pos == egg {
