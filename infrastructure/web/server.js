@@ -58,6 +58,12 @@ wss.on('connection', (ws) => {
 
   sessions.set(ws, pty)
 
+  pty.onData((data) => {
+    if (ws.readyState === ws.OPEN) {
+      ws.send(data)
+    }
+  })
+
   ws.on('close', () => {
     const session = sessions.get(ws)
     if (session) {
