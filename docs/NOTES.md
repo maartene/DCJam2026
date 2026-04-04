@@ -1,12 +1,8 @@
 # NOTES
 
 ## TODO
-- [ ] BUG, Major: After defeating guard, he does not leave
-- [ ] the boss should be a "bigger warden", not a cat. We're cleaning up after the human's mess, so the boss should be a bad a$$ human
-- [ ] polish: legend for minimap (what do the symbols mean?)
 
 ## In progress
-- [ ] Web build???
 
 ## Done
 - [X] Discuss step: polish: 
@@ -20,6 +16,11 @@
     - [X] an overley when dashing that says something like __ZOOM__ (but a better Dragon word) because its difficult to see otherwise. 
     - [X] an overlay when you use the SPECIAL.
 - [X] Discuss: graphics pass: improve dungeon graphics
+- [X] Web build???
+- [X] BUG, Major: After defeating guard, he does not leave
+- [X] the boss should be a "bigger warden", not a cat. We're cleaning up after the human's mess, so the boss should be a bad a$$ human
+- [X] polish: legend for minimap (what do the symbols mean?)
+
 
 
 ## Raspberry PI Runbook
@@ -47,8 +48,7 @@ Step 0 — Verify Swift works natively (do this first)
 
   ---
   Step 1 — Build and run with Docker
-  docker build --platform linux/arm64 -t embers-escape -f
-  infrastructure/deploy/Dockerfile .
+  docker build --platform linux/arm64 -t embers-escape -f infrastructure/deploy/Dockerfile .
   docker compose -f infrastructure/deploy/docker-compose.yml up -d
   curl http://localhost:3000   # should return the HTML page
 
