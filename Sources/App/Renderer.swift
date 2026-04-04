@@ -239,6 +239,30 @@ final class Renderer {
         output.write(floorLabel)
 
         renderMinimap(floor: floor, state: state)
+        drawMinimapLegend()
+    }
+
+    // MARK: - Minimap legend (rows 9-15, cols 61-79)
+
+    /// Renders a 7-entry symbol legend in the right panel below the minimap.
+    /// Only called from renderDungeon — never from combat or other screens.
+    private func drawMinimapLegend() {
+        let entries: [(String, String)] = [
+            (colored("^", code: ansiBoldBrightWhite), " You"),
+            (colored("G", code: ansiBrightRed),       " Guard"),
+            (colored("B", code: ansiBoldBrightRed),   " Boss"),
+            (colored("*", code: ansiBrightYellow),    " Egg"),
+            (colored("S", code: ansiBrightCyan),      " Stairs"),
+            (colored("E", code: ansiDimCyan),         " Entry"),
+            (colored("X", code: ansiBoldBrightCyan),  " Exit"),
+        ]
+        for (i, (symbol, label)) in entries.enumerated() {
+            let row = 9 + i
+            output.moveCursor(row: row, col: 61)
+            output.write(symbol)
+            output.moveCursor(row: row, col: 62)
+            output.write(label)
+        }
     }
 
     // MARK: - Combat view (rows 2-16)
