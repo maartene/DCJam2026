@@ -75,6 +75,22 @@ wss.on('connection', (ws) => {
       sessions.delete(ws)
     }
   })
+
+  ws.on('error', (err) => {
+    console.error('WebSocket error:', err.message)
+    const session = sessions.get(ws)
+    if (session) {
+      session.kill()
+      sessions.delete(ws)
+    }
+  })
+
+  pty.onExit(() => {
+    sessions.delete(ws)
+    if (ws.readyState === ws.OPEN || ws.readyState === ws.CONNECTING) {
+      ws.close()
+    }
+  })
 })
 
 server.listen(PORT, () => {
