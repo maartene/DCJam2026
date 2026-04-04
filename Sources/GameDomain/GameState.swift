@@ -22,6 +22,8 @@ public struct GameState: Sendable {
     public var facingDirection: CardinalDirection
     /// Short-lived HUD overlay driven by a frame countdown; nil when inactive.
     public var transientOverlay: TransientOverlay?
+    /// Positions where an encounter enemy was fully defeated — walking into these skips combat.
+    public var clearedEncounterPositions: Set<Position>
 
     public var specialIsReady: Bool { specialCharge >= 1.0 }
     public var braceWindowActive: Bool { braceWindowTimer > 0 }
@@ -43,7 +45,8 @@ public struct GameState: Sendable {
             braceCooldownTimer: 0.0,
             recentDash: false,
             facingDirection: .north,
-            transientOverlay: nil
+            transientOverlay: nil,
+            clearedEncounterPositions: []
         )
     }
 
@@ -107,5 +110,9 @@ public struct GameState: Sendable {
 
     public func withTransientOverlay(_ overlay: TransientOverlay?) -> GameState {
         var copy = self; copy.transientOverlay = overlay; return copy
+    }
+
+    public func withClearedEncounterPositions(_ positions: Set<Position>) -> GameState {
+        var copy = self; copy.clearedEncounterPositions = positions; return copy
     }
 }

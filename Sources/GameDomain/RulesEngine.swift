@@ -182,7 +182,10 @@ public enum RulesEngine {
         if !floor.hasExitSquare && isAtOrPastStaircase {
             let nextFloor = state.currentFloor + 1
             let nextFloorMap = FloorGenerator.generate(floorNumber: nextFloor, config: state.config)
-            let advanced = state.withCurrentFloor(nextFloor).withPlayerPosition(nextFloorMap.entryPosition)
+            let advanced = state
+                .withCurrentFloor(nextFloor)
+                .withPlayerPosition(nextFloorMap.entryPosition)
+                .withClearedEncounterPositions([])
             // Non-final descent: show upgrade prompt with 3 distinct choices not already taken.
             if nextFloor <= state.config.maxFloors {
                 let pool = UpgradePool(alreadySelected: state.activeUpgrades)
@@ -217,8 +220,10 @@ public enum RulesEngine {
 
         // Step into an encounter.
         if let encounterPos = floor.encounterPosition2D, newPos == encounterPos {
-            let encounter = EncounterModel.guard(isBossEncounter: floor.hasBossEncounter)
-            return state.withPlayerPosition(newPos).withScreenMode(.combat(encounter: encounter))
+            guard state.clearedEncounterPositions.contains(encounterPos) else {
+                let encounter = EncounterModel.guard(isBossEncounter: floor.hasBossEncounter)
+                return state.withPlayerPosition(newPos).withScreenMode(.combat(encounter: encounter))
+            }
         }
 
         return state.withPlayerPosition(newPos)
@@ -270,6 +275,14 @@ public enum RulesEngine {
             .withSpecialCharge(0.0)
             .withTransientOverlay(.special(framesRemaining: TransientOverlay.defaultDuration))
         if encounter.enemyHP <= 0 {
+            let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
+            if let encounterPos = floor.encounterPosition2D {
+                var cleared = next.clearedEncounterPositions
+                cleared.insert(encounterPos)
+                return next
+                    .withClearedEncounterPositions(cleared)
+                    .withScreenMode(.dungeon)
+            }
             return next.withScreenMode(.dungeon)
         }
         return next.withScreenMode(.combat(encounter: encounter))
