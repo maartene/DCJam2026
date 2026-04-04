@@ -102,13 +102,15 @@ import Testing
         let finalFloor = config.maxFloors
         let floor = FloorGenerator.generate(floorNumber: finalFloor, config: config)
         let bossPos = floor.encounterPosition2D!
-        var state = GameState.initial(config: config)
+        // Pre-weaken the boss to 40 HP so one Special (60 damage) defeats it in one hit
+        let weakBoss = EncounterModel(isBossEncounter: true, enemyHP: 40, enemyAttackTimer: GameConfig.default.enemyAttackInterval)
+        let state = GameState.initial(config: config)
             .withCurrentFloor(finalFloor)
-            .withScreenMode(.combat(encounter: EncounterModel.boss()))
+            .withScreenMode(.combat(encounter: weakBoss))
             .withSpecialCharge(1.0)
         let afterDefeat = RulesEngine.apply(command: .special, to: state, deltaTime: 0.0)
         guard case .dungeon = afterDefeat.screenMode else {
-            Issue.record("Expected dungeon mode after boss defeat; boss may need multiple Special hits — adjust test if boss has high HP")
+            Issue.record("Expected dungeon mode after boss defeat")
             return
         }
         // When — minimap renders
@@ -278,13 +280,15 @@ import Testing
         let config = GameConfig.default
         let finalFloor = config.maxFloors
         let floor = FloorGenerator.generate(floorNumber: finalFloor, config: config)
-        var state = GameState.initial(config: config)
+        // Pre-weaken the boss to 40 HP so one Special (60 damage) defeats it in one hit
+        let weakBoss = EncounterModel(isBossEncounter: true, enemyHP: 40, enemyAttackTimer: GameConfig.default.enemyAttackInterval)
+        let state = GameState.initial(config: config)
             .withCurrentFloor(finalFloor)
-            .withScreenMode(.combat(encounter: EncounterModel.boss()))
+            .withScreenMode(.combat(encounter: weakBoss))
             .withSpecialCharge(1.0)
         let afterDefeat = RulesEngine.apply(command: .special, to: state, deltaTime: 0.0)
         guard case .dungeon = afterDefeat.screenMode else {
-            Issue.record("Expected dungeon mode after boss defeat (boss may survive one Special — adjust if needed)")
+            Issue.record("Expected dungeon mode after boss defeat")
             return
         }
         // Position Ember one cell south of boss, facing north
