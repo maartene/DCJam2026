@@ -1,0 +1,38 @@
+{
+  "roadmap": {
+    "project_id": "version-number-start-screen",
+    "created_at": "2026-04-04T00:00:00Z",
+    "total_steps": 1,
+    "feature_description": "Add a version number on the start screen in the lower left corner in major.minor.patch style.",
+    "validation": {
+      "status": "approved",
+      "reviewed_by": "orchestrator",
+      "reviewed_at": "2026-04-04T00:00:00Z"
+    }
+  },
+  "phases": [
+    {
+      "id": "01",
+      "name": "Version Display",
+      "steps": [
+        {
+          "id": "01-01",
+          "step_id": "01-01",
+          "name": "Render version string in lower-left corner of start screen",
+          "criteria": [
+            "AC1: The start screen rendered output contains a string matching the pattern 'v\\d+\\.\\d+\\.\\d+'",
+            "AC2: The version string is written at row 25, col 1 (lower-left corner of a 25-row terminal)",
+            "AC3: The dungeon screen rendered output does NOT contain the version string",
+            "AC4: The version string is defined as a named constant (not a magic string inline)"
+          ],
+          "files_to_modify": [
+            "Sources/App/Renderer.swift",
+            "Sources/App/AppVersion.swift"
+          ],
+          "test_file": "Tests/DCJam2026Tests/StartScreenVersionTests.swift",
+          "scenario_name": "version number displayed in lower-left corner of start screen"
+        }
+      ]
+    }
+  ]
+}
