@@ -1,0 +1,14 @@
+{
+  "name": "dcjam2026-bridge",
+  "version": "1.0.0",
+  "description": "Zero-download deployment bridge server for DCJam2026",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "node-pty": "^1.0.0",
+    "ws": "^8.0.0"
+  }
+}
