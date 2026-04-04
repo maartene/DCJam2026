@@ -157,6 +157,10 @@ final class Renderer {
         output.moveCursor(row: 23, col: promptPad)
         output.write(colored(prompt, code: ansiBrightCyan))
 
+        // Row 25: version (lower-left corner)
+        output.moveCursor(row: 25, col: 1)
+        output.write(colored(AppVersion.current, code: ansiDarkGray))
+
         output.flush()
     }
 
