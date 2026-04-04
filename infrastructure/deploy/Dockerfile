@@ -7,13 +7,15 @@ FROM swift:6.3-jammy AS builder
 
 COPY . /build
 WORKDIR /build
-RUN swift build -c release
+RUN swift build -c release --static-swift-stdlib
 
 # ── Stage 2: Runtime image ────────────────────────────────────────────────────
-FROM arm64v8/node:20-alpine
+# Use jammy (Ubuntu/glibc) — same ABI as swift:6.3-jammy builder stage.
+# Alpine (musl) cannot run glibc-linked Swift binaries.
+FROM node:20-bookworm
 
 # Build tools required for node-pty native compilation via node-gyp
-RUN apk add --no-cache python3 make g++
+RUN apt-get update && apt-get install -y --no-install-recommends g++ && rm -rf /var/lib/apt/lists/*
 
 # Copy compiled Swift binary
 COPY --from=builder /build/.build/release/DCJam2026 /usr/local/bin/DCJam2026
