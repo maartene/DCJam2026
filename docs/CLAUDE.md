@@ -187,3 +187,21 @@ Do not implement:
 - Free movement in combat (only Dash exits encounters)
 - Tutorial text (mechanical state teaches organically)
 - Post-jam expansion features
+
+---
+
+## Mutation Testing Strategy
+
+Mutation testing is **disabled** for the `zero-download-deployment` infrastructure feature. The Node.js WebSocket bridge (`infrastructure/web/server.js`) is transparent byte-pipe infrastructure with no domain logic to mutate. Test quality is validated through port-to-port acceptance tests and manual smoke testing.
+
+For `GameDomain` and `App` Swift targets: no mutation testing strategy is set — default to per-feature if configured in future.
+
+---
+
+## zero-download-deployment Bridge Notes
+
+Terminal size protocol: **query parameters** (`ws://localhost:3000/game?cols=80&rows=25`). Confirmed 2026-04-04.
+
+Bridge server location: `infrastructure/web/server.js`  
+Acceptance tests: `infrastructure/tests/acceptance/steps/bridge.test.js`  
+Deployment config: `infrastructure/deploy/`

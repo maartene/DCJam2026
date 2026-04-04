@@ -1,0 +1,12 @@
+# docker-compose.yml — Ember's Escape local orchestration
+# Usage: docker compose -f infrastructure/deploy/docker-compose.yml up -d
+# Requires: embers-escape:latest image built via Dockerfile
+
+services:
+  embers-escape:
+    image: embers-escape:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"   # localhost only — Cloudflare Tunnel proxies externally
+    environment:
+      - NODE_ENV=production

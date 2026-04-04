@@ -1,0 +1,79 @@
+feature: zero-download-deployment
+persona: judge
+scenario: play-in-browser
+
+steps:
+  - id: receive-url
+    label: Receive submission link
+    actor: judge
+    action: Clicks "Play in browser" link from DCJam 2026 submission page
+    system: Serves static HTML page with xterm.js and WebSocket client
+    emotion: neutral
+    expected_output: Page loads in < 3s
+    failure_modes:
+      - Link is dead (404)
+      - Static host unreachable
+
+  - id: terminal-init
+    label: Terminal initialises
+    actor: judge
+    action: Waits for connection
+    system: >
+      WebSocket connects to server on ws(s)://host/game;
+      server spawns Swift game process;
+      start screen ANSI output piped to WebSocket;
+      xterm.js renders start screen
+    emotion: curious
+    expected_output: Full 80×25 start screen within 2s of page load
+    shared_artifacts:
+      - name: WebSocket URL
+        format: wss://host/game
+      - name: xterm.js terminal div
+        format: HTML element, 80 cols × 25 rows
+    failure_modes:
+      - WebSocket refused (server down)
+      - Game process fails to spawn
+      - Terminal renders blank or garbled
+
+  - id: play
+    label: Play the game
+    actor: judge
+    action: Presses WASD / number keys
+    system: >
+      keydown event → WebSocket send (1 byte) → server reads → GameCommand →
+      RulesEngine.tick → Renderer.render → ANSI frame → WebSocket send → xterm.js render
+    emotion: engaged
+    expected_output: < 100ms perceived latency; all screens (dungeon, combat, overlays) functional
+    failure_modes:
+      - Key input not reaching server
+      - ANSI corruption in xterm.js (encoding issue)
+      - Game crash (unhandled state)
+
+  - id: session-end
+    label: Session ends
+    actor: judge
+    action: Wins, dies, or closes tab
+    system: >
+      WebSocket closes; server-side process exits cleanly;
+      server ready to accept next connection
+    emotion: satisfied
+    expected_output: Clean teardown; re-open URL starts fresh game
+    failure_modes:
+      - Zombie Swift processes accumulate
+      - Server OOMs after multiple sessions
+
+emotional_arc:
+  - step: receive-url
+    emotion: skeptical
+  - step: terminal-init
+    emotion: curious
+  - step: play
+    emotion: engaged
+  - step: session-end
+    emotion: satisfied
+
+target_latency_ms: 100
+terminal_size: "80x25"
+transport: WebSocket
+rendering: xterm.js
+server_runtime: native Swift (unchanged executable)

@@ -1,0 +1,24 @@
+# Swift build artifacts
+.build/
+
+# Git
+.git/
+.gitignore
+
+# Node
+infrastructure/web/node_modules/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# nWave / docs (not needed for build)
+.nwave/
+docs/
+*.md
+
+# Tests (not needed in image)
+infrastructure/tests/
+
+# Claude
+.claude/
