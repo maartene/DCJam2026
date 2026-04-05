@@ -1,10 +1,10 @@
 # NOTES
 
 ## TODO
-- [ ] Refactor test helpers (to inspect the minimap)
 - [ ] (Mikado) Remove unused FloorGenerator
 
 ## In progress
+- [ ] Refactor test helpers (to inspect the minimap)
 
 ## Done
 - [X] Discuss step: polish: 

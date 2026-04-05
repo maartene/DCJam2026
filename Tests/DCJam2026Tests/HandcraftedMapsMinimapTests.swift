@@ -48,23 +48,6 @@ private func renderDungeon(floor floorNum: Int, playerAt pos: Position? = nil) -
     return spy
 }
 
-private func stripANSI(_ s: String) -> String {
-    var result = ""
-    var i = s.startIndex
-    while i < s.endIndex {
-        if s[i] == "\u{1B}", s.index(after: i) < s.endIndex, s[s.index(after: i)] == "[" {
-            var j = s.index(after: s.index(after: i))
-            while j < s.endIndex && s[j] != "m" { j = s.index(after: j) }
-            if j < s.endIndex { j = s.index(after: j) }
-            i = j
-        } else {
-            result.append(s[i])
-            i = s.index(after: i)
-        }
-    }
-    return result
-}
-
 // ============================================================
 // Suite 1: Minimap row origin after floor label relocation
 // ============================================================

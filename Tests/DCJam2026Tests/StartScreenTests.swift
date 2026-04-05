@@ -80,24 +80,3 @@ import Testing
     }
 }
 
-// MARK: - Helpers
-
-private func stripANSI(_ s: String) -> String {
-    var result = ""
-    var i = s.startIndex
-    while i < s.endIndex {
-        if s[i] == "\u{1B}", s.index(after: i) < s.endIndex, s[s.index(after: i)] == "[" {
-            // Skip until a letter terminates the sequence
-            i = s.index(after: i) // skip ESC
-            i = s.index(after: i) // skip [
-            while i < s.endIndex && !s[i].isLetter {
-                i = s.index(after: i)
-            }
-            if i < s.endIndex { i = s.index(after: i) } // skip terminating letter
-        } else {
-            result.append(s[i])
-            i = s.index(after: i)
-        }
-    }
-    return result
-}

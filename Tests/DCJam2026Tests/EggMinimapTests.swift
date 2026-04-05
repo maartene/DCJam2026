@@ -25,16 +25,10 @@ import Testing
             .withPlayerPosition(Position(x: 7, y: 0))
             .withHasEgg(false)
             .withScreenMode(.dungeon)
-        let spy = TUIOutputSpy()
-        Renderer(output: spy).render(state)
-
-        let targetRow = 3 + (6 - eggPos.y)
-        let targetCol = 61 + eggPos.x
-        let cellWrites = spy.entries.filter { $0.row == targetRow && $0.col == targetCol }
-        let allText = cellWrites.map(\.string).joined()
-        let stripped = stripANSI(allText)
-
-        #expect(stripped.contains("*"), "Egg room must show '*' before collection, got: \(stripped)")
+        let spy = render(state)
+        let ch = minimapChar(x: eggPos.x, y: eggPos.y, spy: spy)
+        #expect(ch == "*", "Egg room must show '*' before collection, got: \(ch.map(String.init) ?? "nil")")
+        let stripped = stripANSI(minimapContent(x: eggPos.x, y: eggPos.y, spy: spy))
         #expect(!stripped.contains("e"), "Egg room must NOT show 'e' before collection (AC3), got: \(stripped)")
     }
 
@@ -45,16 +39,10 @@ import Testing
             .withPlayerPosition(Position(x: 7, y: 0))
             .withHasEgg(true)
             .withScreenMode(.dungeon)
-        let spy = TUIOutputSpy()
-        Renderer(output: spy).render(state)
-
-        let targetRow = 3 + (6 - eggPos.y)
-        let targetCol = 61 + eggPos.x
-        let cellWrites = spy.entries.filter { $0.row == targetRow && $0.col == targetCol }
-        let allText = cellWrites.map(\.string).joined()
-        let stripped = stripANSI(allText)
-
-        #expect(stripped.contains("."), "Egg room must show '.' after collection, got: \(stripped)")
+        let spy = render(state)
+        let ch = minimapChar(x: eggPos.x, y: eggPos.y, spy: spy)
+        #expect(ch == ".", "Egg room must show '.' after collection, got: \(ch.map(String.init) ?? "nil")")
+        let stripped = stripANSI(minimapContent(x: eggPos.x, y: eggPos.y, spy: spy))
         #expect(!stripped.contains("e"), "Egg room must NOT show 'e' in either state (AC3), got: \(stripped)")
     }
 
@@ -74,35 +62,10 @@ import Testing
         ]
 
         for (label, state) in states {
-            let spy = TUIOutputSpy()
-            Renderer(output: spy).render(state)
-
-            let targetRow = 3 + (6 - eggPos.y)
-            let targetCol = 61 + eggPos.x
-            let cellWrites = spy.entries.filter { $0.row == targetRow && $0.col == targetCol }
-            let allText = cellWrites.map(\.string).joined()
-            let stripped = stripANSI(allText)
-
+            let spy = render(state)
+            let stripped = stripANSI(minimapContent(x: eggPos.x, y: eggPos.y, spy: spy))
             #expect(!stripped.contains("e"), "Egg room must never show 'e' (\(label) state), got: \(stripped)")
         }
     }
 }
 
-// MARK: - Shared test helpers
-
-private func stripANSI(_ s: String) -> String {
-    var result = ""
-    var i = s.startIndex
-    while i < s.endIndex {
-        if s[i] == "\u{1B}", s.index(after: i) < s.endIndex, s[s.index(after: i)] == "[" {
-            var j = s.index(after: s.index(after: i))
-            while j < s.endIndex && s[j] != "m" { j = s.index(after: j) }
-            if j < s.endIndex { j = s.index(after: j) }
-            i = j
-        } else {
-            result.append(s[i])
-            i = s.index(after: i)
-        }
-    }
-    return result
-}

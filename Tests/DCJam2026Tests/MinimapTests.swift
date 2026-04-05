@@ -129,44 +129,12 @@ import Testing
 
     // Test Budget: 7 distinct behaviors x 2 = 14 max tests; 7 used.
 
-    private func minimapCharAt(x: Int, y: Int, spy: TUIOutputSpy) -> Character? {
-        let targetRow = 3 + (6 - y)
-        let targetCol = 61 + x
-        guard let entry = spy.entries.first(where: { $0.row == targetRow && $0.col == targetCol }) else {
-            return nil
-        }
-        return stripANSI(entry.string).first
-    }
-
-    private func stripANSI(_ s: String) -> String {
-        var result = ""
-        var i = s.startIndex
-        while i < s.endIndex {
-            if s[i] == "\u{1B}", s.index(after: i) < s.endIndex, s[s.index(after: i)] == "[" {
-                var j = s.index(after: s.index(after: i))
-                while j < s.endIndex && s[j] != "m" { j = s.index(after: j) }
-                if j < s.endIndex { j = s.index(after: j) }
-                i = j
-            } else {
-                result.append(s[i])
-                i = s.index(after: i)
-            }
-        }
-        return result
-    }
-
-    private func render(_ state: GameState) -> TUIOutputSpy {
-        let spy = TUIOutputSpy()
-        Renderer(output: spy).render(state)
-        return spy
-    }
-
     @Test func `Minimap shows E at the entry cell (7,0)`() {
         let state = GameState.initial(config: .default)
             .withPlayerPosition(Position(x: 7, y: 3))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        #expect(minimapCharAt(x: 7, y: 0, spy: spy) == "E", "Expected 'E' at entry (7,0)")
+        #expect(minimapChar(x: 7, y: 0, spy: spy) == "E", "Expected 'E' at entry (7,0)")
     }
 
     @Test func `Minimap shows G at the guard encounter cell on a non-final floor`() {
@@ -174,7 +142,7 @@ import Testing
             .withPlayerPosition(Position(x: 7, y: 0))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        #expect(minimapCharAt(x: 7, y: 2, spy: spy) == "G", "Expected 'G' at encounter (7,2)")
+        #expect(minimapChar(x: 7, y: 2, spy: spy) == "G", "Expected 'G' at encounter (7,2)")
     }
 
     @Test func `Minimap shows B at the boss encounter cell on the final floor`() {
@@ -184,7 +152,7 @@ import Testing
             .withPlayerPosition(Position(x: 9, y: 0))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        #expect(minimapCharAt(x: 9, y: 3, spy: spy) == "B", "Expected 'B' at boss encounter (7,3) on final floor")
+        #expect(minimapChar(x: 9, y: 3, spy: spy) == "B", "Expected 'B' at boss encounter (7,3) on final floor")
     }
 
     @Test func `Minimap shows * at the egg room cell before the egg is collected`() {
@@ -193,7 +161,7 @@ import Testing
             .withPlayerPosition(Position(x: 7, y: 0))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        #expect(minimapCharAt(x: 2, y: 1, spy: spy) == "*", "Expected '*' at uncollected egg room (2,3) on floor 2")
+        #expect(minimapChar(x: 2, y: 1, spy: spy) == "*", "Expected '*' at uncollected egg room (2,3) on floor 2")
     }
 
     @Test func `Minimap shows dot at the egg room cell after the egg is collected`() {
@@ -203,7 +171,7 @@ import Testing
             .withHasEgg(true)
             .withScreenMode(.dungeon)
         let spy = render(state)
-        #expect(minimapCharAt(x: 2, y: 3, spy: spy) == ".", "Expected '.' at egg room (2,3) after collection")
+        #expect(minimapChar(x: 2, y: 3, spy: spy) == ".", "Expected '.' at egg room (2,3) after collection")
     }
 
     @Test func `Minimap shows S at the staircase cell on a non-final floor`() {
@@ -211,7 +179,7 @@ import Testing
             .withPlayerPosition(Position(x: 7, y: 0))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        #expect(minimapCharAt(x: 7, y: 6, spy: spy) == "S", "Expected 'S' at staircase (7,6) on non-final floor")
+        #expect(minimapChar(x: 7, y: 6, spy: spy) == "S", "Expected 'S' at staircase (7,6) on non-final floor")
     }
 
     @Test func `Minimap shows X at the exit cell on the final floor`() {
@@ -221,7 +189,7 @@ import Testing
             .withPlayerPosition(Position(x: 9, y: 0))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        #expect(minimapCharAt(x: 9, y: 6, spy: spy) == "X", "Expected 'X' at exit (9,6) on final floor")
+        #expect(minimapChar(x: 9, y: 6, spy: spy) == "X", "Expected 'X' at exit (9,6) on final floor")
     }
 }
 

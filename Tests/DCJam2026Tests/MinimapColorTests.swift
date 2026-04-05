@@ -36,24 +36,6 @@ import Testing
     private let dimCyan      = "\u{1B}[36m"
     private let darkGray     = "\u{1B}[90m"
 
-    // Returns the concatenated write string(s) for a specific minimap cell.
-    // With per-cell writes, each cell (x, y) is written at col = 61 + x, row = 3 + (gridHeight-1 - y).
-    // gridHeight for default floor = 7.
-    private func cellContent(x: Int, y: Int, spy: TUIOutputSpy, gridHeight: Int = 7) -> String {
-        let targetRow = 3 + (gridHeight - 1 - y)
-        let targetCol = 61 + x
-        return spy.entries
-            .filter { $0.row == targetRow && $0.col == targetCol }
-            .map(\.string)
-            .joined()
-    }
-
-    private func render(_ state: GameState) -> TUIOutputSpy {
-        let spy = TUIOutputSpy()
-        Renderer(output: spy).render(state)
-        return spy
-    }
-
     // B1: Player facing north (^) — bold bright white + reset
     @Test func `Player facing north uses bold bright white with ANSI reset`() {
         let state = GameState.initial(config: .default)
@@ -61,7 +43,7 @@ import Testing
             .withScreenMode(.dungeon)
         // Player at (7,0): col = 61+7 = 68, row = 2+(6-0) = 8
         let spy = render(state)
-        let content = cellContent(x: 7, y: 0, spy: spy)
+        let content = minimapContent(x: 7, y: 0, spy: spy)
         #expect(content.contains(boldBrightWhite), "Expected bold bright white for '^', got: \(content)")
         #expect(content.contains("^"), "Expected '^' character, got: \(content)")
         #expect(content.contains(ansiReset), "Expected ANSI reset after '^', got: \(content)")
@@ -74,7 +56,7 @@ import Testing
             .withPlayerPosition(Position(x: 7, y: 0))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        let content = cellContent(x: 7, y: 2, spy: spy)
+        let content = minimapContent(x: 7, y: 2, spy: spy)
         #expect(content.contains(brightRed), "Expected bright red for 'G', got: \(content)")
         #expect(content.contains("G"), "Expected 'G' character, got: \(content)")
         #expect(content.contains(ansiReset), "Expected ANSI reset after 'G', got: \(content)")
@@ -88,7 +70,7 @@ import Testing
             .withPlayerPosition(Position(x: 9, y: 0))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        let content = cellContent(x: 9, y: 3, spy: spy)
+        let content = minimapContent(x: 9, y: 3, spy: spy)
         #expect(content.contains(boldBrightRed), "Expected bold bright red for 'B', got: \(content)")
         #expect(content.contains("B"), "Expected 'B' character, got: \(content)")
         #expect(content.contains(ansiReset), "Expected ANSI reset after 'B', got: \(content)")
@@ -102,7 +84,7 @@ import Testing
             .withPlayerPosition(Position(x: 7, y: 0))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        let content = cellContent(x: 2, y: 1, spy: spy)
+        let content = minimapContent(x: 2, y: 1, spy: spy)
         #expect(content.contains(brightYellow), "Expected bright yellow for '*', got: \(content)")
         #expect(content.contains("*"), "Expected '*' character, got: \(content)")
         #expect(content.contains(ansiReset), "Expected ANSI reset after '*', got: \(content)")
@@ -116,7 +98,7 @@ import Testing
             .withHasEgg(true)
             .withScreenMode(.dungeon)
         let spy = render(state)
-        let content = cellContent(x: 2, y: 3, spy: spy)
+        let content = minimapContent(x: 2, y: 3, spy: spy)
         #expect(content == ".", "Expected bare '.' with no color for collected egg cell, got: \(content)")
     }
 
@@ -126,7 +108,7 @@ import Testing
             .withPlayerPosition(Position(x: 7, y: 0))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        let content = cellContent(x: 7, y: 6, spy: spy)
+        let content = minimapContent(x: 7, y: 6, spy: spy)
         #expect(content.contains(brightCyan), "Expected bright cyan for 'S', got: \(content)")
         #expect(content.contains("S"), "Expected 'S' character, got: \(content)")
         #expect(content.contains(ansiReset), "Expected ANSI reset after 'S', got: \(content)")
@@ -140,7 +122,7 @@ import Testing
             .withPlayerPosition(Position(x: 9, y: 0))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        let content = cellContent(x: 9, y: 6, spy: spy)
+        let content = minimapContent(x: 9, y: 6, spy: spy)
         #expect(content.contains(boldBrightCyan), "Expected bold bright cyan for 'X', got: \(content)")
         #expect(content.contains("X"), "Expected 'X' character, got: \(content)")
         #expect(content.contains(ansiReset), "Expected ANSI reset after 'X', got: \(content)")
@@ -153,7 +135,7 @@ import Testing
             .withPlayerPosition(Position(x: 7, y: 3))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        let content = cellContent(x: 7, y: 0, spy: spy)
+        let content = minimapContent(x: 7, y: 0, spy: spy)
         #expect(content.contains(dimCyan), "Expected dim cyan for 'E', got: \(content)")
         #expect(content.contains("E"), "Expected 'E' character, got: \(content)")
         #expect(content.contains(ansiReset), "Expected ANSI reset after 'E', got: \(content)")
@@ -166,7 +148,7 @@ import Testing
             .withPlayerPosition(Position(x: 7, y: 0))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        let content = cellContent(x: 0, y: 0, spy: spy)
+        let content = minimapContent(x: 0, y: 0, spy: spy)
         #expect(content.contains(darkGray), "Expected dark gray for '#', got: \(content)")
         #expect(content.contains("#"), "Expected '#' character, got: \(content)")
         #expect(content.contains(ansiReset), "Expected ANSI reset after '#', got: \(content)")
@@ -179,7 +161,7 @@ import Testing
             .withPlayerPosition(Position(x: 7, y: 0))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        let content = cellContent(x: 7, y: 1, spy: spy)
+        let content = minimapContent(x: 7, y: 1, spy: spy)
         #expect(content == ".", "Expected bare '.' with no color for passable cell, got: \(content)")
     }
 }
