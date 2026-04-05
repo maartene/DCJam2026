@@ -170,7 +170,7 @@ public enum RulesEngine {
 
         // Clear the post-dash feedback on the first step after a dash.
         let state = state.withRecentDash(false)
-        let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
+        let floor = FloorRegistry.floor(state.currentFloor, config: state.config)
 
         let moveDelta = delta(facing: state.facingDirection, direction: direction)
         let newPos = Position(x: state.playerPosition.x + moveDelta.dx, y: state.playerPosition.y + moveDelta.dy)
@@ -181,7 +181,7 @@ public enum RulesEngine {
             || (state.playerPosition == floor.staircasePosition2D && direction == .forward)
         if !floor.hasExitSquare && isAtOrPastStaircase {
             let nextFloor = state.currentFloor + 1
-            let nextFloorMap = FloorGenerator.generate(floorNumber: nextFloor, config: state.config)
+            let nextFloorMap = FloorRegistry.floor(nextFloor, config: state.config)
             let advanced = state
                 .withCurrentFloor(nextFloor)
                 .withPlayerPosition(nextFloorMap.entryPosition)
@@ -275,7 +275,7 @@ public enum RulesEngine {
             .withSpecialCharge(0.0)
             .withTransientOverlay(.special(framesRemaining: TransientOverlay.defaultDuration))
         if encounter.enemyHP <= 0 {
-            let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
+            let floor = FloorRegistry.floor(state.currentFloor, config: state.config)
             if let encounterPos = floor.encounterPosition2D {
                 var cleared = next.clearedEncounterPositions
                 cleared.insert(encounterPos)
