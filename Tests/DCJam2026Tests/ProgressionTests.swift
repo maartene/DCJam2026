@@ -23,7 +23,7 @@ import Testing
         state = state.withHasEgg(false)
         let floor2 = FloorRegistry.floor(2, config: GameConfig.default)
         state = state.withPlayerPosition(adjacentToEggRoom(floor2))
-            .withFacingDirection(.south)
+            .withFacingDirection(.north)
         // When — step into egg room
         let result = RulesEngine.apply(command: .move(.forward), to: state, deltaTime: 0.0)
         // Then
