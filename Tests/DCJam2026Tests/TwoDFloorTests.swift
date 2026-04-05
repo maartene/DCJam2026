@@ -158,14 +158,14 @@ import Testing
 
     // MARK: - US-TM-03: 2D floor grid structure
 
-    @Test func `Generated floor has the correct 15-wide by 7-tall grid dimensions`() {
-        let floor = FloorGenerator.generate(floorNumber: 1, config: .default)
+    @Test func `Floor 1 served by FloorRegistry has the correct 15-wide by 7-tall grid dimensions`() {
+        let floor = FloorRegistry.floor(1, config: .default)
         #expect(floor.grid.width == 15)
         #expect(floor.grid.height == 7)
     }
 
     @Test func `Main corridor cells at x=7 are passable and off-corridor cells at y=0 are walls`() {
-        let floor = FloorGenerator.generate(floorNumber: 1, config: .default)
+        let floor = FloorRegistry.floor(1, config: .default)
         // All cells at x=7 (main corridor) are passable
         for y in 0..<7 {
             #expect(floor.grid.cell(x: 7, y: y).isPassable, "cell (7,\(y)) should be passable")
@@ -177,7 +177,7 @@ import Testing
     }
 
     @Test func `Branch corridor cells at y=3 from x=2 to x=7 are passable`() {
-        let floor = FloorGenerator.generate(floorNumber: 1, config: .default)
+        let floor = FloorRegistry.floor(1, config: .default)
         for x in 2...7 {
             #expect(floor.grid.cell(x: x, y: 3).isPassable, "cell (\(x),3) should be passable")
         }
@@ -188,7 +188,7 @@ import Testing
     }
 
     @Test func `Landmark positions match the L-shaped corridor topology`() {
-        let floor = FloorGenerator.generate(floorNumber: 1, config: .default)
+        let floor = FloorRegistry.floor(1, config: .default)
         #expect(floor.entryPosition2D == Position(x: 7, y: 0))
         #expect(floor.staircasePosition2D == Position(x: 7, y: 6))
         #expect(floor.encounterPosition2D == Position(x: 7, y: 2))
