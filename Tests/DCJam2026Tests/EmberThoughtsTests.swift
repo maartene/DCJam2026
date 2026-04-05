@@ -29,7 +29,17 @@ import Testing
         let state = GameState.initial(config: .default)
             .withScreenMode(.dungeon)
             .withHasEgg(true)
-        #expect(EmberThoughts.thought(for: state).contains("LAST DRAGON EGG"))
+        #expect(EmberThoughts.thought(for: state).contains("way out"))
+    }
+
+    @Test func `dungeon at staircase without egg shows refusal thought`() {
+        let config = GameConfig.default
+        let floor = FloorRegistry.floor(2, config: config)
+        let state = GameState.initial(config: config)
+            .withScreenMode(.dungeon)
+            .withCurrentFloor(2)
+            .withPlayerPosition(floor.staircasePosition2D)
+        #expect(EmberThoughts.thought(for: state).contains("won't leave without it"))
     }
 
     @Test func `dungeon deeper floor thought`() {
