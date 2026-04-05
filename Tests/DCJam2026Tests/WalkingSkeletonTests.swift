@@ -185,7 +185,7 @@ private extension `Walking Skeleton — Core Loop` {
     }
 
     func stateAtStaircase(_ state: GameState) -> GameState {
-        let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: GameConfig.default)
+        let floor = FloorRegistry.floor(state.currentFloor, config: GameConfig.default)
         return state.withPlayerPosition(floor.staircasePosition)
     }
 
