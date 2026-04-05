@@ -73,7 +73,7 @@ import Testing
         let result = RulesEngine.apply(command: .move(.forward), to: state, deltaTime: 0.0)
         // Then — egg not found (this depends on floor layout; just verify no spurious activation)
         // Accept if the result has no egg (hasEgg still false unless actually entered egg room)
-        // This test is meaningful only in integration with real FloorGenerator output
+        // This test is meaningful only in integration with real FloorRegistry output
         if result.hasEgg {
             // Only valid if player actually stepped into the egg room
             if case .narrativeOverlay(let event) = result.screenMode, event == .eggDiscovery {

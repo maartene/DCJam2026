@@ -23,7 +23,7 @@ import Testing
 //   B8: farRight opening (right of 1-step-ahead is passable)
 // Total tests used: 8 (within budget)
 
-// Grid used in tests (standard L-shaped corridor from FloorGenerator):
+// Grid used in tests (standard L-shaped corridor from FloorRegistry):
 //   Main corridor: x=7, y=0..6 (passable)
 //   Branch corridor: y=3, x=2..7 (passable)
 //   All other cells: wall (not passable)

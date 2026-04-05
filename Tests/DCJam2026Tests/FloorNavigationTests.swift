@@ -9,7 +9,7 @@ import Testing
 // staircase descent allowed on non-egg floors.
 //
 // Tests now drive through FloorRegistry (handcrafted maps) — the sole source of
-// floor maps after FloorGenerator was removed (Mikado: remove-floor-generator).
+// floor maps.
 //
 // Error / edge paths: 3 of 6 = 50%
 

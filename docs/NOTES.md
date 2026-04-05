@@ -1,10 +1,9 @@
 # NOTES
 
 ## TODO
-- [ ] (Mikado) Remove unused FloorGenerator
 
 ## In progress
-- [ ] Refactor test helpers (to inspect the minimap)
+- [ ] (Mikado) Remove unused FloorGenerator
 
 ## Done
 - [X] Discuss step: polish: 
@@ -28,3 +27,4 @@
 - [X] Bug: dash always move you in the north direction, should be in the facing direction
 - [X] Softlock: try and leave without the egg. Bad ending?
 - [X] Egg and Exit visual are not centered
+- [X] Refactor test helpers (to inspect the minimap)

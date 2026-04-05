@@ -15,18 +15,18 @@
 //   rows[0] in the character grid = northernmost row = y = height - 1.
 //   rows[height-1] in the grid = southernmost row = y = 0.
 //
-// Floor 1 character grid (north at top, from FloorGenerator source):
+// Floor 1 character grid (north at top, from FloorRegistry source):
 //   line 0  "######S########"   y=6 — staircase at col 7 (northernmost row)
 //   line 1  "######.########"   y=5
 //   line 2  "######.########"   y=4
 //   line 3  "##.....G.######"   y=3 — guard at col 7, branch x=2..7 (NOTE: no * on floor 1)
-//   line 4  "######.########"   y=2 — encounter at col 7 per FloorGenerator (y=2)
-//   line 5  "######^########"   y=1 — entry at col 7 (DISCUSS says y=1; FloorGenerator uses y=0)
-//   line 6  "###############"   y=0 — south wall (entry is at y=0 per FloorGenerator)
+//   line 4  "######.########"   y=2 — encounter at col 7 per FloorRegistry (y=2)
+//   line 5  "######^########"   y=1 — entry at col 7 (DISCUSS says y=1; FloorRegistry uses y=0)
+//   line 6  "###############"   y=0 — south wall (entry is at y=0 per FloorRegistry)
 //
-// FloorGenerator authoritative positions: entry=(7,0), staircase=(7,6), encounter=(7,2),
+// FloorRegistry authoritative positions: entry=(7,0), staircase=(7,6), encounter=(7,2),
 //   branch: y=3 && x in 2..7. The cell-for-cell comparison (WS-06) is the regression gate.
-// Characters in visual grid are illustrative; exact layout is authoritative from FloorGenerator.
+// Characters in visual grid are illustrative; exact layout is authoritative from FloorRegistry.
 //
 // Mandate compliance:
 //   CM-A: Tests invoke FloorRegistry.floor(_:config:) — public driving port only.
@@ -341,7 +341,7 @@ import Testing
 
     @Test func `Ember can move along the branch corridor on floor 1`() {
         // Given — Ember at (4, 3) facing west — cell (3, 3) is on the branch (passable)
-        // Branch: y=3, x=2..7 are all passable (FloorGenerator: isBranchCorridor = y==3 && x>=2 && x<=7)
+        // Branch: y=3, x=2..7 are all passable (FloorRegistry: isBranchCorridor = y==3 && x>=2 && x<=7)
         let startState = GameState.initial(config: .default)
             .withPlayerPosition(Position(x: 4, y: 3))
             .withFacingDirection(.west)

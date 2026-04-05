@@ -14,7 +14,7 @@ import Testing
 
 @Suite struct `Egg cell disappears from minimap after Ember picks up the egg` {
 
-    // Floor 2 has an egg room at position (2, 3) per FloorGenerator
+    // Floor 2 has an egg room at position (2, 3) per FloorRegistry
     private let eggFloor = 2
     private let eggPos = Position(x: 2, y: 1)
 

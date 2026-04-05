@@ -8,7 +8,7 @@ import Testing
 //   reaches stairs → descends → can die when HP reaches 0.
 //
 // Mandate compliance:
-//   CM-A: All tests invoke GameDomain (driving port) directly — GameState, RulesEngine, FloorGenerator.
+//   CM-A: All tests invoke GameDomain (driving port) directly — GameState, RulesEngine
 //   CM-B: Test names and comments use game domain terms only (Ember, Dash, Floor, egg).
 //   CM-C: Each test validates an observable player outcome, not an internal side effect.
 

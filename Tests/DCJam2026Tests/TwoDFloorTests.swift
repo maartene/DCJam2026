@@ -3,7 +3,7 @@ import Testing
 
 // 2D Floor Tests — US-TM-03 (2D floor model and facing-relative movement)
 //
-// Driving port: RulesEngine.apply(command:to:deltaTime:) and FloorGenerator.generate(floorNumber:config:).
+// Driving port: RulesEngine.apply(command:to:deltaTime:) and FloorRegistry.floor(_:config:).
 //
 // All tests start as .disabled("not yet implemented"). Empty bodies ensure compilation succeeds
 // until the crafter adds the required types. Enable one test at a time during DELIVER.
@@ -14,7 +14,7 @@ import Testing
 //   Origin south-west; y northward; x eastward.
 //
 // Mandate compliance:
-//   CM-A: Tests drive through RulesEngine or FloorGenerator (domain driving ports).
+//   CM-A: Tests drive through RulesEngine or FloorRegistry (domain driving ports).
 //   CM-B: Test names use spatial/navigational terms — no SQL, HTTP, or framework jargon.
 //   CM-C: Each test validates an observable positional outcome for Ember.
 

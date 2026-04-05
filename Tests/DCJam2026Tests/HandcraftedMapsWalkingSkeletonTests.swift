@@ -5,7 +5,7 @@
 //
 // The thinnest end-to-end slice with observable user value:
 //   FloorRegistry.floor(1, config:) returns a FloorMap that is cell-for-cell
-//   identical to the current FloorGenerator output. All existing gameplay tests
+//   identical to the current FloorRegistry output. All existing gameplay tests
 //   continue to pass unchanged. The player sees no visible change on floor 1.
 //
 // This is the hard gate before any new floor topologies are authored (DEC-DESIGN-07).

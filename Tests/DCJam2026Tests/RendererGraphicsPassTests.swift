@@ -200,7 +200,7 @@ private func makeDepthState(depth: Int) -> GameState {
     // We use initial GameState but override playerPosition to engineer the depth.
     var state = GameState.initial(config: .default).withScreenMode(.dungeon)
     // depth=0 → player at position that creates depth-0 key.
-    // From FloorGenerator, staircase is at y=6; walls are beyond that.
+    // From FloorRegistry, staircase is at y=6; walls are beyond that.
     // Player at y=6 facing north = wall 1 step ahead = depth 0.
     // Player at y=5 facing north = 1 open cell ahead = depth 1.
     // Player at y=4 facing north = 2 open cells ahead = depth 2/3.

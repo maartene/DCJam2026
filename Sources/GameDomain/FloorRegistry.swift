@@ -126,7 +126,7 @@ public enum FloorRegistry {
 
     // MARK: - Floor definitions
 
-    /// Floor 1: L-shaped corridor — 15×7, identical topology to FloorGenerator output.
+    /// Floor 1: L-shaped corridor — 15×7, identical topology to original procedural output.
     /// North = top (line 0 = y=6), south = bottom (line 6 = y=0).
     /// Main corridor: x=7 for all y=0..6.
     /// Branch corridor: y=3, x=2..7.
@@ -164,7 +164,7 @@ public enum FloorRegistry {
     """
     )
 
-    /// Floor 4: compatible stub — 18×7 L-shaped topology, entry/staircase/guard match FloorGenerator.
+    /// Floor 4: compatible stub — 18×7 L-shaped topology, entry/staircase/guard match original procedural layout.
     /// Egg room at (2,3), guard encounter at (7,2), staircase at (7,6), entry at (7,0).
     /// Width 18 distinguishes dimensions from floors 1, 2, and 3.
     private static let floor4 = FloorDefinition(grid:
