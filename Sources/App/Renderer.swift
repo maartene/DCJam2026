@@ -217,7 +217,7 @@ final class Renderer {
     // MARK: - Dungeon view (rows 2-16, cols 2-79 = 78×15 interior)
 
     private func renderDungeon(_ state: GameState) {
-        let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
+        let floor = FloorRegistry.floor(state.currentFloor, config: state.config)
         let key = dungeonFrameKey(
             grid: floor.grid, position: state.playerPosition, facing: state.facingDirection)
         let frameLines = frames[key] ?? fallbackFrame(for: key)
@@ -307,25 +307,26 @@ final class Renderer {
         let art: [String]
         if encounter.isBossEncounter {
             art = [
-                #"            _______"#,
-                #"           /       \"#,
-                #"          | >   <  |"#,
-                #"          |   -    |"#,
-                #"           \_______/"#,
-                #"          /|       |\"#,
-                #"         / |  ###  | \"#,
-                #"        /__|_______|__\"#,
+                #".   _.---._     jgs   "#,
+                #"..-' ((O)) '-.        "#,
+                #". \ _.\_/._ /         "#,
+                #".  /..___..\          "#,
+                #".  ;-.___.-;          "#,
+                #". (| e ) e |)     .;. "#,
+                #".  \  /_   /      ||||"#,
+                #".  _\__-__/_    (\|'-|"#,
+                #"./` / \V/ \ `\   \ )/ "#,
             ]
         } else {
             art = [
-                #"            _____"#,
-                #"           /     \"#,
-                #"          | o   o |"#,
-                #"          |   ^   |"#,
-                #"           \_____/"#,
-                #"          /|     |\"#,
-                #"         / |     | \"#,
-                #"        /__|_____|__\"#,
+                #"       __  _.-"` `'-. "#,
+                #"      /||\'._ __{}_(  "#,
+                #"      ||||  #'--.__\  "#,
+                #"      |  L.(   ^_\^   "#,
+                #"      \ .-' |   _ |   "#,
+                #"      | |   )\___/    "#,
+                #"      |  \-'`:._]     "#,
+                #" jgs  \__/;       '-. "#,
             ]
         }
 
@@ -460,7 +461,7 @@ final class Renderer {
         output.write(pad78(centered("- - - - - - - - - - - - - - -", width: 78)))
 
         drawStatusBar(state)
-        drawThoughts(["The darkness takes me... but perhaps the egg survived."])
+        drawThoughts(["The darkness takes me... but perhaps the egg will survive?"])
     }
 
     // MARK: - Win screen
