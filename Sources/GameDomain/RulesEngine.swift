@@ -180,6 +180,7 @@ public enum RulesEngine {
         let isAtOrPastStaircase = (newPos == floor.staircasePosition2D)
             || (state.playerPosition == floor.staircasePosition2D && direction == .forward)
         if !floor.hasExitSquare && isAtOrPastStaircase {
+            if floor.hasEggRoom && !state.hasEgg { return state }
             let nextFloor = state.currentFloor + 1
             let nextFloorMap = FloorRegistry.floor(nextFloor, config: state.config)
             let advanced = state
