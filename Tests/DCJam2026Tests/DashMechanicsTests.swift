@@ -126,23 +126,20 @@ import Testing
         #expect(result.playerPosition == Position(x: positionBefore.x + 2, y: positionBefore.y))
     }
 
-    @Test("Dash moves Ember 2 squares in the facing direction",
-          arguments: [
-            (CardinalDirection.north, 0,  2),
-            (CardinalDirection.south, 0, -2),
-            (CardinalDirection.east,  2,  0),
-            (CardinalDirection.west, -2,  0),
-          ])
-    func dashMovesInFacingDirection(facing: CardinalDirection, dx: Int, dy: Int) {
-        // Given
+    @Test func `Dashing while facing South moves Ember 2 squares south`() {
         var state = gameStateInRegularEncounter(dashCharges: 2)
-        state = state.withFacingDirection(facing)
+        state = state.withFacingDirection(.south)
         let positionBefore = state.playerPosition
-        // When
         let result = RulesEngine.apply(command: .dash, to: state, deltaTime: 0.0)
-        // Then
-        let expected = Position(x: positionBefore.x + dx, y: positionBefore.y + dy)
-        #expect(result.playerPosition == expected)
+        #expect(result.playerPosition == Position(x: positionBefore.x, y: positionBefore.y - 2))
+    }
+
+    @Test func `Dashing while facing West moves Ember 2 squares west`() {
+        var state = gameStateInRegularEncounter(dashCharges: 2)
+        state = state.withFacingDirection(.west)
+        let positionBefore = state.playerPosition
+        let result = RulesEngine.apply(command: .dash, to: state, deltaTime: 0.0)
+        #expect(result.playerPosition == Position(x: positionBefore.x - 2, y: positionBefore.y))
     }
 
     @Test func `Dash blocking is controlled by the boss encounter flag, not by the floor number`() {
