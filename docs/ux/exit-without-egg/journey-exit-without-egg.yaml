@@ -1,0 +1,216 @@
+journey:
+  name: "exit-without-egg"
+  goal: "Ember reaches the dungeon exit on floor 5 without having collected the egg, receives meaningful feedback, and can backtrack to find the egg and complete her escape."
+  persona: "Ember — young dragon, one run, no second chances. The egg is the mission."
+
+  emotional_arc:
+    start: "Determined urgency — Ember has fought through four floors and can smell fresh air."
+    middle: "Crushing realisation — she is at the threshold of freedom but cannot cross it without her egg."
+    end: "Renewed resolve — she turns back into the dungeon knowing exactly what she must do."
+
+  design_decision:
+    chosen_option: "Feedback + backtrack (NarrativeOverlay .exitWithoutEgg)"
+    rejected_options:
+      - option: "Bad ending (escape without egg)"
+        rejection_reason: "Undermines the game's core emotional premise. Ember's mission is the egg — offering her freedom without it would require a separate narrative arc the jam scope cannot support."
+      - option: "Invisible block (current state — do nothing)"
+        rejection_reason: "Softlock. No feedback. Reads as a bug. Violates 'mechanical state teaches organically'."
+      - option: "Teleport player back to last floor entry"
+        rejection_reason: "Invisible hand — player loses spatial agency. Backtracking on their own is more empowering and consistent with existing movement rules."
+    rationale: >
+      The NarrativeOverlay model is already established for moments of import (eggDiscovery, exitPatio).
+      Adding .exitWithoutEgg follows the same pattern with zero new mechanics — only new content.
+      It resolves the softlock, communicates the rule through Ember's voice (not tutorial text),
+      and preserves the emotional arc of desperation → determination → triumph.
+      Backtracking is already possible (movement is free in dungeon mode); the fix simply
+      unlocks the path that was accidentally blocked by silence.
+
+steps:
+  - id: 1
+    name: "Player arrives at exit square (floor 5, hasEgg=false)"
+    trigger: "GameCommand.move(.forward) resolves to newPos == floor.exitPosition2D AND state.hasEgg == false"
+
+    shared_artifacts:
+      - name: "hasEgg"
+        source: "GameState.hasEgg (Bool)"
+        displayed_as: "EGG status bar segment (-- when false)"
+        consumers:
+          - "RulesEngine.applyMove — win condition gate"
+          - "RulesEngine.applyMove — exitWithoutEgg branch (NEW)"
+          - "Renderer.drawStatusBar — EGG indicator"
+
+      - name: "exitPosition2D"
+        source: "FloorDefinition grid character 'X' parsed by FloorRegistry"
+        displayed_as: "exit square in dungeon view"
+        consumers:
+          - "RulesEngine.applyMove — step-on-exit check"
+          - "Renderer.renderDungeon — exit cell rendering"
+
+    emotional_state:
+      entry: "Player approaches exit — near-victory anticipation"
+      exit: "Overlay fires — sudden shift to crushing realisation"
+
+    integration_checkpoint: >
+      RulesEngine.applyMove must check hasEgg BEFORE transitioning to any overlay.
+      Branch: hasEgg=true -> .narrativeOverlay(.exitPatio) [existing]
+               hasEgg=false -> .narrativeOverlay(.exitWithoutEgg) [NEW]
+
+    tui_mockup: |
+      +-- Step 1: Step onto exit square (no egg) --------+
+      | [dungeon view — floor 5, Ember at exit 'X']      |
+      | [minimap: exit marked, egg not collected]         |
+      |                                                    |
+      | HP: ■■■■■■□□  EGG: --  DASH: ◆◆  SPEC: ████░   |
+      +---------------------------------------------------+
+      | Transition: .narrativeOverlay(.exitWithoutEgg)    |
+      +---------------------------------------------------+
+
+    gherkin: |
+      Scenario: Ember steps onto exit without egg — overlay fires
+        Given Ember is on floor 5 at a position adjacent to the exit square
+        And state.hasEgg is false
+        When Ember moves forward onto the exit square
+        Then screenMode becomes .narrativeOverlay(event: .exitWithoutEgg)
+        And playerPosition is updated to the exit square
+        And no win transition occurs
+
+  - id: 2
+    name: "exitWithoutEgg narrative overlay displayed"
+    trigger: "screenMode == .narrativeOverlay(event: .exitWithoutEgg)"
+
+    shared_artifacts:
+      - name: "NarrativeEvent.exitWithoutEgg"
+        source: "GameDomain/NarrativeEvent.swift — new case"
+        displayed_as: "Full-screen narrative overlay with Ember's refusal text"
+        consumers:
+          - "Renderer.renderNarrativeOverlay — new branch"
+          - "EmberThoughts.narrativeThought — new case"
+          - "RulesEngine.applyConfirmOverlay — new case"
+
+    emotional_state:
+      entry: "Player reads Ember's refusal — realisation that the egg was not picked up"
+      exit: "Player dismisses overlay — resolve to backtrack"
+
+    integration_checkpoint: >
+      Renderer must handle .exitWithoutEgg case — no fallthrough or crash.
+      EmberThoughts must return a thought for this event.
+      Controls line must read "Space / Enter: turn back" (not "continue").
+
+    tui_mockup: |
+      +-- Step 2: exitWithoutEgg overlay -------------------+
+      |                                                      |
+      |              THE PATIO LIES OPEN                     |
+      |                                                      |
+      |    Cold wind. Stars. Freedom, one wingbeat away.     |
+      |                                                      |
+      |    But the egg.                                      |
+      |                                                      |
+      |    Ember's claws lock on the stone. Her wings        |
+      |    half-open and then fold back. She cannot leave    |
+      |    it here. She will not leave it here.              |
+      |                                                      |
+      |    The dungeon waits behind her.                     |
+      |                                                      |
+      |         [ Space / Enter: turn back ]                 |
+      |                                                      |
+      +------------------------------------------------------+
+      |--Thoughts---------------------------------------------|
+      | I can see the sky. But the egg is still in there.    |
+      | I will not leave without it.                          |
+      +-------------------------------------------------------+
+
+    gherkin: |
+      Scenario: exitWithoutEgg overlay renders correctly
+        Given screenMode is .narrativeOverlay(event: .exitWithoutEgg)
+        When Renderer.render is called
+        Then the overlay displays Ember's refusal in dragon vocabulary
+        And the controls line reads "Space / Enter: turn back"
+        And EmberThoughts returns "I can see the sky. But the egg is still in there."
+        And no win state is entered
+
+  - id: 3
+    name: "Player confirms overlay — returns to dungeon"
+    trigger: "GameCommand.confirmOverlay while screenMode == .narrativeOverlay(.exitWithoutEgg)"
+
+    shared_artifacts:
+      - name: "playerPosition"
+        source: "GameState.playerPosition"
+        displayed_as: "Ember's position in dungeon view and minimap"
+        consumers:
+          - "RulesEngine — movement collision"
+          - "Renderer.renderDungeon — player position"
+
+    emotional_state:
+      entry: "Player presses confirm — choosing to go back"
+      exit: "Back in dungeon mode on exit square — clear goal to find egg"
+
+    integration_checkpoint: >
+      After confirm: screenMode must be .dungeon (NOT .winState).
+      playerPosition must remain on the exit square — do not move player.
+      Movement keys must work immediately (no lock state).
+      Stepping on exit again (still no egg) must re-trigger the overlay.
+
+    tui_mockup: |
+      +-- Step 3: Back in dungeon (floor 5, exit square) --+
+      | [dungeon view — Ember at exit, facing south]        |
+      | [minimap: exit position visible]                    |
+      |                                                      |
+      | HP: ■■■■■■□□  EGG: --  DASH: ◆◆  SPEC: ████░      |
+      +------[W/S: move  A/D: turn  1: dash  2: brace]-----+
+      |--Thoughts---------------------------------------------|
+      | My egg is still out there. I came too far to stop.   |
+      +-------------------------------------------------------+
+
+    gherkin: |
+      Scenario: Confirming exitWithoutEgg returns to dungeon
+        Given screenMode is .narrativeOverlay(event: .exitWithoutEgg)
+        When the player presses Space or Enter (GameCommand.confirmOverlay)
+        Then screenMode becomes .dungeon
+        And playerPosition remains on the exit square
+        And movement commands are accepted immediately
+
+  - id: 4
+    name: "Player steps onto exit AGAIN without egg (repeat visit)"
+    trigger: "As step 1 — repeat trigger"
+
+    emotional_state:
+      entry: "Player returned to exit still without egg"
+      exit: "Overlay fires again — consistent rule reinforcement"
+
+    integration_checkpoint: >
+      The overlay must fire on every visit to exit square when hasEgg=false.
+      No "already seen" suppression — the rule must be enforced consistently.
+
+    gherkin: |
+      Scenario: Re-stepping exit without egg re-triggers overlay
+        Given Ember is in .dungeon mode on the exit square
+        And state.hasEgg is still false
+        When Ember moves off the exit square and back onto it
+        Then .narrativeOverlay(event: .exitWithoutEgg) fires again
+        And the player can confirm and continue backtracking
+
+  - id: 5
+    name: "Player finds egg and returns to exit (win path)"
+    trigger: "hasEgg transitions to true; player returns to exit square"
+    note: "Existing flow — no changes required."
+
+    integration_checkpoint: >
+      Existing: step on exit with hasEgg=true -> .narrativeOverlay(.exitPatio) -> confirm -> .winState.
+      No changes to this path. exitWithoutEgg fix must NOT touch the win-condition branch.
+
+    gherkin: |
+      Scenario: Ember returns to exit with egg — win condition unchanged
+        Given Ember has collected the egg (state.hasEgg == true)
+        And Ember moves onto the exit square on floor 5
+        Then screenMode becomes .narrativeOverlay(event: .exitPatio)
+        And confirming the overlay transitions to .winState
+
+integration_validation:
+  shared_artifact_consistency:
+    - artifact: "NarrativeEvent"
+      must_match_across: [step_2_overlay_render, step_3_confirm_handling, EmberThoughts]
+      failure_message: "Adding .exitWithoutEgg case to NarrativeEvent enum without updating all switch sites causes Swift compile error (exhaustive enum). All three sites must be updated atomically."
+
+    - artifact: "hasEgg"
+      must_match_across: [step_1_gate, status_bar_display]
+      failure_message: "EGG status bar must reflect hasEgg=false (showing '--') at the moment the overlay fires. If the status bar is rendered after the overlay in the same frame pass, the state snapshot must be consistent."

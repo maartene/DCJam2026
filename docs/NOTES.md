@@ -2,7 +2,8 @@
 
 ## TODO
 - [ ] Egg and Exit visual are not centered
-- [ ] Discuss softlock: try and leave without the egg. Bad ending?
+- [ ] Refactor test helpers (to inspect the minimap)
+- [ ] (Mikado) Remove unused FloorGenerator
 
 ## In progress
 
@@ -26,3 +27,4 @@
 - [X] Egg should remove from (mini)map after picking it up.
 - [X] When reaching the patio, the night sky is not visible. Fix: use the one from the narrative spike (spike2-narrative-overlay.swift)
 - [X] Bug: dash always move you in the north direction, should be in the facing direction
+- [X] Softlock: try and leave without the egg. Bad ending?
