@@ -32,7 +32,7 @@ import Testing
 
     // The standard floor grid: main corridor x=7 (y=0..6), branch y=3 (x=2..7).
     private let grid: FloorGrid = {
-        let floor = FloorGenerator.generate(floorNumber: 1, config: .default)
+        let floor = FloorRegistry.floor(1, config: .default)
         return floor.grid
     }()
 
