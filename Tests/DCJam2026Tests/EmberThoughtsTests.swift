@@ -32,13 +32,17 @@ import Testing
         #expect(EmberThoughts.thought(for: state).contains("way out"))
     }
 
-    @Test func `dungeon at staircase without egg shows refusal thought`() {
+    @Test func `dungeon one tile from staircase without egg shows refusal thought`() {
         let config = GameConfig.default
         let floor = FloorRegistry.floor(2, config: config)
+        let staircase = floor.staircasePosition2D
+        // Player faces north (default); staircase is one step north of this position.
+        let oneStepSouth = Position(x: staircase.x, y: staircase.y - 1)
         let state = GameState.initial(config: config)
             .withScreenMode(.dungeon)
             .withCurrentFloor(2)
-            .withPlayerPosition(floor.staircasePosition2D)
+            .withFacingDirection(.north)
+            .withPlayerPosition(oneStepSouth)
         #expect(EmberThoughts.thought(for: state).contains("won't leave without it"))
     }
 

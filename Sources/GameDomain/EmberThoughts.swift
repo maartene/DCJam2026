@@ -27,7 +27,9 @@ public enum EmberThoughts {
 
     private static func dungeonThought(_ state: GameState) -> String {
         let floor = FloorRegistry.floor(state.currentFloor, config: state.config)
-        if floor.hasEggRoom && !state.hasEgg && state.playerPosition == floor.staircasePosition2D {
+        let fwd = state.facingDirection.forwardDelta
+        let oneStepAhead = Position(x: state.playerPosition.x + fwd.dx, y: state.playerPosition.y + fwd.dy)
+        if floor.hasEggRoom && !state.hasEgg && oneStepAhead == floor.staircasePosition2D {
             return "I won't leave without it. The egg is still somewhere on this floor."
         } else if state.recentDash {
             return "I tear through! Moving faster than the guard could see. Feels a bit like flying."
