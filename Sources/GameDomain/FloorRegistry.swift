@@ -131,65 +131,67 @@ public enum FloorRegistry {
     /// Main corridor: x=7 for all y=0..6.
     /// Branch corridor: y=3, x=2..7.
     private static let floor1 = FloorDefinition(grid:
-        "#######S#######\n" +
-        "#######.#######\n" +
-        "#######.#######\n" +
-        "##......#######\n" +
-        "#######G#######\n" +
-        "#######.#######\n" +
-        "#######^#######"
+    "#######S#######\n" +
+    "#######.#######\n" +
+    "#######.#######\n" +
+    "##......#######\n" +
+    "#######G#######\n" +
+    "#######.#######\n" +
+    "#######^#######"
     )
 
-    /// Floor 2: compatible stub — 16×7 L-shaped topology, entry/staircase/guard match FloorGenerator.
-    /// Egg room at (2,3), guard encounter at (7,2), staircase at (7,6), entry at (7,0).
-    /// Width 16 (one extra wall column) distinguishes dimensions from floor 1.
     private static let floor2 = FloorDefinition(grid:
-        "#######S########\n" +
-        "#######.########\n" +
-        "#######.########\n" +
-        "##*.....########\n" +
-        "#######G########\n" +
-        "#######.########\n" +
-        "#######^########"
+    """
+    ###S###############
+    ###..............##
+    #######.######.####
+    ##.###########.####
+    ##...G.........####
+    ##*#####.##########
+    ########^##########
+    """
     )
 
-    /// Floor 3: compatible stub — 17×7 L-shaped topology, entry/staircase/guard match FloorGenerator.
-    /// Egg room at (2,3), guard encounter at (7,2), staircase at (7,6), entry at (7,0).
-    /// Width 17 distinguishes dimensions from floors 1 and 2.
     private static let floor3 = FloorDefinition(grid:
-        "#######S#########\n" +
-        "#######.#########\n" +
-        "#######.#########\n" +
-        "##*.....#########\n" +
-        "#######G#########\n" +
-        "#######.#########\n" +
-        "#######^#########"
+    """
+    ###########S#######
+    #######.........###
+    #######.#######.###
+    ###.........G...###
+    ###.###.#######.###
+    ###.###.........###
+    ###^###############
+    """
     )
 
     /// Floor 4: compatible stub — 18×7 L-shaped topology, entry/staircase/guard match FloorGenerator.
     /// Egg room at (2,3), guard encounter at (7,2), staircase at (7,6), entry at (7,0).
     /// Width 18 distinguishes dimensions from floors 1, 2, and 3.
     private static let floor4 = FloorDefinition(grid:
-        "#######S##########\n" +
-        "#######.##########\n" +
-        "#######.##########\n" +
-        "##*.....##########\n" +
-        "#######G##########\n" +
-        "#######.##########\n" +
-        "#######^##########"
+    """
+    #########S#########
+    ###.#####.#####.###
+    ###.#####.#####.###
+    ###.#####G#####.###
+    ###.#####.#####.###
+    ###.............###
+    ###########^#######
+    """
     )
 
     /// Floor 5: compatible stub — 19×7 L-shaped topology with boss and exit.
     /// Boss encounter at (7,3), exit at (7,6), entry at (7,0). No egg room, no staircase.
     /// Width 19 (maximum allowed) distinguishes dimensions from all other floors.
     private static let floor5 = FloorDefinition(grid:
-        "#######X###########\n" +
-        "#######.###########\n" +
-        "#######.###########\n" +
-        "##.....B###########\n" +
-        "#######.###########\n" +
-        "#######.###########\n" +
-        "#######^###########"
+    """
+    #########X#########
+    #########.#########
+    #########.#########
+    #########B#########
+    #########.#########
+    #########.#########
+    #########^#########
+    """
     )
 
     // MARK: - Public API

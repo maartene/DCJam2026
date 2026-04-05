@@ -43,19 +43,19 @@ final class Renderer {
         case .dungeon:
             renderDungeon(state)
             drawStatusBar(state)
-            drawThoughts(dungeonThoughts(state))
+            drawThoughts([EmberThoughts.thought(for: state)])
         case .combat(let encounter):
             renderCombat(state, encounter: encounter)
             drawStatusBar(state)
-            drawThoughts(combatThoughts(state, encounter: encounter))
+            drawThoughts([EmberThoughts.thought(for: state)])
         case .narrativeOverlay(let event):
             renderNarrativeOverlay(event)
             drawControlsBar("Space / Enter: continue")
-            drawThoughts(narrativeThoughts(event))
+            drawThoughts([EmberThoughts.thought(for: state)])
         case .upgradePrompt(let choices):
             renderUpgradePrompt(state, choices: choices)
             drawControlsBar("1 / 2 / 3: select upgrade")
-            drawThoughts(["An important choice awaits..."])
+            drawThoughts([EmberThoughts.thought(for: state)])
         case .deathState:
             renderDeathScreen(state)
         case .winState:
@@ -465,7 +465,7 @@ final class Renderer {
         output.write(pad78(centered("- - - - - - - - - - - - - - -", width: 78)))
 
         drawStatusBar(state)
-        drawThoughts(["The darkness takes me... but perhaps the egg will survive?"])
+        drawThoughts([EmberThoughts.thought(for: state)])
     }
 
     // MARK: - Win screen
@@ -501,7 +501,7 @@ final class Renderer {
         )
 
         drawStatusBar(state)
-        drawThoughts(["I am free! The egg is safe under the open sky."])
+        drawThoughts([EmberThoughts.thought(for: state)])
     }
 
     // MARK: - Status bar (row 18)
@@ -596,62 +596,6 @@ final class Renderer {
         }
         if !current.isEmpty { lines.append(current) }
         return lines.isEmpty ? [""] : lines
-    }
-
-    // MARK: - Thought content
-
-    private func dungeonThoughts(_ state: GameState) -> [String] {
-        let flavor: String
-        if state.recentDash {
-            flavor =
-                "I tear through! Moving faster than the guard could see. Feels a bit like flying."
-        } else if state.hp <= 20 {
-            flavor =
-                "Need to be a bit careful, these humans are more dangerous than I thought."
-        } else if state.hasEgg {
-            flavor =
-                "I can feel it! The egg, the LAST DRAGON EGG, its near. I need to find it, whatever the cost."
-        } else if state.currentFloor == 1 {
-            flavor =
-                "Where am I? I smell fresh air from somewhere, but its not near. Need to escape."
-        } else {
-            flavor =
-                "Deeper now. The air is thicker, heavier. My claws find the floor and I press on."
-        }
-        return [flavor]
-    }
-
-    private func combatThoughts(_ state: GameState, encounter: EncounterModel) -> [String] {
-        if case .special = state.transientOverlay {
-            return ["One deep breath and the air ignites."]
-        } else if encounter.isBossEncounter {
-            return ["The Head Warden. The one who ordered my egg stolen. This ends now."]
-        } else if state.hp <= 30 {
-            return [
-                "I'm wounded and it knows it. I have to time this — brace for the next strike, then move."
-            ]
-        } else if state.dashCharges == 0 {
-            return [
-                "My wings are spent. No Dash left. I'll hold this ground until their strength returns."
-            ]
-        } else {
-            return [
-                "A guard. Armoured, blocking the corridor. I can brace and take the hit — or just dash through."
-            ]
-        }
-    }
-
-    private func narrativeThoughts(_ event: NarrativeEvent) -> [String] {
-        switch event {
-        case .eggDiscovery:
-            return ["Thank the elements. There it is! I can feel its alive. Time to leave."]
-        case .exitPatio:
-            return ["Cold air, open sky. Finally. And jump and I'm free."]
-        case .specialAttack:
-            return [
-                "The heat rises in my chest and I let it out. Nothing in that corridor is standing."
-            ]
-        }
     }
 
     // MARK: - 2D Minimap (rows 2-8, cols 61-75, panel cols 61-79)
