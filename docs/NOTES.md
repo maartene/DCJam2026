@@ -1,9 +1,9 @@
 # NOTES
 
 ## TODO
-- [ ] Dash moves 2 squares ahead. 3 brings you too close to the stairs in one turn. Thats confusing.
-- [ ] Egg should remove from (mini)map after picking it up.
-- [ ] When reaching the patio, the night sky is not visible. Fix: use the one from the narrative spike (spike2-narrative-overlay.swift)
+- [X] Dash moves 2 squares ahead. 3 brings you too close to the stairs in one turn. Thats confusing.
+- [X] Egg should remove from (mini)map after picking it up.
+- [X] When reaching the patio, the night sky is not visible. Fix: use the one from the narrative spike (spike2-narrative-overlay.swift)
 
 ## In progress
 

@@ -13,7 +13,7 @@ import Testing
 //   B2: G (guard)              — bright red
 //   B3: B (boss)               — bold bright red
 //   B4: * (egg uncollected)    — bright yellow
-//   B5: e (egg collected)      — dim yellow
+//   B5: . (egg collected)      — no color (plain corridor)
 //   B6: S (staircase)          — bright cyan
 //   B7: X (exit)               — bold bright cyan
 //   B8: E (entry)              — dim cyan
@@ -108,8 +108,8 @@ import Testing
         #expect(content.contains(ansiReset), "Expected ANSI reset after '*', got: \(content)")
     }
 
-    // B5: e (egg collected) — dim yellow + reset
-    @Test func `Collected egg cell uses dim yellow with ANSI reset`() {
+    // B5: . (egg collected) — no color (plain corridor, same as passable '.')
+    @Test func `Collected egg cell renders as plain corridor dot with no ANSI color`() {
         let state = GameState.initial(config: .default)
             .withCurrentFloor(2)
             .withPlayerPosition(Position(x: 7, y: 0))
@@ -117,9 +117,7 @@ import Testing
             .withScreenMode(.dungeon)
         let spy = render(state)
         let content = cellContent(x: 2, y: 3, spy: spy)
-        #expect(content.contains(dimYellow), "Expected dim yellow for 'e', got: \(content)")
-        #expect(content.contains("e"), "Expected 'e' character, got: \(content)")
-        #expect(content.contains(ansiReset), "Expected ANSI reset after 'e', got: \(content)")
+        #expect(content == ".", "Expected bare '.' with no color for collected egg cell, got: \(content)")
     }
 
     // B6: S (staircase) — bright cyan + reset

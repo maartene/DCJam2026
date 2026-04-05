@@ -20,9 +20,9 @@ import Testing
         let positionBefore = state.playerPosition
         // When
         let result = RulesEngine.apply(command: .dash, to: state, deltaTime: 0.0)
-        // Then — Ember is now 3 squares ahead and not at the enemy's former position
+        // Then — Ember is now 2 squares ahead and not at the enemy's former position
         #expect(result.playerPosition > positionBefore)
-        #expect(result.playerPosition == positionBefore + 3)
+        #expect(result.playerPosition == positionBefore + 2)
     }
 
     @Test func `Ember uses Dash with exactly 1 charge remaining and it depletes to 0`() {
@@ -124,7 +124,7 @@ import Testing
         // When
         let result = RulesEngine.apply(command: .dash, to: state, deltaTime: 0.0)
         // Then — Dash succeeds because the boss flag is false, regardless of floor number
-        #expect(result.playerPosition == positionBefore + 3)
+        #expect(result.playerPosition == positionBefore + 2)
     }
 }
 

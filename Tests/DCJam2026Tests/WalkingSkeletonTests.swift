@@ -63,7 +63,7 @@ import Testing
 
     // MARK: - Ember passes through a guard using Dash
 
-    @Test func `Ember's position advances 3 squares after a successful Dash through a guard`() {
+    @Test func `Ember's position advances 2 squares after a successful Dash through a guard`() {
         // Given — Ember on Floor 1, 1 Dash charge, in encounter with regular enemy
         let config = GameConfig.default
         var state = GameState.initial(config: config)
@@ -72,7 +72,7 @@ import Testing
         // When
         let result = RulesEngine.apply(command: .dash, to: state, deltaTime: 0.0)
         // Then
-        #expect(result.playerPosition == startPosition + 3)
+        #expect(result.playerPosition == startPosition + 2)
     }
 
     @Test func `Ember's Dash charge count decrements by 1 after a successful Dash`() {

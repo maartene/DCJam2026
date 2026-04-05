@@ -196,14 +196,14 @@ import Testing
         #expect(minimapCharAt(x: 2, y: 3, spy: spy) == "*", "Expected '*' at uncollected egg room (2,3) on floor 2")
     }
 
-    @Test func `Minimap shows e at the egg room cell after the egg is collected`() {
+    @Test func `Minimap shows dot at the egg room cell after the egg is collected`() {
         let state = GameState.initial(config: .default)
             .withCurrentFloor(2)
             .withPlayerPosition(Position(x: 7, y: 0))
             .withHasEgg(true)
             .withScreenMode(.dungeon)
         let spy = render(state)
-        #expect(minimapCharAt(x: 2, y: 3, spy: spy) == "e", "Expected 'e' at egg room (2,3) after collection")
+        #expect(minimapCharAt(x: 2, y: 3, spy: spy) == ".", "Expected '.' at egg room (2,3) after collection")
     }
 
     @Test func `Minimap shows S at the staircase cell on a non-final floor`() {

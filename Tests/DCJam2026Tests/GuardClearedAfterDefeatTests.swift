@@ -195,6 +195,7 @@ import Testing
         let floor = FloorGenerator.generate(floorNumber: 1, config: config)
         let encounterPos = floor.encounterPosition2D!
         var state = GameState.initial(config: config)
+        state = state.withPlayerPosition(Position(x: encounterPos.x, y: encounterPos.y - 1))
         state = state.withScreenMode(.combat(encounter: EncounterModel.guard(isBossEncounter: false)))
         // When — Ember Dashes (bypasses guard, does not defeat it)
         let afterDash = RulesEngine.apply(command: .dash, to: state, deltaTime: 0.0)

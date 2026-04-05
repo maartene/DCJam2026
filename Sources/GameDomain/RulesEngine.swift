@@ -263,7 +263,7 @@ public enum RulesEngine {
     // MARK: - Special
 
     private static let specialAttackDamage = 60
-    private static let dashAdvanceSquares = 3
+    private static let dashAdvanceSquares = 2
 
     private static func applySpecial(to state: GameState) -> GameState {
         guard case .combat(var encounter) = state.screenMode else { return state }

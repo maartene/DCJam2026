@@ -388,10 +388,15 @@ final class Renderer {
                 "THE PATIO",
                 [
                     "",
-                    "  Moonlight. Open sky. The faint smell of pine and cold stone.",
-                    "  You've found the exit patio — freedom is one leap away.",
+                    "  " + colored("The sky.", code: ansiBrightCyan)
+                        + "  " + colored("Open. Endless. Yours.", code: ansiBrightCyan),
                     "",
-                    "  The wardens are close behind. Move now, or lose everything.",
+                    "  " + colored("       *    .  *       .        ", code: ansiBrightWhite),
+                    "  " + colored("  .         .              .    ", code: ansiBrightWhite),
+                    "  " + colored("      .    *       .            ", code: ansiBrightWhite),
+                    "  " + colored("  *        .    .       *       ", code: ansiBrightWhite),
+                    "",
+                    "  " + colored("Home is a long flight from here. But you are free.", code: ansiBrightWhite),
                 ]
             )
         case .specialAttack:
@@ -704,7 +709,7 @@ final class Renderer {
             return floor.hasBossEncounter ? "B" : "G"
         }
         if let egg = floor.eggRoomPosition2D, pos == egg {
-            return state.hasEgg ? "e" : "*"
+            return state.hasEgg ? "." : "*"
         }
         if floor.hasExitSquare && pos == floor.exitPosition2D { return "X" }
         if pos == floor.staircasePosition2D { return "S" }
