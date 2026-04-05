@@ -177,7 +177,7 @@ private extension `Win and Loss Conditions` {
         var state = GameState.initial(config: config)
         state = state.withCurrentFloor(5)
         state = state.withHasEgg(hasEgg)
-        let floor5 = FloorGenerator.generate(floorNumber: 5, config: config)
+        let floor5 = FloorRegistry.floor(5, config: config)
         state = state.withPlayerPosition(adjacentToExit(floor5))
         return state
     }

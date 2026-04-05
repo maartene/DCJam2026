@@ -23,6 +23,7 @@ import Testing
         state = state.withHasEgg(false)
         let floor2 = FloorGenerator.generate(floorNumber: 2, config: GameConfig.default)
         state = state.withPlayerPosition(adjacentToEggRoom(floor2))
+            .withFacingDirection(.south)
         // When — step into egg room
         let result = RulesEngine.apply(command: .move(.forward), to: state, deltaTime: 0.0)
         // Then
@@ -110,10 +111,12 @@ import Testing
         // Given — Ember is on floor 4, adjacent to the staircase
         var state = GameState.initial(config: GameConfig.default)
         state = state.withCurrentFloor(4).withScreenMode(.dungeon)
-        let floor4 = FloorGenerator.generate(floorNumber: 4, config: GameConfig.default)
+        let floor4 = FloorRegistry.floor(4, config: .default)
         let beforeStaircase = Position(x: floor4.staircasePosition2D.x, y: floor4.staircasePosition2D.y - 1)
         state = state.withPlayerPosition(beforeStaircase).withFacingDirection(.north)
         // When
+        
+        print(beforeStaircase)
         let result = RulesEngine.apply(command: .move(.forward), to: state, deltaTime: 0.0)
         // Then — upgrade prompt still fires on the floor 4→5 boundary
         if case .upgradePrompt = result.screenMode {

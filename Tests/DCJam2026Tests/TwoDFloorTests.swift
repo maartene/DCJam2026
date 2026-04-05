@@ -145,7 +145,7 @@ import Testing
         let finalFloor = GameConfig.default.maxFloors
         let start = GameState.initial(config: .default)
             .withCurrentFloor(finalFloor)
-            .withPlayerPosition(Position(x: 7, y: 5))
+            .withPlayerPosition(Position(x: 9, y: 5))
             .withFacingDirection(.north)
             .withHasEgg(true)
         let result = RulesEngine.apply(command: .move(.forward), to: start, deltaTime: 0)

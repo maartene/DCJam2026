@@ -181,10 +181,10 @@ import Testing
         let finalFloor = GameConfig.default.maxFloors
         let state = GameState.initial(config: .default)
             .withCurrentFloor(finalFloor)
-            .withPlayerPosition(Position(x: 7, y: 0))
+            .withPlayerPosition(Position(x: 9, y: 0))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        #expect(minimapCharAt(x: 7, y: 3, spy: spy) == "B", "Expected 'B' at boss encounter (7,3) on final floor")
+        #expect(minimapCharAt(x: 9, y: 3, spy: spy) == "B", "Expected 'B' at boss encounter (7,3) on final floor")
     }
 
     @Test func `Minimap shows * at the egg room cell before the egg is collected`() {
@@ -193,7 +193,7 @@ import Testing
             .withPlayerPosition(Position(x: 7, y: 0))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        #expect(minimapCharAt(x: 2, y: 3, spy: spy) == "*", "Expected '*' at uncollected egg room (2,3) on floor 2")
+        #expect(minimapCharAt(x: 2, y: 1, spy: spy) == "*", "Expected '*' at uncollected egg room (2,3) on floor 2")
     }
 
     @Test func `Minimap shows dot at the egg room cell after the egg is collected`() {
@@ -218,10 +218,10 @@ import Testing
         let finalFloor = GameConfig.default.maxFloors
         let state = GameState.initial(config: .default)
             .withCurrentFloor(finalFloor)
-            .withPlayerPosition(Position(x: 7, y: 0))
+            .withPlayerPosition(Position(x: 9, y: 0))
             .withScreenMode(.dungeon)
         let spy = render(state)
-        #expect(minimapCharAt(x: 7, y: 6, spy: spy) == "X", "Expected 'X' at exit (7,6) on final floor")
+        #expect(minimapCharAt(x: 9, y: 6, spy: spy) == "X", "Expected 'X' at exit (9,6) on final floor")
     }
 }
 

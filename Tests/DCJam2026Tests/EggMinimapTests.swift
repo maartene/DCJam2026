@@ -16,7 +16,7 @@ import Testing
 
     // Floor 2 has an egg room at position (2, 3) per FloorGenerator
     private let eggFloor = 2
-    private let eggPos = Position(x: 2, y: 3)
+    private let eggPos = Position(x: 2, y: 1)
 
     // AC1: egg room shows '*' before the egg is collected
     @Test func `Minimap shows star at egg room position when egg has not been collected`() {

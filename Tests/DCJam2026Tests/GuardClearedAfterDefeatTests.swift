@@ -100,7 +100,7 @@ import Testing
         // Given — Ember on floor 5, boss defeated via Special
         let config = GameConfig.default
         let finalFloor = config.maxFloors
-        let floor = FloorGenerator.generate(floorNumber: finalFloor, config: config)
+        let floor = FloorRegistry.floor(finalFloor, config: config)
         let bossPos = floor.encounterPosition2D!
         // Pre-weaken the boss to 40 HP so one Special (60 damage) defeats it in one hit
         let weakBoss = EncounterModel(isBossEncounter: true, enemyHP: 40, enemyAttackTimer: GameConfig.default.enemyAttackInterval)
@@ -164,12 +164,12 @@ import Testing
             return
         }
         // Move Ember to the staircase on floor 1
-        let floor1 = FloorGenerator.generate(floorNumber: 1, config: config)
+        let floor1 = FloorRegistry.floor(1, config: config)
         let atStairs = afterDefeat.withPlayerPosition(floor1.staircasePosition).withFacingDirection(.north)
         let onFloor2 = RulesEngine.apply(command: .move(.forward), to: atStairs, deltaTime: 0.0)
         #expect(onFloor2.currentFloor == 2, "Expected Ember to be on floor 2 after descending")
         // When — Ember walks into the encounter position on floor 2
-        let floor2 = FloorGenerator.generate(floorNumber: 2, config: config)
+        let floor2 = FloorRegistry.floor(2, config: config)
         let approaching = onFloor2
             .withPlayerPosition(Position(x: floor2.encounterPosition2D!.x, y: floor2.encounterPosition2D!.y - 1))
             .withFacingDirection(.north)

@@ -140,7 +140,7 @@ import Testing
         // When
         let result = RulesEngine.apply(command: .move(.forward), to: state, deltaTime: 0.0)
         // Then
-        let floor2 = FloorGenerator.generate(floorNumber: 2, config: config)
+        let floor2 = FloorRegistry.floor(2, config: config)
         #expect(result.playerPosition == floor2.entryPosition)
     }
 

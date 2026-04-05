@@ -87,7 +87,7 @@ import Testing
         // Given — Ember on floor 5 in dungeon navigation mode (not yet in combat)
         let config = GameConfig.default
         let finalFloor = config.maxFloors
-        let floor = FloorGenerator.generate(floorNumber: finalFloor, config: config)
+        let floor = FloorRegistry.floor(finalFloor, config: config)
         let bossPos = floor.encounterPosition2D!
         let state = GameState.initial(config: config)
             .withCurrentFloor(finalFloor)
