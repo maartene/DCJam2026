@@ -21,7 +21,8 @@ final class Renderer {
     init(output: TUIOutputPort) {
         self.output = output
         self.frames = buildFrameTable()
-        self.supports256Color = (ProcessInfo.processInfo.environment["TERM"] ?? "").contains("256color")
+        self.supports256Color = (ProcessInfo.processInfo.environment["TERM"] ?? "").contains(
+            "256color")
     }
 
     /// Internal initializer for tests — injects the 256-color capability directly.
@@ -60,7 +61,7 @@ final class Renderer {
         case .winState:
             renderWinScreen(state)
         case .startScreen:
-            break // unreachable — handled above
+            break  // unreachable — handled above
         }
         renderTransientOverlay(state)
         output.flush()
@@ -170,7 +171,8 @@ final class Renderer {
         // Row 1: top border with vertical split connector '┬' at col 60
         // col 1='┌', cols 2-59=58×'─', col 60='┬', cols 61-79=19×'─', col 80='┐'
         output.moveCursor(row: 1, col: 1)
-        output.write("┌" + String(repeating: "─", count: 58) + "┬" + String(repeating: "─", count: 19) + "┐")
+        output.write(
+            "┌" + String(repeating: "─", count: 58) + "┬" + String(repeating: "─", count: 19) + "┐")
 
         // Rows 2-16: side borders + vertical divider at col 60
         drawSideBarsWithDivider(rows: 2...16)
@@ -178,7 +180,8 @@ final class Renderer {
         // Row 17: separator with '┴' T-junction closing the vertical divider
         // col 1='├', cols 2-59=58×'─', col 60='┴', cols 61-79=19×'─', col 80='┤'
         output.moveCursor(row: 17, col: 1)
-        output.write("├" + String(repeating: "─", count: 58) + "┴" + String(repeating: "─", count: 19) + "┤")
+        output.write(
+            "├" + String(repeating: "─", count: 58) + "┴" + String(repeating: "─", count: 19) + "┤")
 
         drawSideBars(rows: 18...19)
 
@@ -215,22 +218,25 @@ final class Renderer {
 
     private func renderDungeon(_ state: GameState) {
         let floor = FloorGenerator.generate(floorNumber: state.currentFloor, config: state.config)
-        let key = dungeonFrameKey(grid: floor.grid, position: state.playerPosition, facing: state.facingDirection)
+        let key = dungeonFrameKey(
+            grid: floor.grid, position: state.playerPosition, facing: state.facingDirection)
         let frameLines = frames[key] ?? fallbackFrame(for: key)
         let colorCode = depthColor(for: key.depth)
         output.moveCursor(row: Self.mainViewFirstRow, col: 1)
         output.write("\u{1B}[40m")
         let sideColor = depthColor(for: 0)
         // Apply region coloring whenever depth > 0 and at least one side wall is present.
-        let hasLeftWall  = !key.nearLeft
+        let hasLeftWall = !key.nearLeft
         let hasRightWall = !key.nearRight
         let useRegionColoring = key.depth > 0 && (hasLeftWall || hasRightWall)
         for (i, line) in frameLines.enumerated() {
             output.moveCursor(row: i + Self.mainViewFirstRow, col: 2)
             if useRegionColoring {
-                output.write(regionColoredLine(line, sideColor: sideColor, centerColor: colorCode,
-                                               row: i, hasLeftWall: hasLeftWall, hasRightWall: hasRightWall,
-                                               hasFarRight: key.farRight, hasFarLeft: key.farLeft))
+                output.write(
+                    regionColoredLine(
+                        line, sideColor: sideColor, centerColor: colorCode,
+                        row: i, hasLeftWall: hasLeftWall, hasRightWall: hasRightWall,
+                        hasFarRight: key.farRight, hasFarLeft: key.farLeft))
             } else {
                 output.write(colorCode + line + ansiReset)
             }
@@ -253,12 +259,12 @@ final class Renderer {
     private func drawMinimapLegend() {
         let entries: [(String, String)] = [
             (colored("^", code: ansiBoldBrightWhite), " You"),
-            (colored("G", code: ansiBrightRed),       " Guard"),
-            (colored("B", code: ansiBoldBrightRed),   " Boss"),
-            (colored("*", code: ansiBrightYellow),    " Egg"),
-            (colored("S", code: ansiBrightCyan),      " Stairs"),
-            (colored("E", code: ansiDimCyan),         " Entry"),
-            (colored("X", code: ansiBoldBrightCyan),  " Exit"),
+            (colored("G", code: ansiBrightRed), " Guard"),
+            (colored("B", code: ansiBoldBrightRed), " Boss"),
+            (colored("*", code: ansiBrightYellow), " Egg"),
+            (colored("S", code: ansiBrightCyan), " Stairs"),
+            (colored("E", code: ansiDimCyan), " Entry"),
+            (colored("X", code: ansiBoldBrightCyan), " Exit"),
         ]
         for (i, (symbol, label)) in entries.enumerated() {
             let row = 9 + i
@@ -288,9 +294,12 @@ final class Renderer {
     private static let hpBarWidth = 10
 
     private func buildCombatFrame(_ state: GameState, encounter: EncounterModel) -> [String] {
-        let enemyFillCount = Int(Double(encounter.enemyHP) / Double(encounter.maxHP) * Double(Self.enemyHPBarWidth))
+        let enemyFillCount = Int(
+            Double(encounter.enemyHP) / Double(encounter.maxHP) * Double(Self.enemyHPBarWidth))
         let clamped = max(0, min(enemyFillCount, Self.enemyHPBarWidth))
-        let enemyBar = String(repeating: "█", count: clamped) + String(repeating: "░", count: Self.enemyHPBarWidth - clamped)
+        let enemyBar =
+            String(repeating: "█", count: clamped)
+            + String(repeating: "░", count: Self.enemyHPBarWidth - clamped)
         let attackIn = String(format: "%.1f", max(0.0, encounter.enemyAttackTimer))
         let enemyName = encounter.isBossEncounter ? "HEAD WARDEN" : "DUNGEON GUARD"
         let enemyHP = encounter.enemyHP
@@ -356,37 +365,47 @@ final class Renderer {
     private func narrativeContent(_ event: NarrativeEvent) -> (String, [String]) {
         switch event {
         case .eggDiscovery:
-            return ("THE EGG", [
-                "",
-                "  " + colored("~ My egg. ~", code: ansiBrightYellow),
-                "",
-                "  " + colored("     .-.     ", code: ansiYellow),
-                "  " + colored("    /   \\    ", code: ansiYellow),
-                "  " + colored("   | o o |   ", code: ansiYellow),
-                "  " + colored("   |  ^  |   ", code: ansiYellow),
-                "  " + colored("    \\___/    ", code: ansiYellow),
-                "",
-                "  " + colored("Warm. Alive. Pulsing against your scales.", code: ansiBoldBrightWhite),
-                "",
-                "  " + colored("\"They almost had you. Almost.\"", code: ansiDarkGray),
-            ])
+            return (
+                "THE EGG",
+                [
+                    "",
+                    "  " + colored("~ My egg. ~", code: ansiBrightYellow),
+                    "  " + colored(#"     ---     "#, code: ansiYellow),
+                    "  " + colored(#"    /  O\     "#, code: ansiYellow),
+                    "  " + colored(#"   |) o  |   "#, code: ansiYellow),
+                    "  " + colored(#"   | o  O|   "#, code: ansiYellow),
+                    "  " + colored(#"    \__(/     "#, code: ansiYellow),
+                    "",
+                    "  "
+                        + colored(
+                            "Warm. Alive. Pulsing against your scales.", code: ansiBoldBrightWhite),
+                    "",
+                    "  " + colored("\"They almost had you. Almost.\"", code: ansiDarkGray),
+                ]
+            )
         case .exitPatio:
-            return ("THE PATIO", [
-                "",
-                "  Moonlight. Open sky. The faint smell of pine and cold stone.",
-                "  You've found the exit patio — freedom is one leap away.",
-                "",
-                "  The wardens are close behind. Move now, or lose everything.",
-            ])
+            return (
+                "THE PATIO",
+                [
+                    "",
+                    "  Moonlight. Open sky. The faint smell of pine and cold stone.",
+                    "  You've found the exit patio — freedom is one leap away.",
+                    "",
+                    "  The wardens are close behind. Move now, or lose everything.",
+                ]
+            )
         case .specialAttack:
-            return ("DRAGON FIRE", [
-                "",
-                "  Something ancient stirs in your chest.",
-                "  The charge is complete. Heat floods your throat.",
-                "",
-                "  You unleash it — a column of fire that scorches stone and silences",
-                "  everything in its path.",
-            ])
+            return (
+                "DRAGON FIRE",
+                [
+                    "",
+                    "  Something ancient stirs in your chest.",
+                    "  The charge is complete. Heat floods your throat.",
+                    "",
+                    "  You unleash it — a column of fire that scorches stone and silences",
+                    "  everything in its path.",
+                ]
+            )
         }
     }
 
@@ -449,19 +468,32 @@ final class Renderer {
     private func renderWinScreen(_ state: GameState) {
         clearMainView()
         output.moveCursor(row: 4, col: 2)
-        output.write(pad78(centered(colored("* * * * * * * * * * * * * * *", code: ansiBrightCyan), width: 78)))
+        output.write(
+            pad78(
+                centered(colored("* * * * * * * * * * * * * * *", code: ansiBrightCyan), width: 78))
+        )
         output.moveCursor(row: 6, col: 2)
         output.write(pad78(centered(colored("ESCAPED!", code: ansiBrightCyan), width: 78)))
         output.moveCursor(row: 7, col: 2)
-        output.write(pad78(centered(colored("The egg is safe. You are free.", code: ansiYellow), width: 78)))
+        output.write(
+            pad78(centered(colored("The egg is safe. You are free.", code: ansiYellow), width: 78)))
         output.moveCursor(row: 9, col: 2)
-        output.write(pad78(centered(colored("Floors cleared: \(state.currentFloor - 1)", code: ansiDimCyan), width: 78)))
+        output.write(
+            pad78(
+                centered(
+                    colored("Floors cleared: \(state.currentFloor - 1)", code: ansiDimCyan),
+                    width: 78)))
         output.moveCursor(row: 10, col: 2)
-        output.write(pad78(centered(colored("HP remaining: \(state.hp)", code: ansiDimCyan), width: 78)))
+        output.write(
+            pad78(centered(colored("HP remaining: \(state.hp)", code: ansiDimCyan), width: 78)))
         output.moveCursor(row: 12, col: 2)
-        output.write(pad78(centered(colored("[ Press R to play again ]", code: ansiDarkGray), width: 78)))
+        output.write(
+            pad78(centered(colored("[ Press R to play again ]", code: ansiDarkGray), width: 78)))
         output.moveCursor(row: 14, col: 2)
-        output.write(pad78(centered(colored("* * * * * * * * * * * * * * *", code: ansiBrightCyan), width: 78)))
+        output.write(
+            pad78(
+                centered(colored("* * * * * * * * * * * * * * *", code: ansiBrightCyan), width: 78))
+        )
 
         drawStatusBar(state)
         drawThoughts(["I am free! The egg is safe under the open sky."])
@@ -472,7 +504,9 @@ final class Renderer {
     private func drawStatusBar(_ state: GameState) {
         let hpFilled = Int(Double(state.hp) / Double(state.config.maxHP) * Double(Self.hpBarWidth))
         let hpClamped = max(0, min(hpFilled, Self.hpBarWidth))
-        let hpBarRaw = String(repeating: "█", count: hpClamped) + String(repeating: "░", count: Self.hpBarWidth - hpClamped)
+        let hpBarRaw =
+            String(repeating: "█", count: hpClamped)
+            + String(repeating: "░", count: Self.hpBarWidth - hpClamped)
 
         let hpRatio = Double(state.hp) / Double(state.config.maxHP)
         let hpColorCode: String
@@ -488,16 +522,20 @@ final class Renderer {
         let eggSymbol = state.hasEgg ? "*" : " "
 
         let cooldown = state.timerModel.activeCooldownDuration
-        let coloredDashCooldownStr = cooldown > 0
+        let coloredDashCooldownStr =
+            cooldown > 0
             ? " " + colored(String(format: "cd=%.0fs", cooldown), code: ansiYellow)
             : ""
-        let coloredBraceCooldownStr = state.braceOnCooldown
+        let coloredBraceCooldownStr =
+            state.braceOnCooldown
             ? " " + colored(String(format: "cd=%.1fs", state.braceCooldownTimer), code: ansiYellow)
             : ""
 
         let specFilled = Int(state.specialCharge * Double(Self.specialMeterWidth))
         let specClamped = max(0, min(specFilled, Self.specialMeterWidth))
-        let specBarRaw = String(repeating: "█", count: specClamped) + String(repeating: "░", count: Self.specialMeterWidth - specClamped)
+        let specBarRaw =
+            String(repeating: "█", count: specClamped)
+            + String(repeating: "░", count: Self.specialMeterWidth - specClamped)
         let specColorCode = state.specialIsReady ? ansiBoldBrightCyan : ansiDimCyan
         let specBar = colored(specBarRaw, code: specColorCode)
 
@@ -560,38 +598,54 @@ final class Renderer {
     private func dungeonThoughts(_ state: GameState) -> [String] {
         let flavor: String
         if state.recentDash {
-            flavor = "I tear through! Wings snap, scales scrape stone — the guard never had a chance."
+            flavor =
+                "I tear through! Moving faster than the guard could see. Feels a bit like flying."
         } else if state.hp <= 20 {
-            flavor = "My scales are scorched and my breath comes ragged. One more blow could finish me."
+            flavor =
+                "Need to be a bit careful, these humans are more dangerous than I thought."
         } else if state.hasEgg {
-            flavor = "I can feel the egg's warmth through my scales. Just a little further — hold together."
+            flavor =
+                "I can feel it! The egg, the LAST DRAGON EGG, its near. I need to find it, whatever the cost."
         } else if state.currentFloor == 1 {
-            flavor = "Cold stone, ash, the smell of old magic. Something moves in the dark ahead. I keep walking."
+            flavor =
+                "Where am I? I smell fresh air from somewhere, but its not near. Need to escape."
         } else {
-            flavor = "Deeper now. The air is thicker, heavier. My claws find the floor and I press on."
+            flavor =
+                "Deeper now. The air is thicker, heavier. My claws find the floor and I press on."
         }
         return [flavor]
     }
 
     private func combatThoughts(_ state: GameState, encounter: EncounterModel) -> [String] {
         if case .special = state.transientOverlay {
-            return ["I breathe deep and let the fire pour out. The air itself ignites."]
+            return ["One deep breath and the air ignites."]
         } else if encounter.isBossEncounter {
             return ["The Head Warden. The one who ordered my egg stolen. This ends now."]
         } else if state.hp <= 30 {
-            return ["I'm wounded and it knows it. I have to time this — brace the next strike, then move."]
+            return [
+                "I'm wounded and it knows it. I have to time this — brace for the next strike, then move."
+            ]
         } else if state.dashCharges == 0 {
-            return ["My wings are spent. No Dash left. I'll hold this ground until the fire builds."]
+            return [
+                "My wings are spent. No Dash left. I'll hold this ground until their strength returns."
+            ]
         } else {
-            return ["A guard. Armoured, blocking the corridor. I can brace and take the hit — or just run."]
+            return [
+                "A guard. Armoured, blocking the corridor. I can brace and take the hit — or just dash through."
+            ]
         }
     }
 
     private func narrativeThoughts(_ event: NarrativeEvent) -> [String] {
         switch event {
-        case .eggDiscovery:  return ["There it is. The egg. I reach out and it pulses — warm, alive. Let's go."]
-        case .exitPatio:     return ["Open sky. Cold air on my scales. I made it this far — one leap and I'm free."]
-        case .specialAttack: return ["The heat rises in my chest and I let it out. Nothing in that corridor is standing."]
+        case .eggDiscovery:
+            return ["Thank the elements. There it is! I can feel its alive. Time to leave."]
+        case .exitPatio:
+            return ["Cold air, open sky. Finally. And jump and I'm free."]
+        case .specialAttack:
+            return [
+                "The heat rises in my chest and I let it out. Nothing in that corridor is standing."
+            ]
         }
     }
 
@@ -604,15 +658,16 @@ final class Renderer {
         let facingChar: Character
         switch state.facingDirection {
         case .north: facingChar = "^"
-        case .east:  facingChar = ">"
+        case .east: facingChar = ">"
         case .south: facingChar = "v"
-        case .west:  facingChar = "<"
+        case .west: facingChar = "<"
         }
         for y in stride(from: floor.grid.height - 1, through: 0, by: -1) {
             let screenRow = 2 + (floor.grid.height - 1 - y)
             for x in 0..<floor.grid.width {
                 let pos = Position(x: x, y: y)
-                let ch: Character = pos == state.playerPosition
+                let ch: Character =
+                    pos == state.playerPosition
                     ? facingChar
                     : minimapChar(at: pos, floor: floor, state: state)
                 let colorCode = minimapColor(for: ch)
@@ -630,15 +685,15 @@ final class Renderer {
     private func minimapColor(for ch: Character) -> String {
         switch ch {
         case "^", ">", "v", "<": return ansiBoldBrightWhite
-        case "G":                return ansiBrightRed
-        case "B":                return ansiBoldBrightRed
-        case "*":                return ansiBrightYellow
-        case "e":                return ansiYellow
-        case "S":                return ansiBrightCyan
-        case "X":                return ansiBoldBrightCyan
-        case "E":                return ansiDimCyan
-        case "#":                return ansiDarkGray
-        default:                 return ""
+        case "G": return ansiBrightRed
+        case "B": return ansiBoldBrightRed
+        case "*": return ansiBrightYellow
+        case "e": return ansiYellow
+        case "S": return ansiBrightCyan
+        case "X": return ansiBoldBrightCyan
+        case "E": return ansiDimCyan
+        case "#": return ansiDarkGray
+        default: return ""
         }
     }
 
@@ -664,16 +719,16 @@ final class Renderer {
     private func depthColor(for depth: Int) -> String {
         if supports256Color {
             switch depth {
-            case 0:  return ansi256Fg(252)  // near-white
-            case 1:  return ansi256Fg(249)  // light gray
-            case 2:  return ansi256Fg(244)  // medium gray
+            case 0: return ansi256Fg(252)  // near-white
+            case 1: return ansi256Fg(249)  // light gray
+            case 2: return ansi256Fg(244)  // medium gray
             default: return ansi256Fg(240)  // dark-but-readable gray (depth 3+)
             }
         } else {
             switch depth {
-            case 0:  return ansiBrightWhite   // \e[97m — bright white (closest wall)
-            case 1:  return ansiWhite         // \e[37m — standard white
-            default: return ansiDarkGray      // \e[90m — dark gray (depth 2+)
+            case 0: return ansiBrightWhite  // \e[97m — bright white (closest wall)
+            case 1: return ansiWhite  // \e[37m — standard white
+            default: return ansiDarkGray  // \e[90m — dark gray (depth 2+)
             }
         }
     }
@@ -683,16 +738,18 @@ final class Renderer {
     /// match the converging perspective structure of the ASCII frames.
     /// hasLeftWall/hasRightWall let callers suppress brightening on the open side
     /// (e.g. nearRight frames have no right outer wall).
-    private func regionColoredLine(_ line: String, sideColor: String, centerColor: String,
-                                    row: Int, hasLeftWall: Bool = true, hasRightWall: Bool = true,
-                                    hasFarRight: Bool = false, hasFarLeft: Bool = false) -> String {
+    private func regionColoredLine(
+        _ line: String, sideColor: String, centerColor: String,
+        row: Int, hasLeftWall: Bool = true, hasRightWall: Bool = true,
+        hasFarRight: Bool = false, hasFarLeft: Bool = false
+    ) -> String {
         let width = sideWallWidth(for: row)
         guard width > 0 else {
             return centerColor + line + ansiReset
         }
         let chars = Array(line)
         let n = chars.count
-        let leftW  = hasLeftWall  ? min(width, n) : 0
+        let leftW = hasLeftWall ? min(width, n) : 0
         let rightW = hasRightWall ? min(width, n) : 0
         let isFarRow = (3...8).contains(row)
         let farColor = depthColor(for: 1)
@@ -701,7 +758,7 @@ final class Renderer {
         // get D=1 tinting instead of D=0 side or center color.
         func colorFor(_ col: Int) -> String {
             if isFarRow && hasFarRight && col >= 53 && col < 56 { return farColor }
-            if isFarRow && hasFarLeft  && col >= 2  && col < 5  { return farColor }
+            if isFarRow && hasFarLeft && col >= 2 && col < 5 { return farColor }
             if col < leftW { return sideColor }
             if col >= n - rightW { return sideColor }
             return centerColor
@@ -729,8 +786,8 @@ final class Renderer {
         case 0, 12: return 1
         case 1, 11: return 2
         case 2, 10: return 3
-        case 3...9:  return 4
-        default:     return 0
+        case 3...9: return 4
+        default: return 0
         }
     }
 
