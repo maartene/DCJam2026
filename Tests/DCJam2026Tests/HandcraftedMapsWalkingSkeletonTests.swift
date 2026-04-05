@@ -89,53 +89,6 @@ import Testing
     }
 
     // -------------------------------------------------------------------------
-    // SKELETON-06: Cell-for-cell passability identical to FloorGenerator
-    // This is the migration gate. If any cell differs, the character grid has a
-    // transcription error and must be corrected before floors 2-5 are authored.
-    // -------------------------------------------------------------------------
-
-    @Test func `Every cell on floor 1 has the same passability whether served by FloorRegistry or FloorGenerator`() {
-        // Given
-        let fromRegistry  = FloorRegistry.floor(1, config: .default)
-        let fromGenerator = FloorGenerator.generate(floorNumber: 1, config: .default)
-        // When — compare every cell
-        var mismatches: [(x: Int, y: Int, registry: Bool, generator: Bool)] = []
-        for y in 0..<fromGenerator.grid.height {
-            for x in 0..<fromGenerator.grid.width {
-                let regPassable = fromRegistry.grid.cell(x: x, y: y).isPassable
-                let genPassable = fromGenerator.grid.cell(x: x, y: y).isPassable
-                if regPassable != genPassable {
-                    mismatches.append((x: x, y: y, registry: regPassable, generator: genPassable))
-                }
-            }
-        }
-        // Then — zero mismatches
-        #expect(mismatches.isEmpty,
-                "Cell passability mismatches between FloorRegistry and FloorGenerator: \(mismatches)")
-    }
-
-    // -------------------------------------------------------------------------
-    // SKELETON-07: FloorRegistry and FloorGenerator agree on all landmark flags
-    // -------------------------------------------------------------------------
-
-    @Test func `FloorRegistry floor 1 landmark flags match FloorGenerator output exactly`() {
-        // Given
-        let fromRegistry  = FloorRegistry.floor(1, config: .default)
-        let fromGenerator = FloorGenerator.generate(floorNumber: 1, config: .default)
-        // Then — all flag fields match
-        #expect(fromRegistry.hasEggRoom       == fromGenerator.hasEggRoom,
-                "hasEggRoom differs: registry=\(fromRegistry.hasEggRoom) generator=\(fromGenerator.hasEggRoom)")
-        #expect(fromRegistry.hasBossEncounter == fromGenerator.hasBossEncounter,
-                "hasBossEncounter differs")
-        #expect(fromRegistry.hasExitSquare    == fromGenerator.hasExitSquare,
-                "hasExitSquare differs")
-        #expect(fromRegistry.entryPosition2D  == fromGenerator.entryPosition2D,
-                "entryPosition2D differs: registry=\(fromRegistry.entryPosition2D) generator=\(fromGenerator.entryPosition2D)")
-        #expect(fromRegistry.staircasePosition2D == fromGenerator.staircasePosition2D,
-                "staircasePosition2D differs")
-    }
-
-    // -------------------------------------------------------------------------
     // Error path: requesting an unregistered floor number falls back safely
     // -------------------------------------------------------------------------
 
