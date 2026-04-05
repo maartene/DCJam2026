@@ -16,8 +16,8 @@ import Testing
             .withFacingDirection(.north)
             .withScreenMode(.dungeon)
         renderer.render(state)
-        // Player at (x:7, y:0); screenRow = 2 + (6 - 0) = 8, col = 61 + 7 = 68
-        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 68 }
+        // Player at (x:7, y:0); screenRow = 3 + (6 - 0) = 9, col = 61 + 7 = 68
+        let playerCellWrites = spy.entries.filter { $0.row == 9 && $0.col == 68 }
         let allText = playerCellWrites.map(\.string).joined()
         #expect(allText.contains("^"), "Expected '^' at player cell when facing north, got: \(allText)")
     }
@@ -29,7 +29,7 @@ import Testing
             .withFacingDirection(.east)
             .withScreenMode(.dungeon)
         renderer.render(state)
-        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 68 }
+        let playerCellWrites = spy.entries.filter { $0.row == 9 && $0.col == 68 }
         let allText = playerCellWrites.map(\.string).joined()
         #expect(allText.contains(">"), "Expected '>' at player cell when facing east, got: \(allText)")
     }
@@ -41,7 +41,7 @@ import Testing
             .withFacingDirection(.south)
             .withScreenMode(.dungeon)
         renderer.render(state)
-        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 68 }
+        let playerCellWrites = spy.entries.filter { $0.row == 9 && $0.col == 68 }
         let allText = playerCellWrites.map(\.string).joined()
         #expect(allText.contains("v"), "Expected 'v' at player cell when facing south, got: \(allText)")
     }
@@ -53,7 +53,7 @@ import Testing
             .withFacingDirection(.west)
             .withScreenMode(.dungeon)
         renderer.render(state)
-        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 68 }
+        let playerCellWrites = spy.entries.filter { $0.row == 9 && $0.col == 68 }
         let allText = playerCellWrites.map(\.string).joined()
         #expect(allText.contains("<"), "Expected '<' at player cell when facing west, got: \(allText)")
     }
@@ -66,8 +66,8 @@ import Testing
             .withFacingDirection(.north)
             .withScreenMode(.dungeon)
         renderer.render(state)
-        // Player at (7,3): screenRow = 2 + (6 - 3) = 5, col = 61 + 7 = 68
-        let playerCellWrites = spy.entries.filter { $0.row == 5 && $0.col == 68 }
+        // Player at (7,3): screenRow = 3 + (6 - 3) = 6, col = 61 + 7 = 68
+        let playerCellWrites = spy.entries.filter { $0.row == 6 && $0.col == 68 }
         let allText = playerCellWrites.map(\.string).joined()
         #expect(allText.contains("^"), "Expected '^' at encounter cell when player is there facing north, got: \(allText)")
     }
@@ -79,8 +79,8 @@ import Testing
             .withFacingDirection(.north)
             .withScreenMode(.dungeon)
         renderer.render(state)
-        // Player at (7,0): screenRow = 8, col = 68
-        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 68 }
+        // Player at (7,0): screenRow = 9, col = 68
+        let playerCellWrites = spy.entries.filter { $0.row == 9 && $0.col == 68 }
         let allText = playerCellWrites.map(\.string).joined()
         #expect(allText.contains("^"), "Expected '^' at entry cell when player is there facing north, got: \(allText)")
     }
@@ -92,8 +92,8 @@ import Testing
         let turnedState = RulesEngine.apply(command: .turn(.left), to: initialState, deltaTime: 0)
             .withScreenMode(.dungeon)
         renderer.render(turnedState)
-        // Player at (7,0): screenRow = 8, col = 68; after turning left from north, facing = west
-        let playerCellWrites = spy.entries.filter { $0.row == 8 && $0.col == 68 }
+        // Player at (7,0): screenRow = 9, col = 68; after turning left from north, facing = west
+        let playerCellWrites = spy.entries.filter { $0.row == 9 && $0.col == 68 }
         let allText = playerCellWrites.map(\.string).joined()
         #expect(allText.contains("<"), "Expected '<' at player cell after turning left (north->west), got: \(allText)")
     }
@@ -130,7 +130,7 @@ import Testing
     // Test Budget: 7 distinct behaviors x 2 = 14 max tests; 7 used.
 
     private func minimapCharAt(x: Int, y: Int, spy: TUIOutputSpy) -> Character? {
-        let targetRow = 2 + (6 - y)
+        let targetRow = 3 + (6 - y)
         let targetCol = 61 + x
         guard let entry = spy.entries.first(where: { $0.row == targetRow && $0.col == targetCol }) else {
             return nil

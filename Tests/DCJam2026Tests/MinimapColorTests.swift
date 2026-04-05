@@ -37,10 +37,10 @@ import Testing
     private let darkGray     = "\u{1B}[90m"
 
     // Returns the concatenated write string(s) for a specific minimap cell.
-    // With per-cell writes, each cell (x, y) is written at col = 61 + x, row = 2 + (gridHeight-1 - y).
+    // With per-cell writes, each cell (x, y) is written at col = 61 + x, row = 3 + (gridHeight-1 - y).
     // gridHeight for default floor = 7.
     private func cellContent(x: Int, y: Int, spy: TUIOutputSpy, gridHeight: Int = 7) -> String {
-        let targetRow = 2 + (gridHeight - 1 - y)
+        let targetRow = 3 + (gridHeight - 1 - y)
         let targetCol = 61 + x
         return spy.entries
             .filter { $0.row == targetRow && $0.col == targetCol }

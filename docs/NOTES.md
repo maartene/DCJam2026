@@ -2,6 +2,8 @@
 
 ## TODO
 - [ ] Dash moves 2 squares ahead. 3 brings you too close to the stairs in one turn. Thats confusing.
+- [ ] Egg should remove from (mini)map after picking it up.
+- [ ] When reaching the patio, the night sky is not visible. Fix: use the one from the narrative spike (spike2-narrative-overlay.swift)
 
 ## In progress
 
@@ -21,8 +23,6 @@
 - [X] BUG, Major: After defeating guard, he does not leave
 - [X] the boss should be a "bigger warden", not a cat. We're cleaning up after the human's mess, so the boss should be a bad a$$ human
 - [X] polish: legend for minimap (what do the symbols mean?)
-
-
 
 ## Licensed assets:
 The guard and boss sprites are from [Joan Stark's Ascii Art gallery](https://asciiart.website/mirrors/jgs/www.geocities.com/SoHo/7373/indexjava.html)

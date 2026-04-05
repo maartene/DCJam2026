@@ -86,7 +86,7 @@ import Testing
         let spy = TUIOutputSpy()
         Renderer(output: spy).render(afterDefeat)
         // Then — the encounter cell renders as "." (corridor), not "G"
-        let targetRow = 2 + (6 - encounterPos.y)
+        let targetRow = 3 + (6 - encounterPos.y)
         let targetCol = 61 + encounterPos.x
         let cellWrites = spy.entries.filter { $0.row == targetRow && $0.col == targetCol }
         let allText = cellWrites.map(\.string).joined()
@@ -117,7 +117,7 @@ import Testing
         let spy = TUIOutputSpy()
         Renderer(output: spy).render(afterDefeat)
         // Then — boss cell shows "." not "B"
-        let targetRow = 2 + (6 - bossPos.y)
+        let targetRow = 3 + (6 - bossPos.y)
         let targetCol = 61 + bossPos.x
         let cellWrites = spy.entries.filter { $0.row == targetRow && $0.col == targetCol }
         let allText = cellWrites.map(\.string).joined()
@@ -205,7 +205,7 @@ import Testing
         // Then — minimap still shows "G" at the encounter cell (guard not cleared)
         let spy = TUIOutputSpy()
         Renderer(output: spy).render(afterDash)
-        let targetRow = 2 + (6 - encounterPos.y)
+        let targetRow = 3 + (6 - encounterPos.y)
         let targetCol = 61 + encounterPos.x
         let cellWrites = spy.entries.filter { $0.row == targetRow && $0.col == targetCol }
         let allText = cellWrites.map(\.string).joined()
@@ -266,7 +266,7 @@ import Testing
         // Then — the guard cell shows "G", not "."
         let floor = FloorGenerator.generate(floorNumber: 1, config: config)
         let encounterPos = floor.encounterPosition2D!
-        let targetRow = 2 + (6 - encounterPos.y)
+        let targetRow = 3 + (6 - encounterPos.y)
         let targetCol = 61 + encounterPos.x
         let cellWrites = spy.entries.filter { $0.row == targetRow && $0.col == targetCol }
         let allText = cellWrites.map(\.string).joined()

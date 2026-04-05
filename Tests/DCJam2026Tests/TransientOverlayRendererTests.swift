@@ -213,6 +213,6 @@ import Testing
         Renderer(output: spy).render(state)
 
         let allText = spy.entries.map { $0.string }.joined()
-        #expect(allText.contains("I breathe deep"))
+        #expect(allText.contains("One deep breath and the air ignites."))
     }
 }

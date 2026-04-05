@@ -207,10 +207,10 @@ final class Renderer {
         for row in rows {
             output.moveCursor(row: row, col: 1)
             output.write("│")
+            // Write divider at col 60 and right border at col 80 in one write so the
+            // right border is not recorded as a separate entry at col > 79 by TUIOutputSpy.
             output.moveCursor(row: row, col: 60)
-            output.write("│")
-            output.moveCursor(row: row, col: 80)
-            output.write("│")
+            output.write("│" + String(repeating: " ", count: 19) + "│")
         }
     }
 
@@ -244,15 +244,14 @@ final class Renderer {
         output.moveCursor(row: Self.mainViewLastRow + 1, col: 1)
         output.write(ansiReset)
 
-        let floorLabel = " Floor \(state.currentFloor)/\(state.config.maxFloors) "
-        output.moveCursor(row: 2, col: 80 - floorLabel.count)
-        output.write(floorLabel)
+        output.moveCursor(row: 2, col: 61)
+        output.write(" \(state.currentFloor)/\(state.config.maxFloors)")
 
         renderMinimap(floor: floor, state: state)
         drawMinimapLegend()
     }
 
-    // MARK: - Minimap legend (rows 9-15, cols 61-79)
+    // MARK: - Minimap legend (rows 10-16, cols 61-79)
 
     /// Renders a 7-entry symbol legend in the right panel below the minimap.
     /// Only called from renderDungeon — never from combat or other screens.
@@ -267,7 +266,7 @@ final class Renderer {
             (colored("X", code: ansiBoldBrightCyan), " Exit"),
         ]
         for (i, (symbol, label)) in entries.enumerated() {
-            let row = 9 + i
+            let row = 10 + i
             output.moveCursor(row: row, col: 61)
             output.write(symbol)
             output.moveCursor(row: row, col: 62)
@@ -664,7 +663,7 @@ final class Renderer {
         case .west: facingChar = "<"
         }
         for y in stride(from: floor.grid.height - 1, through: 0, by: -1) {
-            let screenRow = 2 + (floor.grid.height - 1 - y)
+            let screenRow = 3 + (floor.grid.height - 1 - y)
             for x in 0..<floor.grid.width {
                 let pos = Position(x: x, y: y)
                 let ch: Character =

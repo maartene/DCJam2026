@@ -8,7 +8,7 @@ import Testing
 //               All tests observe what the renderer writes to the terminal via the port.
 //
 // Story: In dungeon navigation mode, the right panel shows a compact legend below the
-// minimap (rows 9-15, cols 61-79). Each entry shows the minimap symbol in its correct
+// minimap (rows 10-16, cols 61-79). Each entry shows the minimap symbol in its correct
 // colour and a plain-text label. The legend is invisible in all other screen modes.
 // Row 17 (the status bar separator) must not be overwritten.
 //
@@ -34,7 +34,7 @@ import Testing
         let spy = TUIOutputSpy()
         Renderer(output: spy).render(state)
         // Then — the legend region (rows 9-15, cols 61-79) contains all 7 expected labels
-        let legendWrites = spy.entries.filter { (9...15).contains($0.row) && (61...79).contains($0.col) }
+        let legendWrites = spy.entries.filter { (10...16).contains($0.row) && (61...79).contains($0.col) }
         let legendText = legendWrites.map(\.string).joined()
         let stripped = stripANSI(legendText)
         #expect(stripped.contains("You"),    "Legend must contain 'You' entry")
@@ -58,7 +58,7 @@ import Testing
         let state = GameState.initial(config: .default).withScreenMode(.dungeon)
         let spy = TUIOutputSpy()
         Renderer(output: spy).render(state)
-        let legendWrites = spy.entries.filter { (9...15).contains($0.row) && (61...79).contains($0.col) }
+        let legendWrites = spy.entries.filter { (10...16).contains($0.row) && (61...79).contains($0.col) }
         let legendText = legendWrites.map(\.string).joined()
         let stripped = stripANSI(legendText)
         #expect(stripped.contains("^"), "Legend must contain '^' symbol for You")
@@ -75,29 +75,29 @@ import Testing
         let state = GameState.initial(config: .default).withScreenMode(.dungeon)
         let spy = TUIOutputSpy()
         Renderer(output: spy).render(state)
-        // Row 9 is the "You" entry; find writes to row 9 in the legend region
-        let row9Writes = spy.entries.filter { $0.row == 9 && (61...79).contains($0.col) }
+        // Row 10 is the "You" entry; find writes to row 10 in the legend region
+        let row9Writes = spy.entries.filter { $0.row == 10 && (61...79).contains($0.col) }
         let row9Text = row9Writes.map(\.string).joined()
         // Bold bright white = ESC[1;97m or ESC[1m combined with 37 or 97
         // The presence of an ESC sequence followed by "^" confirms coloured rendering
-        #expect(row9Text.contains("^"), "Row 9 (You) must contain the '^' symbol")
-        #expect(row9Text.contains("\u{1B}"), "Row 9 (You) must contain an ANSI colour sequence for the symbol")
+        #expect(row9Text.contains("^"), "Row 10 (You) must contain the '^' symbol")
+        #expect(row9Text.contains("\u{1B}"), "Row 10 (You) must contain an ANSI colour sequence for the symbol")
     }
 
-    // GPF-03-H3: Legend is contained within 7 rows (9-15); row 16 is not written to by legend content
-    @Test func `Legend occupies exactly rows 9-15 — row 16 contains no legend labels`() {
+    // GPF-03-H3: Legend is contained within 7 rows (10-16); row 17 is not written to by legend content
+    @Test func `Legend occupies exactly rows 10-16 — row 17 contains no legend labels`() {
         let state = GameState.initial(config: .default).withScreenMode(.dungeon)
         let spy = TUIOutputSpy()
         Renderer(output: spy).render(state)
-        // Row 16 must not contain any of the legend label words
-        let row16Writes = spy.entries.filter { $0.row == 16 && (61...79).contains($0.col) }
+        // Row 17 must not contain any of the legend label words
+        let row16Writes = spy.entries.filter { $0.row == 17 && (61...79).contains($0.col) }
         let row16Text = row16Writes.map(\.string).joined()
         let stripped = stripANSI(row16Text)
-        #expect(!stripped.contains("Guard"),  "Row 16 must not contain legend label 'Guard'")
-        #expect(!stripped.contains("Boss"),   "Row 16 must not contain legend label 'Boss'")
-        #expect(!stripped.contains("Stairs"), "Row 16 must not contain legend label 'Stairs'")
-        #expect(!stripped.contains("Entry"),  "Row 16 must not contain legend label 'Entry'")
-        #expect(!stripped.contains("Exit"),   "Row 16 must not contain legend label 'Exit'")
+        #expect(!stripped.contains("Guard"),  "Row 17 must not contain legend label 'Guard'")
+        #expect(!stripped.contains("Boss"),   "Row 17 must not contain legend label 'Boss'")
+        #expect(!stripped.contains("Stairs"), "Row 17 must not contain legend label 'Stairs'")
+        #expect(!stripped.contains("Entry"),  "Row 17 must not contain legend label 'Entry'")
+        #expect(!stripped.contains("Exit"),   "Row 17 must not contain legend label 'Exit'")
     }
 
     // GPF-03-H4: Legend renders on every dungeon floor (floor 2 with egg room present)
@@ -107,7 +107,7 @@ import Testing
             .withScreenMode(.dungeon)
         let spy = TUIOutputSpy()
         Renderer(output: spy).render(state)
-        let legendWrites = spy.entries.filter { (9...15).contains($0.row) && (61...79).contains($0.col) }
+        let legendWrites = spy.entries.filter { (10...16).contains($0.row) && (61...79).contains($0.col) }
         let legendText = legendWrites.map(\.string).joined()
         let stripped = stripANSI(legendText)
         #expect(stripped.contains("Egg"), "Legend must still show 'Egg' entry on floor 2")
@@ -122,7 +122,7 @@ import Testing
             .withScreenMode(.dungeon)
         let spy = TUIOutputSpy()
         Renderer(output: spy).render(state)
-        let legendWrites = spy.entries.filter { (9...15).contains($0.row) && (61...79).contains($0.col) }
+        let legendWrites = spy.entries.filter { (10...16).contains($0.row) && (61...79).contains($0.col) }
         let legendText = legendWrites.map(\.string).joined()
         let stripped = stripANSI(legendText)
         #expect(stripped.contains("Exit"), "Legend must show 'Exit' entry on the final floor")
@@ -146,7 +146,7 @@ import Testing
         let spy = TUIOutputSpy()
         Renderer(output: spy).render(state)
         // Then — no legend labels appear in the right panel region
-        let rightPanelWrites = spy.entries.filter { (9...15).contains($0.row) && (61...79).contains($0.col) }
+        let rightPanelWrites = spy.entries.filter { (10...16).contains($0.row) && (61...79).contains($0.col) }
         let rightPanelText = rightPanelWrites.map(\.string).joined()
         let stripped = stripANSI(rightPanelText)
         #expect(!stripped.contains("Guard"),  "Legend must not appear in combat mode")
@@ -176,7 +176,7 @@ import Testing
         let state = GameState.initial(config: .default).withScreenMode(.deathState)
         let spy = TUIOutputSpy()
         Renderer(output: spy).render(state)
-        let rightPanelWrites = spy.entries.filter { (9...15).contains($0.row) && (61...79).contains($0.col) }
+        let rightPanelWrites = spy.entries.filter { (10...16).contains($0.row) && (61...79).contains($0.col) }
         let text = rightPanelWrites.map(\.string).joined()
         let stripped = stripANSI(text)
         #expect(!stripped.contains("Guard"),  "Legend must not appear on the death screen")
@@ -188,7 +188,7 @@ import Testing
         let state = GameState.initial(config: .default).withScreenMode(.winState)
         let spy = TUIOutputSpy()
         Renderer(output: spy).render(state)
-        let rightPanelWrites = spy.entries.filter { (9...15).contains($0.row) && (61...79).contains($0.col) }
+        let rightPanelWrites = spy.entries.filter { (10...16).contains($0.row) && (61...79).contains($0.col) }
         let text = rightPanelWrites.map(\.string).joined()
         let stripped = stripANSI(text)
         #expect(!stripped.contains("Guard"),  "Legend must not appear on the win screen")

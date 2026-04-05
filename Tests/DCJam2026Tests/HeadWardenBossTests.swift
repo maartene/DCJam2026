@@ -96,7 +96,7 @@ import Testing
         let spy = TUIOutputSpy()
         Renderer(output: spy).render(state)
         // Boss encounter cell on the minimap must still show "B"
-        let targetRow = 2 + (6 - bossPos.y)
+        let targetRow = 3 + (6 - bossPos.y)
         let targetCol = 61 + bossPos.x
         let cellWrites = spy.entries.filter { $0.row == targetRow && $0.col == targetCol }
         let allText = cellWrites.map(\.string).joined()
