@@ -15,17 +15,14 @@
 <body>
   <div id="terminal"></div>
   <script>
-    const term = new Terminal({ cursorBlink: true, fontFamily: 'monospace', fontSize: 16 })
+    const COLS = 80
+    const ROWS = 25
+    const term = new Terminal({ cursorBlink: true, fontFamily: 'monospace', fontSize: 16, cols: COLS, rows: ROWS, scrollback: 0 })
     term.open(document.getElementById('terminal'))
 
     const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const ws = new WebSocket(`${wsProtocol}//${location.host}/game`)
+    const ws = new WebSocket(`${wsProtocol}//${location.host}/game?cols=${COLS}&rows=${ROWS}`)
     ws.binaryType = 'arraybuffer'
-
-    ws.addEventListener('open', () => {
-      const dims = { cols: term.cols, rows: term.rows }
-      ws.send(JSON.stringify(dims))
-    })
 
     ws.addEventListener('message', event => {
       const data = event.data instanceof ArrayBuffer
