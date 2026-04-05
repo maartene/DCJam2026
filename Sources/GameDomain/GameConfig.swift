@@ -25,7 +25,7 @@ public struct GameConfig: Sendable {
         enemyAttackInterval: 2.0,
         braceWindowDuration: 0.5,
         braceCooldownSeconds: 1.5,
-        braceSpecialBonus: 0.15,
+        braceSpecialBonus: 0.25,
         upgradeChoiceCount: 3
     )
 

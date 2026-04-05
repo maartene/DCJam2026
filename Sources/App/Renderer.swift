@@ -356,7 +356,7 @@ final class Renderer {
         output.write(pad78(centered("* * *  \(title)  * * *", width: 78)))
         for (i, line) in body.enumerated() {
             output.moveCursor(row: 7 + i, col: 2)
-            output.write(pad78(line))
+            output.write(pad78(centeredAnsi(line, width: 78)))
         }
         output.moveCursor(row: 14, col: 2)
         output.write(pad78(centered("[ Press SPACE to continue ]", width: 78)))
@@ -369,18 +369,16 @@ final class Renderer {
                 "THE EGG",
                 [
                     "",
-                    "  " + colored("~ My egg. ~", code: ansiBrightYellow),
-                    "  " + colored(#"     ---     "#, code: ansiYellow),
-                    "  " + colored(#"    /  O\     "#, code: ansiYellow),
-                    "  " + colored(#"   |) o  |   "#, code: ansiYellow),
-                    "  " + colored(#"   | o  O|   "#, code: ansiYellow),
-                    "  " + colored(#"    \__(/     "#, code: ansiYellow),
+                    colored("~ My egg. ~", code: ansiBrightYellow),
+                    colored(#"  ---  "#, code: ansiYellow),
+                    colored(#" /  O\ "#, code: ansiYellow),
+                    colored(#"|) o  |"#, code: ansiYellow),
+                    colored(#"| o  O|"#, code: ansiYellow),
+                    colored(#" \__( /"#, code: ansiYellow),
                     "",
-                    "  "
-                        + colored(
-                            "Warm. Alive. Pulsing against your scales.", code: ansiBoldBrightWhite),
+                    colored("Warm. Alive. Pulsing against your scales.", code: ansiBoldBrightWhite),
                     "",
-                    "  " + colored("\"They almost had you. Almost.\"", code: ansiDarkGray),
+                    colored("\"They almost had you. Almost.\"", code: ansiDarkGray),
                 ]
             )
         case .exitPatio:
@@ -388,15 +386,14 @@ final class Renderer {
                 "THE PATIO",
                 [
                     "",
-                    "  " + colored("The sky.", code: ansiBrightCyan)
-                        + "  " + colored("Open. Endless. Yours.", code: ansiBrightCyan),
+                    colored("The sky.  Open. Endless. Yours.", code: ansiBrightCyan),
                     "",
-                    "  " + colored("       *    .  *       .        ", code: ansiBrightWhite),
-                    "  " + colored("  .         .              .    ", code: ansiBrightWhite),
-                    "  " + colored("      .    *       .            ", code: ansiBrightWhite),
-                    "  " + colored("  *        .    .       *       ", code: ansiBrightWhite),
+                    colored("       *    .  *       .        ", code: ansiBrightWhite),
+                    colored("  .         .              .    ", code: ansiBrightWhite),
+                    colored("      .    *       .            ", code: ansiBrightWhite),
+                    colored("  *        .    .       *       ", code: ansiBrightWhite),
                     "",
-                    "  " + colored("Home is a long flight from here. But you are free.", code: ansiBrightWhite),
+                    colored("Home is a long flight from here. But you are free.", code: ansiBrightWhite),
                 ]
             )
         case .specialAttack:
@@ -776,6 +773,14 @@ final class Renderer {
         let count = s.count
         guard count < width else { return String(s.prefix(width)) }
         let padding = (width - count) / 2
+        return String(repeating: " ", count: padding) + s
+    }
+
+    /// Centers a string that may contain ANSI escape sequences, using visible length.
+    private func centeredAnsi(_ s: String, width: Int) -> String {
+        let visible = visibleLength(s)
+        guard visible < width else { return s }
+        let padding = (width - visible) / 2
         return String(repeating: " ", count: padding) + s
     }
 }
