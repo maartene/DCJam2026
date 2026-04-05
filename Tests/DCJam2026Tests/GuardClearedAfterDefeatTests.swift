@@ -34,7 +34,7 @@ import Testing
     @Test func `Ember can walk into a previously defeated guard cell without entering combat`() {
         // Given — Ember has defeated the guard at the encounter cell on floor 1
         let config = GameConfig.default
-        let floor = FloorGenerator.generate(floorNumber: 1, config: config)
+        let floor = FloorRegistry.floor(1, config: config)
         var state = GameState.initial(config: config)
             .withPlayerPosition(floor.encounterPosition2D!)
             .withScreenMode(.dungeon)
@@ -72,7 +72,7 @@ import Testing
     @Test func `Minimap shows a corridor symbol at the guard cell after the guard is defeated`() throws {
         // Given — guard defeated on floor 1
         let config = GameConfig.default
-        let floor = FloorGenerator.generate(floorNumber: 1, config: config)
+        let floor = FloorRegistry.floor(1, config: config)
         let encounterPos = floor.encounterPosition2D!
         var state = GameState.initial(config: config)
             .withScreenMode(.combat(encounter: EncounterModel.guard(isBossEncounter: false)))
@@ -130,7 +130,7 @@ import Testing
     @Test func `Walking into a cleared guard cell keeps Ember in dungeon navigation mode`() {
         // Given — guard cell cleared
         let config = GameConfig.default
-        let floor = FloorGenerator.generate(floorNumber: 1, config: config)
+        let floor = FloorRegistry.floor(1, config: config)
         let encounterPos = floor.encounterPosition2D!
         var state = GameState.initial(config: config)
             .withScreenMode(.combat(encounter: EncounterModel.guard(isBossEncounter: false)))
@@ -192,7 +192,7 @@ import Testing
     @Test func `Dashing past a guard leaves the guard on the minimap — guard cell was not cleared`() {
         // Given — Ember enters a guard encounter and uses Dash to escape
         let config = GameConfig.default
-        let floor = FloorGenerator.generate(floorNumber: 1, config: config)
+        let floor = FloorRegistry.floor(1, config: config)
         let encounterPos = floor.encounterPosition2D!
         var state = GameState.initial(config: config)
         state = state.withPlayerPosition(Position(x: encounterPos.x, y: encounterPos.y - 1))
@@ -219,7 +219,7 @@ import Testing
     @Test func `Walking into an undefeated guard cell triggers combat`() {
         // Given — Ember has not fought the guard; the cell is uncleared
         let config = GameConfig.default
-        let floor = FloorGenerator.generate(floorNumber: 1, config: config)
+        let floor = FloorRegistry.floor(1, config: config)
         let encounterPos = floor.encounterPosition2D!
         let state = GameState.initial(config: config)
             .withPlayerPosition(Position(x: encounterPos.x, y: encounterPos.y - 1))
@@ -238,7 +238,7 @@ import Testing
     @Test func `Returning to a guard cell Dashed past triggers combat again`() {
         // Given — Ember Dashed past the guard (guard bypassed, not defeated)
         let config = GameConfig.default
-        let floor = FloorGenerator.generate(floorNumber: 1, config: config)
+        let floor = FloorRegistry.floor(1, config: config)
         let encounterPos = floor.encounterPosition2D!
         var state = GameState.initial(config: config)
         state = state.withScreenMode(.combat(encounter: EncounterModel.guard(isBossEncounter: false)))
@@ -265,7 +265,7 @@ import Testing
         let spy = TUIOutputSpy()
         Renderer(output: spy).render(state)
         // Then — the guard cell shows "G", not "."
-        let floor = FloorGenerator.generate(floorNumber: 1, config: config)
+        let floor = FloorRegistry.floor(1, config: config)
         let encounterPos = floor.encounterPosition2D!
         let targetRow = 3 + (6 - encounterPos.y)
         let targetCol = 61 + encounterPos.x
@@ -280,7 +280,7 @@ import Testing
         // Given — Ember has defeated the boss on floor 5
         let config = GameConfig.default
         let finalFloor = config.maxFloors
-        let floor = FloorGenerator.generate(floorNumber: finalFloor, config: config)
+        let floor = FloorRegistry.floor(finalFloor, config: config)
         // Pre-weaken the boss to 40 HP so one Special (60 damage) defeats it in one hit
         let weakBoss = EncounterModel(isBossEncounter: true, enemyHP: 40, enemyAttackTimer: GameConfig.default.enemyAttackInterval)
         let state = GameState.initial(config: config)
