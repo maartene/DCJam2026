@@ -21,7 +21,7 @@ import Testing
         var state = GameState.initial(config: GameConfig.default)
         state = state.withCurrentFloor(2)
         state = state.withHasEgg(false)
-        let floor2 = FloorGenerator.generate(floorNumber: 2, config: GameConfig.default)
+        let floor2 = FloorRegistry.floor(2, config: GameConfig.default)
         state = state.withPlayerPosition(adjacentToEggRoom(floor2))
             .withFacingDirection(.south)
         // When — step into egg room
@@ -90,7 +90,7 @@ import Testing
         // Given — Ember is on floor 1, standing adjacent to the staircase
         var state = GameState.initial(config: GameConfig.default)
         state = state.withCurrentFloor(1).withScreenMode(.dungeon)
-        let floor1 = FloorGenerator.generate(floorNumber: 1, config: GameConfig.default)
+        let floor1 = FloorRegistry.floor(1, config: GameConfig.default)
         // Position one step before the staircase (staircase is at y=6, so stand at y=5 facing north = +y)
         let beforeStaircase = Position(x: floor1.staircasePosition2D.x, y: floor1.staircasePosition2D.y - 1)
         state = state.withPlayerPosition(beforeStaircase).withFacingDirection(.north)
@@ -137,7 +137,7 @@ import Testing
         state = state.withCurrentFloor(2).withScreenMode(.dungeon)
         // Floor 2 is the final floor with maxFloors=2, so it has hasExitSquare=true
         // and NO staircase trigger — movement returns dungeon directly.
-        let floor2 = FloorGenerator.generate(floorNumber: 2, config: config)
+        let floor2 = FloorRegistry.floor(2, config: config)
         // Place Ember adjacent to what would be the staircase cell and step forward
         let nearExit = Position(x: floor2.staircasePosition2D.x, y: floor2.staircasePosition2D.y - 1)
         state = state.withPlayerPosition(nearExit).withFacingDirection(.north)
