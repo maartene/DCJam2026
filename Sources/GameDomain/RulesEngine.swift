@@ -238,10 +238,15 @@ public enum RulesEngine {
 
         let newCharges = state.dashCharges - 1
         let newTimer = state.timerModel.addingCooldown(duration: state.config.dashCooldownSeconds)
+        let facing = state.facingDirection.forwardDelta
+        let newPos = Position(
+            x: state.playerPosition.x + facing.dx * Self.dashAdvanceSquares,
+            y: state.playerPosition.y + facing.dy * Self.dashAdvanceSquares
+        )
         return state
             .withDashCharges(newCharges)
             .withTimerModel(newTimer)
-            .withPlayerPosition(state.playerPosition + dashAdvanceSquares)
+            .withPlayerPosition(newPos)
             .withScreenMode(.dungeon)
             .withRecentDash(true)
             .withTransientOverlay(.dash(framesRemaining: TransientOverlay.defaultDuration))

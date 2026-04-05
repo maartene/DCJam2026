@@ -113,6 +113,38 @@ import Testing
         #expect(result.dashCharges == 2)
     }
 
+    // MARK: - Facing direction: Dash moves in the direction Ember faces
+
+    @Test func `Dashing while facing East moves Ember 2 squares east, not north`() {
+        // Given — Ember is in a regular encounter, facing East
+        var state = gameStateInRegularEncounter(dashCharges: 2)
+        state = state.withFacingDirection(.east)
+        let positionBefore = state.playerPosition
+        // When
+        let result = RulesEngine.apply(command: .dash, to: state, deltaTime: 0.0)
+        // Then — x increases by 2, y is unchanged
+        #expect(result.playerPosition == Position(x: positionBefore.x + 2, y: positionBefore.y))
+    }
+
+    @Test("Dash moves Ember 2 squares in the facing direction",
+          arguments: [
+            (CardinalDirection.north, 0,  2),
+            (CardinalDirection.south, 0, -2),
+            (CardinalDirection.east,  2,  0),
+            (CardinalDirection.west, -2,  0),
+          ])
+    func dashMovesInFacingDirection(facing: CardinalDirection, dx: Int, dy: Int) {
+        // Given
+        var state = gameStateInRegularEncounter(dashCharges: 2)
+        state = state.withFacingDirection(facing)
+        let positionBefore = state.playerPosition
+        // When
+        let result = RulesEngine.apply(command: .dash, to: state, deltaTime: 0.0)
+        // Then
+        let expected = Position(x: positionBefore.x + dx, y: positionBefore.y + dy)
+        #expect(result.playerPosition == expected)
+    }
+
     @Test func `Dash blocking is controlled by the boss encounter flag, not by the floor number`() {
         // Given — regular encounter on Floor 5 (not boss; flag is false)
         var state = GameState.initial(config: GameConfig.default)
